@@ -4,27 +4,27 @@ title: About
 ---
 
 你好哇，来访者👋
-
+<br>
 这是我的个人博客网站。这些博客不为任何人创作。只是将我在日常生活中学到或思考的内容记录。更多博客参阅：[语雀：我的知识库](https://www.yuque.com/u41117719/xd1qgc)
-
+<br>
 关于我:
-
+<br>
 - 来自中国
 - 软件工程大四学生
 - 正在准备秋季校园招聘
 
-
+<br>
 
 最近，我入门并参加了开源项目，并打算长期致力于开源世界
 此外，我还在业余时间练习弹钢琴和吉他，还有足球。好吧我上一次踢足球已经是两年前了，但仍旧感兴趣，这就够了。
-
+<br>
 我的一些项目:
-
+<br>
 - [CloudShare](https://github.com/Juzi-xyhao/CloudShare): 我的个人开源项目
 - [Vectorizing-SM3-Report-Documents](https://github.com/Juzi-xyhao/Vectorizing-SM3-Report-Documents): 参加开源活动产出的文档
 - ...
-
+  <br>
 从这找到我:
-
+  <br>
 - ⌨️ GitHub: [Juzi-xyhao](https://github.com/Juzi-xyhao)
 - ...
