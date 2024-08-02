@@ -3,3 +3,8 @@
 .sass-cache
 _site
 Gemfile.lock
+/.idea/.gitignore
+/.idea/Juzi-xyhao.github.io.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
