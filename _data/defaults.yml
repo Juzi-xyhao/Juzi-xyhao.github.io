@@ -1,4 +1,10 @@
+#home:
+#  heading: "Your awesome heading"
+#  subheading: "Your awesome subheading"
+#  banner: "Your image url"
+# Page default value
+
 home:
-  heading: "Your awesome heading"
-  subheading: "Your awesome subheading"
-  banner: "Your image url"
+  heading: "Learning to be good at thinking, thinking, thinking."
+  subheading: "Try not to become a man of success, but rather try to become a man of value."
+  banner: ""
