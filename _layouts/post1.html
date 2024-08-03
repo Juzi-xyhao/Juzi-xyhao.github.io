@@ -6,8 +6,8 @@ sidebar:
 - article-menu
 ---
 
-<div class="container">
-  <section class="post">
+<div class="post">
+  <section>
     {%- assign name = 'banner' -%}
     {%- include functions.html func='get_value' -%}
     {%- assign banner = return -%}
@@ -88,24 +88,6 @@ sidebar:
   </section>
 </div>
 
-<style>
-  .container {
-    display: flex;
-  }
-
-  .post {
-    flex-grow: 1;
-    width: 1000px; /* Subtract the sidebar width from 100% */
-    /* Add any other styles you need for the post section */
-  }
-
-  .sidebar {
-    width: 300px;
-    position: sticky;
-    top: 0;
-    /* Add any other styles you need for the sidebar section */
-  }
-</style>
 
 
 
