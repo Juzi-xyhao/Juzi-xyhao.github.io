@@ -11,7 +11,7 @@ tags: JVM Java
 top: 1
 ---
 
-> > 这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读  
+> 这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读  
 > [GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现](https://mp.weixin.qq.com/s/kEqBut3gcV9RM86DAMJLRA)  
 > 本文档讨论的动态、静态编译仅限于java语言  
 > 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
