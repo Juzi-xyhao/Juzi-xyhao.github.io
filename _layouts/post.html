@@ -215,6 +215,29 @@ sidebar:
   </section>
 </div>
 
+<script>
+  // Function to check if the title contains "About" and hide/show the sidebar accordingly
+  function toggleSidebarVisibility() {
+    const titleElement = document.querySelector('title');
+    const titleText = titleElement.textContent || titleElement.innerText;
+
+    const sidebar = document.getElementById('sidebar');
+
+    if (titleText.includes('About')) {
+      sidebar.style.display = 'none';
+    } else {
+      sidebar.style.display = 'block';
+    }
+  }
+
+  // Call the function to set the initial state
+  toggleSidebarVisibility();
+
+  // Optionally, listen for changes in the title and update the sidebar visibility
+  // This is useful if the title might change dynamically after the page loads
+  document.title = document.title; // Trigger the change event for initial setup
+  document.addEventListener('titlechange', toggleSidebarVisibility);
+</script>
 
 <style>
   .container {

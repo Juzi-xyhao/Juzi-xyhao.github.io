@@ -214,8 +214,8 @@ paginate: 10
 #     color: "#bbb"
 
 # Disqus comments
-disqus:
-   shortname: "xyhao"
+#disqus:
+#   shortname: "xyhao"
 
 # Gitment 注释
 # gitment:
