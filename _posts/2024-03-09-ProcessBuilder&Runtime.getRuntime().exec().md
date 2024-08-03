@@ -11,11 +11,11 @@ tags: Java 命令
 top: 1
 sidebar: []
 ---
->> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
+> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
 <br>
 
->> 我的网盘程序部署在服务器上，前端资源通过nginx托管。但不知为何，nginx总是每隔几天就被kill了。所以我在后台程序内部搞了一个定时任务<br>
+> 我的网盘程序部署在服务器上，前端资源通过nginx托管。但不知为何，nginx总是每隔几天就被kill了。所以我在后台程序内部搞了一个定时任务<br>
 > 每隔一段时间重启nginx。执行重启命令使用了Runtime.exec方法。但后来在实习过程中发现公司的项目里执行命令行命令使用了ProcessBuilder。<br>
 > 于是我研究（GPT）了一下两者的区别，并写下这篇笔记。
 
