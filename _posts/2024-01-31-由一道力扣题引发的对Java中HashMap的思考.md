@@ -111,7 +111,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 }
 ```
 
-![](../assets/articleSource/2024-01-31-HashMap/img.png)<br />
+![](/assets/articleSource/2024-01-31-HashMap/img.png)<br />
 可以看到，在执行putVal方法之前，会调用native方法hashCode得到哈希值，由于这个方法会让每一个不同的对象都得到不同的哈希值，如果我们希望两个内存地址不同但相同内容的数组的哈希值也相等，就必须重写hashCode方法，使得相同内容的数组的哈希值也相等。<br />Java为许多常用的数据类型重写了hashCode()方法,使它们只要内容相同哈希值就也相同，比如String，Integer，Double等。比如在Integer类中哈希值就是其int类型的数据。
 ```java
 
