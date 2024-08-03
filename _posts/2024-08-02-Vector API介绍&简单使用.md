@@ -16,7 +16,7 @@ banner:
   min_height: "38vh"
   heading_style: "font-size: 4.25em; font-weight: bold; text-decoration: underline"
   subheading_style: "color: gold"
-tags: java Vector
+tags: Java Vector
 top: 1
 sidebar: []
 ---
@@ -63,12 +63,12 @@ offset表示从数组第几位开始写入。
 `IntVector fromArray(VectorSpecies<Integer> species,int[] a, int offset,VectorMask<Integer> m)`<br />
 多传入一个mask变量，即可做到即使`offset >= array.length - Species.length`，也能转化为向量。但需要`offset < array.length`<br />
 mask变量使用示例如下：
-```
+```java
 /*
     SPECIES.length() = 16
     Array.length = 35
 */
-for (i = 0; i < Array.length; i += SPECIES.length()) {
+for (int i = 0; i < Array.length; i += SPECIES.length()) {
   var mask = SPECIES.indexInRange(i, w.length);
   IntVector v = IntVector.fromArray(SPECIES, Array, i - 16, mask);
 }
@@ -78,7 +78,7 @@ for (i = 0; i < Array.length; i += SPECIES.length()) {
 <a name="xV4bn"></a>
 ### lanwise方法
 lanewise直接翻译就是车道交叉。在Vector API中，向量被视为车道，不同向量之间的运算被视为车道交叉。<br />简单的加减乘除，在`jdk.incubator.vector.Vector`类中已经封装了。<br />例如：
-```
+```java
 var va = IntVector.fromArray(SPECIES, a, i);
 var vb = IntVector.fromArray(SPECIES, b, i);
 var vc = va.add(vb);
@@ -104,7 +104,7 @@ int sum = v2.reduceLanes(VectorOperators.ADD);
 <a name="ZdbWo"></a>
 ## 如何编译运行使用了Vector API的代码？
 由于Vector API至今仍处于孵化期，直接使用必然报错。需要在编译时指定两个参数`--enable-preview`和`--add-modules=jdk.incubator.vector`。<br />在哪里指定？<br />网络上一些博客说的在pom文件中添加编译参数：
-```
+```xml
 <build>
         <plugins>
             <plugin>

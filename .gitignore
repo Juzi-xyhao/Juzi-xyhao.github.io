@@ -8,3 +8,6 @@ Gemfile.lock
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/vcs.xml
+Third.java
+/out/
+/.idea/
