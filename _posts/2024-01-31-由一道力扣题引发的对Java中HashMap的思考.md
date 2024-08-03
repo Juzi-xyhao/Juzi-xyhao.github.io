@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 哈希表成环问题
+title: 2024-01-31-由一道力扣题引发的对Java中HashMap的思考
 subtitle: A awesome static site generator.
 author: xyhao
 categories: Java
@@ -11,6 +11,9 @@ tags: Java HashMap
 top: 1
 sidebar: []
 ---
+>> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
+
+<br>
 
 哈希表插入是在尾节点插入，因为需要遍历哈希桶内所有链表节点判断重复
 
@@ -107,7 +110,9 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     return null;
 }
 ```
-![](https://cdn.nlark.com/yuque/0/2024/webp/42476384/1706635802018-8b82d75e-3753-4f5f-8803-0389ab14012c.webp#averageHue=%23f3f1ed&clientId=uec30a616-ced7-4&from=paste&id=u079f46e6&originHeight=878&originWidth=720&originalType=url&ratio=1.25&rotation=0&showTitle=false&status=done&style=none&taskId=u20464ddb-dd81-4088-b246-73f88ac47b0&title=)<br />可以看到，在执行putVal方法之前，会调用native方法hashCode得到哈希值，由于这个方法会让每一个不同的对象都得到不同的哈希值，如果我们希望两个内存地址不同但相同内容的数组的哈希值也相等，就必须重写hashCode方法，使得相同内容的数组的哈希值也相等。<br />Java为许多常用的数据类型重写了hashCode()方法,使它们只要内容相同哈希值就也相同，比如String，Integer，Double等。比如在Integer类中哈希值就是其int类型的数据。
+
+![](../assets/articleSource/2024-01-31-HashMap/img.png)<br />
+可以看到，在执行putVal方法之前，会调用native方法hashCode得到哈希值，由于这个方法会让每一个不同的对象都得到不同的哈希值，如果我们希望两个内存地址不同但相同内容的数组的哈希值也相等，就必须重写hashCode方法，使得相同内容的数组的哈希值也相等。<br />Java为许多常用的数据类型重写了hashCode()方法,使它们只要内容相同哈希值就也相同，比如String，Integer，Double等。比如在Integer类中哈希值就是其int类型的数据。
 ```java
 
 public static int hashCode(int value) {
