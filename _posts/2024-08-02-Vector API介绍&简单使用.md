@@ -20,10 +20,8 @@ tags: Java Vector
 top: 1
 sidebar: []
 ---
-> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
-<br>
-
+> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)  
 > > 我在参与腾讯犀牛鸟开源时，认领了有关Vector API的issue。但找遍全网也找不到关于Vector API具体使用的介绍。于是我简单学习Vector API之后写下这篇简单的介绍供大家参考。个人水平有限。不足之处请大家多多指正。
 > 
 > 【JEP咖啡屋18[熟肉]-如何通过Vector API加速并行计算】[https://www.bilibili.com/video/BV1Nh4y1s7dJ?vd_source=6df57b2b8470f0f2c9187d097a219270](https://www.bilibili.com/video/BV1Nh4y1s7dJ?vd_source=6df57b2b8470f0f2c9187d097a219270)
