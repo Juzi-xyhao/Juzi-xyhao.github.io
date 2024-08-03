@@ -69,7 +69,7 @@ yat:
 # enableDNT： “false”
 
 # 如果要生成网站站点地图，可以设置 true
-# sitemap： false
+sitemap: true
 
 # 如果您想更改网站语言，您可以设置 语言选项
 lang: "zh-CN"  # default lang is zh-CN

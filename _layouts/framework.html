@@ -9,7 +9,6 @@ layout: default
 
   </section>
   <section class="sidebar" style="margin-left: 15px;">
-    <!-- Get sidebar items -->
     {%- if page.sidebar -%}
     {%- assign sidebar = page.sidebar -%}
     {%- elsif site.defaults[page.layout].sidebar -%}
@@ -19,7 +18,9 @@ layout: default
     {%- endif -%}
 
     {%- for item in sidebar -%}
-
+    {%- if item == 'article-menu' -%}
+    {%- assign file = 'sidebar/article-menu.html' -%}
+    {%- else -%}
     {%- assign file = item -%}
     {%- assign array = file | split: '.' -%}
     {%- if array.size == 1 -%}
@@ -27,9 +28,9 @@ layout: default
     {%- endif -%}
 
     {%- assign file = 'sidebar/' | append: file -%}
+    {%- endif -%}
 
     {%- include {{ file }} %}
-
     {%- endfor -%}
   </section>
 </div>
