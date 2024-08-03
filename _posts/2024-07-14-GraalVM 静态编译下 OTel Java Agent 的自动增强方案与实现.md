@@ -5,8 +5,8 @@ subtitle: A awesome static site generator.
 author: xyhao
 categories: Java
 banner:
-image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png
-opacity: 0.9
+  image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png
+  opacity: 0.9
 tags: JVM Java
 top: 1
 ---
