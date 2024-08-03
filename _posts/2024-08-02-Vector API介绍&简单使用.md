@@ -20,7 +20,9 @@ tags: Java Vector
 top: 1
 sidebar: []
 ---
+>> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
+<br>
 
 > > 我在参与腾讯犀牛鸟开源时，认领了有关Vector API的issue。但找遍全网也找不到关于Vector API具体使用的介绍。于是我简单学习Vector API之后写下这篇简单的介绍供大家参考。个人水平有限。不足之处请大家多多指正。
 > 
