@@ -1,81 +1,80 @@
-# Welcome to Jekyll!
+# 欢迎来到 Jekyll！
 #
-# About Theme
+# 关于主题
 #
-# Yet another theme for elegant writers with modern flat style and beautiful
-# night/dark mode.
+# 又一个为优雅作家创作的主题，具有现代、扁平的风格和美观的风格
+# 夜间/黑暗模式。
 #
-# Website: https://github.com/jeffreytse/jekyll-theme-yat
+# 网站： https://github.com/jeffreytse/jekyll-theme-yat
 #
-# You can do anything you want, including projects for your clients, as long
-# as you mention an attribution back (credit links in footer or project).
-# See the LICENCE file.
+# 你可以做任何你想做的事，包括为你的客户做项目，只要
+# 当您提到归因时（页脚或项目中的信用链接）。
+# 请参阅 LICENCE 文件。
 #
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that.
+# 此配置文件用于影响整个博客的设置，值
+# 您需要设置一次，之后很少编辑。
 #
-# For technical reasons, this file is *NOT* reloaded automatically when you
-# use 'bundle exec jekyll serve'. If you change this file, please restart
-# the server process.
+# 由于技术原因，当您
+# 使用 'bundle exec jekyll serve'。如果您更改此文件，请重新启动
+# 服务器进程。
 #
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
+# 网站设置
+# 这些用于个性化您的新网站。如果您查看 HTML 文件，
+# 您将看到它们通过 {{ site.title }}、{{ site.email }} 等访问。
+# 您可以创建任何您想要的自定义变量，并且它们将可以访问
+# 通过 {{ site.myvariable }} 在模板中。
 
 title: xyhao's Blog
 email: xyhaomail@163.com
 author: xyhao
 
-# Copyright setting
-# You can use any html code, currently below placeholders are available:
-# * current year: {currentYear}
-# * author: {author} (Value is the same as site.author)
-# * copyright: (c) - ©
-# * copyleft: (cleft)
-# * sound recording copyright: (p) - ℗
+# 版权设置
+# 你可以使用任何html代码，目前下面有几个占位符可用：
+# * 当前年份： {currentYear}
+# * author： {author} （值与site.author相同）
+# * 版权所有： （c） - ©
+# * copyleft： （裂口）
+# * 录音版权：（p） - ℗
 #
-# For example:
-#   "Copyright (c) 2017-{currentYear} <a href="https://example.com">{author}</a>"
-#   "Copyright © 2017-2021 Foobar"
-#Copyright ©2020-2022 小林coding 版权所有
+# 例如：
+# “版权所有 （c） 2017-{currentYear} <a href=”https://example.com“>{author}</a>”
+# “版权所有 © 2017-2021 Foobar”
 copyright: "Copyright © 2024-{currentYear} {author}"
 
-description: >- # this means to ignore newlines until "baseurl:"
+description: >- # 这意味着忽略换行符，直到“BaseURL："
   Write an awesome description for your new site here. You can edit this
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
 
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. https://example.com
-favicon: "/favicon.png" # the favicon for your site
+baseurl: "" # 您网站的子路径，例如 /blog
+url: "" # 您站点的基本主机名和协议，例如 https://example.com
+favicon: "/favicon.png" # 您的网站网站图标
 
 # Yat date format
 # refer to https://shopify.github.io/liquid/filters/date/ if you want to customize this
 yat:
   date_format: "%b %d, %Y"
 
-# If you want more debug log, you can set true
-# debug: false
+# 如果需要更多的调试日志，可以设置 true
+# debug： false
 
-# If you don't want transparent header, you can set false
-# header_transparent: true
+# 如果你不想要透明的标题，你可以设置 false
+# header_transparent：真
 
-# If you want to change the content width, you can set to another value
-# content_width: "920px"
+# 如果要更改内容宽度，可以设置为另一个值
+# content_width： “920px”
 
-# Google analytics - GA4
-# google_analytics: [Measurement ID]
-# enableDNT: "false"
+# Google 分析 - GA4
+# google_analytics：[测量ID]
+# enableDNT： “false”
 
-# If you want to generate website sitemap, you can set true
-# sitemap: false
+# 如果要生成网站站点地图，可以设置 true
+# sitemap： false
 
-# If you want to change site language, you can set lang option
-# lang: "en"  # default lang is en
+# 如果您想更改网站语言，您可以设置 语言选项
+lang: "zh-CN"  # default lang is zh-CN
 
-# Translate languges
+# 翻译语言
 # langs refer to https://cloud.google.com/translate/docs/languages
 # translate_langs:
 #   - lang: en
@@ -102,19 +101,19 @@ yat:
 #     img: https://cdn.countryflags.com/thumbs/russia/flag-400.png
 #     text: Russian
 
-# You can choose a theme color
-# Default theme colors as below:
+# 您可以选择主题颜色
+# 默认主题颜色如下：
 # coolblack: #090a0b
 # spacegrey: #353535
 # snowwhite: #ffffff
 #
-# theme_color: snowwhite
+theme_color: snowwhite
 #
 # Custom color as below:
 # theme_color: "#882250"
 
-# You can choose a brand color
-# Default brand colors as below:
+# 您可以选择品牌颜色
+# 默认品牌颜色如下：
 # orangered: #ff5100
 # greatgold: #f2cb05
 # greenblue: #389092
@@ -124,34 +123,34 @@ yat:
 # Custom color as below:
 # brand_color: "#1a8e42"
 
-# You can custom selection style
+# 您可以自定义选择样式
 # selection:
 #   color: "#ff00ff"
 #   background_color: "yellow"
 
-# Night/Dark mode
-# Default mode is "auto", "auto" is for auto nightshift
-# (19:00 - 07:00), "manual" is for manual toggle, and
-# "on/off" is for default on/off.
+# 夜间/黑暗模式
+# 默认模式为“自动”，“自动”用于自动夜班
+# （19：00 - 07：00），“手动”用于手动切换，以及
+# “开/关”为默认开/关。
 #
-# Whatever the user's choice is, it will supersede the
-# default setting of the site and be kept during the
-# visit (session). Only the dark mode setting is"manual",
-# it will be always kept on every visit (i.e. no matter
-# the browser is closed or not)
+# 无论用户的选择是什么，它都会取代
+# 网站的默认设置，并在
+# 访问（会话）。只有暗模式设置是“手动”，
+# 它将在每次访问时始终保留（即无论
+# 浏览器是否关闭）
 #
 # night_mode: "auto"
 
-# Code badge setting
-# You can enable or disable the code badge and so on
+# 代码徽章设置
+# 您可以启用或禁用代码徽章等
 # code_badge:
 #   enabled: "true"
 #   color: "#fff"
 #   background_color: "#ff4e00"
 #   text_transform: "uppercase"  # ("uppercase", "lowercase", "capitalize")
 
-# If you want to link only specific pages in your header, uncomment
-# this and add the path to the pages in order as they should show up
+# 如果您只想链接标题中的特定页面，请取消注释
+# 这个并按照它们应该显示的顺序添加页面的路径
 # header_pages:
 #   - index.html
 #   - archives.html
@@ -159,16 +158,16 @@ yat:
 #   - tags.html
 #   - about.md
 
-# Page default value
+# 页面默认值
 # defaults:
 #   home:
 #     heading: "Your awesome heading"
 #     subheading: "Your awesome subheading"
 #     banner: "Your image url"
 
-# Banner default settings
-# These banner settings are for global banner default, but you can also
-# config it by the front matter for one specific post
+# 横幅广告默认设置
+# 这些横幅广告设置是针对全局横幅广告的默认设置，但您也可以
+# 通过前言为一个特定的帖子配置它
 # banner:
 #   video: null             # Video banner source
 #   loop: true              # Video loop
@@ -182,18 +181,18 @@ yat:
 #   heading_style: null     # Custom heading style (e.g. "font-weight: bold; text-decoration: underline")
 #   subheading_style: null  # Custom subheading style (e.g. color: gold)
 
-# Excerpt settings
+# 摘录设置
 # excerpt:
-#   default_image: /assets/images/default-image.jpeg  # Default image when the image style is not none
-#   image_style: z          # Image layout style (It's value could be none, left, right, top, z, z-reverse)
+#   default_image: /assets/images/default-image.jpeg  # 当图像样式不是无时的默认图像
+#   image_style: z          # 图像布局样式（其值可以是 none、left、right、top、z、z-reverse）
 #   image_width: 38.2%      # Image default width
 #   image_height: 160px     # Image default height
 #   text_size: 350          # Words default size
 
 # Pagination setting
-# paginate: 5
+paginate: 10
 
-# Photo previewer settings (PhotoSwipe 5)
+# 照片预览器设置（PhotoSwipe 5）
 # the options please refer to: https://photoswipe.com/options/
 # photo_previewer:
 #  gallery: "section.main"
@@ -205,7 +204,7 @@ yat:
 #    left: 100
 #    right: 100
 
-# Click to top settings
+# 点击返回顶部设置
 # click_to_top:
 #   light:
 #     background_color: "white"
@@ -215,10 +214,10 @@ yat:
 #     color: "#bbb"
 
 # Disqus comments
-# disqus:
-#   shortname: "Your Disqus username"
+disqus:
+   shortname: "xyhao"
 
-# Gitment comments
+# Gitment 注释
 # gitment:
 #   username: "Your GitHub username"
 #   repo: "The repo to store comments"
@@ -226,7 +225,7 @@ yat:
 #   client_secret: "Your client secret"
 #   redirect_uri: "Your redirect url"   # If you use a custom domain name
 
-# Utterances comments
+# 话语注释
 # See https://utteranc.es/
 # set follow_site_theme true to make utterances' theme follow the site's
 
