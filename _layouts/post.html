@@ -6,7 +6,7 @@ sidebar:
 - article-menu
 ---
 
-<div >
+<div class="container">
   <section class="post">
     {%- assign name = 'banner' -%}
     {%- include functions.html func='get_value' -%}
@@ -215,6 +215,24 @@ sidebar:
   </section>
 </div>
 
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 300px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
 
 
 
