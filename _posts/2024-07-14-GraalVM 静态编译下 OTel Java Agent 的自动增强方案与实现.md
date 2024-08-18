@@ -1,7 +1,7 @@
 ---
 layout: post
 title: GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现
-subtitle: A awesome static site generator.
+subtitle: 静态编译导致Java程序很多特性都失效了
 author: xyhao
 categories: Java
 banner:

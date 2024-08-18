@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 2024-01-31-由一道力扣题引发的对Java中HashMap的思考
-subtitle: A awesome static site generator.
+subtitle: 开始背JUC八股的起点
 author: xyhao
 categories: Java
 banner:

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Vector API介绍&简单使用
-subtitle: A awesome static site generator.
+subtitle: Vector API是Java用于科学计算的新API
 author: xyhao
 categories: Java
 banner:

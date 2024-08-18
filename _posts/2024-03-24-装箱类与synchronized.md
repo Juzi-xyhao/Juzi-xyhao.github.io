@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 装箱类与synchronized
-subtitle: A awesome static site generator.
+subtitle: 装箱类缓存了一些数据，这些数据只有一个内存地址
 author: xyhao
 categories: Java
 banner:

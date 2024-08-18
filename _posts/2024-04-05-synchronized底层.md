@@ -1,7 +1,7 @@
 ---
 layout: post
 title: synchronized底层
-subtitle: A awesome static site generator.
+subtitle: 锁升级的过程
 author: xyhao
 categories: Java
 banner:

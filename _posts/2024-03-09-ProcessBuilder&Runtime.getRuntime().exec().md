@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Java里两种执行命令的方式比较
-subtitle: A awesome static site generator.
+subtitle: ProcessBuilder VS Runtime.exec()
 author: xyhao
 categories: Java
 banner:
