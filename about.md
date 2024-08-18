@@ -21,7 +21,8 @@ title: About
 
 <h3>我的一些项目</h3>
 - [CloudShare](https://github.com/Juzi-xyhao/CloudShare): 我的个人开源项目
-- [Vectorizing-SM3-Report-Documents](https://github.com/Juzi-xyhao/Vectorizing-SM3-Report-Documents): 参加开源活动产出的文档
+- [ZGC.VS.G1GC](https://github.com/Juzi-xyhao/ZGC.VS.G1GC): 参加开源活动产出的文档，比较了ZGC与G1GC
+- [Vectorizing-SM3-Report-Documents](https://github.com/Juzi-xyhao/Vectorizing-SM3-Report-Documents): 参加开源活动产出的文档,尝试使用Vector API优化SM3算法
 - ...
 
 
