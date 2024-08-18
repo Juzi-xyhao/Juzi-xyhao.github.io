@@ -7,6 +7,7 @@ categories: Java
 banner:
   image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-09-ProcessBuilder.png
   opacity: 0.9
+  subheading_style: "color: gold"
 tags: Java 命令
 top: 1
 sidebar: []

@@ -7,6 +7,7 @@ categories: Java
 banner:
   image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png
   opacity: 0.9
+  subheading_style: "color: gold"
 tags: Java HashMap
 top: 1
 sidebar: []

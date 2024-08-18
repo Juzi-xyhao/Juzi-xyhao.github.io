@@ -7,6 +7,7 @@ categories: Java
 banner:
   image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png
   opacity: 0.9
+  subheading_style: "color: gold"
 tags: Java JUC Synchronized
 top: 1
 sidebar: []
