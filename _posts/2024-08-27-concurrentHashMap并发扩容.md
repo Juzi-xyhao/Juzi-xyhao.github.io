@@ -58,6 +58,8 @@ JDK8版本中，扩容是在不持有锁时发生的。
 5. **单个桶内元素的迁移是加锁的**，将旧 table 的 i 位置上所有元素迁移到新表。  
 6. 最后将旧 table 的 i 位置设置为 ForwardingNode 节点。  
 7. 所有桶扩容完毕，将 table 指向 nextTable，设置 sizeCtl 为新容量 0.75 倍    
+
+
 ```java
 private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
     int n = tab.length, stride;
@@ -223,6 +225,8 @@ private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
 每个线程通过cas的方式获取自己的哈希桶范围。如果有多个线程预期的哈希桶范围都一样，  
 那么因为cas的原因，只有一个线程可以拥有这段范围并且更新transferIndex的值。其它线程自旋等待，超时才进入下一步  
 具体见下面这段解释：
+
+
 ```java
 Node<K,V> f; int fh;
         while (advance) { // 此循环的作用是 1.确定当前线程要迁移的桶的范围；2.通过更新i的值确定当前范围内下一个要处理的节点
@@ -260,10 +264,9 @@ Node<K,V> f; int fh;
                 advance = false;
             }
         }
-
-
-
 ```
+
+
 TRANSFERINDEX在源码的6357行通过unsafe对象获取了transferIndex的内存地址  
 ![image.png](https://cdn.nlark.com/yuque/0/2024/png/42476384/1724746737155-b041820c-7b24-4209-b711-e4fab51f0991.png#averageHue=%232d2c2b&clientId=u443e7605-49b7-4&from=paste&height=917&id=u6cdee119&originHeight=917&originWidth=880&originalType=binary&ratio=1&rotation=0&showTitle=false&size=162391&status=done&style=none&taskId=u31e1b847-a811-45ba-b2f2-22c361bbc0e&title=&width=880)
 
