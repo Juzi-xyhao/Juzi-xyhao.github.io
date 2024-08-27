@@ -5,9 +5,9 @@ subtitle: JDK 8使用细粒度更高的cas并发扩容
 author: xyhao
 categories: Java
 banner:
-image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png
-opacity: 0.9
-subheading_style: "color: gold"
+  image: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png
+  opacity: 0.9
+  subheading_style: "color: gold"
 tags: Java HashMap
 top: 1
 sidebar: []
@@ -19,24 +19,24 @@ sidebar: []
 JDK7和JDK8两个版本的扩容有点不一样。
 ## JDK7
 JDK7版本中，扩容是在持有锁时发生的。
-![image.png](/assets/articleSource/2024-08-27-concurrentHashMap/img.png)
+![image.png](/assets/articleSource/2024-08-27-concurrentHashMap/img_4.png)
 35行的rehash是扩容函数。直到46行的finally代码块才释放锁。  
 拿到锁的线程执行put方法时会检查要不要扩容（已有元素个数 / table数组的长度  > 负载因子）。  
 因此只有一个线程可以执行扩容操作，不存在并发问题。  
 但是map扩容了总得让其它线程知道吧。具体是怎么知道的呢？  
 其实数组table是一个volatile变量，这就保证了可见性。  
 证据见JDK 8中源码778行。我没有装JDK 7,但JDK7里也肯定是一个volatile变量。  
-![image.png](https://cdn.nlark.com/yuque/0/2024/png/42476384/1724734940823-399df475-5d2f-47c2-b2b4-022724bde265.png#averageHue=%235a5a41&clientId=u96dccc5c-36ae-4&from=paste&height=122&id=JTVn7&originHeight=122&originWidth=577&originalType=binary&ratio=1&rotation=0&showTitle=false&size=12322&status=done&style=none&taskId=u4b138be6-3628-4c33-8f10-ed48f6777fe&title=&width=577)
+![image.png](/assets/articleSource/2024-08-27-concurrentHashMap/img.png)
 
 
 
 ## JDK8
 JDK8版本中，扩容是在不持有锁时发生的。  
-![image.png](https://cdn.nlark.com/yuque/0/2024/png/42476384/1724735565358-4133b2ba-a0c5-43f0-9395-5ce87c0d5c52.png#averageHue=%232c2b2b&clientId=u96dccc5c-36ae-4&from=paste&height=1206&id=udd1e5f55&originHeight=1206&originWidth=809&originalType=binary&ratio=1&rotation=0&showTitle=false&size=105186&status=done&style=none&taskId=ue22f9e56-f4b8-46fb-ae39-d138184f5a9&title=&width=809)
+![image.png](/assets/articleSource/2024-08-27-concurrentHashMap/img_1.png)  
 倒数第三行的addCount是扩容的检查函数，可以清晰的看到，它不在syncronized代码块里。  
 
 先看看add方法：  
-![image.png](https://cdn.nlark.com/yuque/0/2024/png/42476384/1724736311432-74679be4-cc11-47b1-8a52-574c8aaf4c02.png#averageHue=%232d2c2b&clientId=u96dccc5c-36ae-4&from=paste&height=965&id=u8272d396&originHeight=965&originWidth=863&originalType=binary&ratio=1&rotation=0&showTitle=false&size=145578&status=done&style=none&taskId=ude5ffd1e-54e7-42de-ad4d-e85dfec6a44&title=&width=863)
+![image.png](/assets/articleSource/2024-08-27-concurrentHashMap/img_2.png)   
 **扩容检查流程：**
 
 - 计算元素总量 size，若 CAS 冲突严重则放弃扩容。  
@@ -268,7 +268,7 @@ Node<K,V> f; int fh;
 
 
 TRANSFERINDEX在源码的6357行通过unsafe对象获取了transferIndex的内存地址  
-![image.png](https://cdn.nlark.com/yuque/0/2024/png/42476384/1724746737155-b041820c-7b24-4209-b711-e4fab51f0991.png#averageHue=%232d2c2b&clientId=u443e7605-49b7-4&from=paste&height=917&id=u6cdee119&originHeight=917&originWidth=880&originalType=binary&ratio=1&rotation=0&showTitle=false&size=162391&status=done&style=none&taskId=u31e1b847-a811-45ba-b2f2-22c361bbc0e&title=&width=880)
+![image.png](/assets/articleSource/2024-08-27-concurrentHashMap/img_3.png) 
 
 
 
