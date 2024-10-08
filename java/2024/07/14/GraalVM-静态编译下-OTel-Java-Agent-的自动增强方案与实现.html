@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现 | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读 GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现 本文档讨论的动态、静态编译仅限于java语言 更多博客请见 我的语雀知识库">
+<meta property="og:description" content="这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读 GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现 本文档讨论的动态、静态编译仅限于java语言 更多博客请见 我的语雀知识库">
+<link rel="canonical" href="/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html">
+<meta property="og:url" content="/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2024-07-14T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"xyhao"},"dateModified":"2024-07-14T00:00:00+00:00","datePublished":"2024-07-14T00:00:00+00:00","description":"这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读 GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现 本文档讨论的动态、静态编译仅限于java语言 更多博客请见 我的语雀知识库","headline":"GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html"},"url":"/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    html .page-banner .page-banner-img > *:first-child {
+      opacity: 0.9;
+    }
+
+    html[data-theme="dark"] .page-banner .page-banner-img > *:first-child {
+      opacity: 0.6462;
+    }
+  </style>
+<style>
+    html .page-banner .page-banner-inner > *:first-child > *:nth-child(2) {
+      color: gold
+    }
+  </style>
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png)"></div>
+        <img class="img-placeholder" src="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner">
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现</h1>
+  <h2 class="post-subtitle">静态编译导致Java程序很多特性都失效了</h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2024-07-14T00:00:00+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Jul 14, 2024
+    </time><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 5 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#JVM">#JVM</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a>
+</div></header>
+</div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="container">
+  <section class="post">
+
+
+
+
+
+
+
+
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <blockquote>
+  <p>这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读<br>
+<a href="https://mp.weixin.qq.com/s/kEqBut3gcV9RM86DAMJLRA">GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现</a><br>
+本文档讨论的动态、静态编译仅限于java语言<br>
+更多博客请见 <a href="https://www.yuque.com/u41117719/xd1qgc">我的语雀知识库</a></p>
+</blockquote>
+
+<h2 id="什么是动态编译">什么是动态编译？</h2>
+<p>启动jar运行程序时，热点代码会被JVM以JIT（Just-In-Time Compilation,即时编译）的形式编译为机器码。当我们启动jar包时，实质上是启动了一个JVM，然后执行类加载，JIT将热点字节码编译为机器码这三个部分。</p>
+
+<p>也就是说，<strong>java的动态编译是指动态地将热点字节码编译为机器码直接让CPU执行。</strong></p>
+
+<blockquote>
+  <p>需要注意的是，类加<strong>载这个过程</strong>实际上在启动阶段只会加载那些需要被运行的类。笔者在起草这篇文档时已经很久没有接触过JVM的八股了，<strong>忘了类加载的时机</strong>，<strong>以为所有的类在启动时都会被加载</strong>。导致没有理解后续的JIT编译热点代码。<a href="https://www.yuque.com/u41117719/xd1qgc/iqfmoe9tpnstvw0i">类的生命周期与加载时机</a>
+<strong>明明所有的类都被加载了,为什么还有编译为机器码的步骤？</strong>
+这是笔者的第二个误区。类的字节码被加载进JVM内存后，JVM会将字节码解析并转换为JVM内部的数据结构，比如:</p>
+  <ul>
+    <li>
+<strong>方法区,</strong>记录类的相关信息：类名、方法、变量等等</li>
+    <li>
+<strong>虚拟机栈</strong>，用栈帧记录每个java方法从调用直至执行完成的过程。栈帧中存储了局部变量表、操作数栈、动态链接、方法返回地址等等信息</li>
+    <li>
+<strong>本地方法栈</strong>：与虚拟机栈几乎完全相同。区别在于本地方法栈如其名，只记录native的C++方法</li>
+    <li>
+<strong>堆</strong>：存储对象实例和<strong>数组</strong>。是的，也有数组。java秉持着<strong>一切皆对象</strong>的原则，大方地让数组，甚至基本数据类型都继承了Object类。</li>
+    <li>
+<strong>运行时常量池</strong>：存储像符号引用(类和接口的全限定名、字段名称、方法名称)、编译期计算出来的常量表达式、字符串常量、枚举类常量等等。</li>
+  </ul>
+</blockquote>
+
+<p><a href="https://www.yuque.com/u41117719/xd1qgc/hreiiqh4texe9z9m">运行时内存区域</a></p>
+<blockquote>
+  <p>字节码在JVM里并不是以机器码执行的。能够执行机器码的，只有CPU。
+只是说频繁被使用的字节码会由JIT编译为字节码<strong>直接</strong>让CPU去执行，提高执行效率。
+秋招前夕，笔者的JVM已经忘得差不多了，难绷</p>
+</blockquote>
+
+<h2 id="什么是静态编译">什么是静态编译？</h2>
+<p>相比于动态编译只将热点数据编译为机器码让CPU执行，静态编译是把所有字节码全部编译为机器码并打包为二进制可执行文件（如Windows平台的exe文件）。
+不过由于不同操作系统的二进制文件格式并不一样, 所以静态编译时需要程序员手动指定操作系统</p>
+
+<h2 id="静态编译有哪些问题">静态编译有哪些问题？</h2>
+<p>下文基于文档开头提到的公众号文章中提到的静态编译技术：GraalVM的Native Image。
+以下三点问题均引用自公众号原文。</p>
+<h2 id="一次编译处处运行失效了">“一次编译，处处运行”失效了</h2>
+<p>以往依托于字节码和JVM，确实可以处处运行。但是静态编译只是把字节码作为中间变量，是生成二进制可执行文件的中间工具。为windows平台编译的exe可执行文件没办法在mac和linux上接着执行。</p>
+
+<h2 id="java的许多动态特性都不直接生效了">java的许多动态特性都不直接生效了</h2>
+<p>例如动态类加载，反射，动态代理等。</p>
+
+<ul>
+  <li>动态类加载失效：Native Image在构建时就需要知道应用会用到的所有类，然后把这些类打包进二进制文件。这样在运行时就不需要再加载任何类了，因为所有需要的类都已经在里面了。</li>
+  <li>反射失效：java的反射的原理是根据类的字节码获取类的信息。而在静态编译中，编译期就要把代码全部编译完，且不会保留任何类的元数据。程序运行时动态的反射指定的类对静态编译而言是不知道的。这就会导致即使字节码存在，元数据的丢失也会导致反射失效。<br>因为反射就是通过类的元数据加载这个类的方法和字段的。所以需要手动指定哪些类会被反射，静态编译才会把它们的元数据和字节码编译进最终生成的二进制文件中</li>
+  <li>动态代理失效：不管JDK代理还是CGLIB代理，都是基于原有字节码创建新的字节码。而在静态编译中，由于没有了字节码和元数据的概念，动态代理自然就和反射一样失效了。</li>
+</ul>
+
+<blockquote>
+  <h6 id="为什么静态编译会丢失元数据">为什么静态编译会丢失元数据？</h6>
+  <p>待补充</p>
+</blockquote>
+
+<h2 id="基于字节码改写实现的java-agent将不再适用">基于字节码改写实现的Java Agent将不再适用</h2>
+<p>因为没有了字节码概念，所以之前我们通过 Java Agent 做到的各种可观测能力，例如收集 Trace/Metrics 等信号这些能力都不能生效了。</p>
+
+<p>总的来说，静态编译导致的字节码缺失是java程序的许多特性都失效的根本原因。</p>
+
+<h2 id="如何解决静态编译带来的问题">如何解决静态编译带来的问题？</h2>
+<p>参考原文第二部分：<img src="/assets/articleSource/2024-07-14-GraalVM/img.png" alt="image.png"></p>
+
+<p><img src="/assets/articleSource/2024-07-14-GraalVM/img_1.png" alt="image.png">
+<img src="/assets/articleSource/2024-07-14-GraalVM/img_2.png" alt="image.png">
+<img src="/assets/articleSource/2024-07-14-GraalVM/img_3.png" alt="image.png"></p>
+
+<p>总的来说，是通过在native编译前先用普通的jvm执行一遍，把需要修改和增强的扩展点识别出来保存下来，然后native编译的时候再基于这些东西去增强。</p>
+
+<p>对于加载过程之前的字节码修改可以前置到编译时期，对运行时的，像arthas，又该如何解决呢？</p>
+
+
+    </div>
+
+</article>
+</section>
+
+  <section class="sidebar" style="margin-left: 15px;">
+    <style type="text/css" media="screen">
+      .post-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class="post-menu">
+      <div class="post-menu-title">大纲</div>
+      <div class="post-menu-content"></div>
+    </div>
+
+    <script>
+      function generateContent() {
+        var menu = document.querySelector(".post-menu");
+        var menuContent =  menu.querySelector(".post-menu-content");
+        var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+        // Hide menu when no headings
+        if (headings.length === 0) {
+          return menu.style.display = "none";
+        }
+
+        // Generate post menu
+        var menuHTML = '';
+        for (var i = 0; i < headings.length; i++) {
+          var h = headings[i];
+          menuHTML += (
+            '<li class="h-' + h.tagName.toLowerCase() + '">'
+            + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+        }
+
+        menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+        // The header element
+        var header = document.querySelector('header.site-header');
+
+        function doMenuCollapse(index, over_items) {
+          var items = menuContent.firstChild.children;
+
+          if (over_items == undefined) {
+            over_items = 20;
+          }
+
+          if (items.length < over_items) {
+            return;
+          }
+
+          var activeItem = items[index];
+          var beginItem = activeItem
+          var endItem = activeItem
+          var beginIndex = index;
+          var endIndex = index + 1;
+          while (beginIndex >= 0
+          && !items[beginIndex].classList.contains('h-h2')) {
+            beginIndex -= 1;
+          }
+          while (endIndex < items.length
+          && !items[endIndex].classList.contains('h-h2')) {
+            endIndex += 1;
+          }
+          for (var i = 0; i < beginIndex; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+          for (var i = beginIndex + 1; i < endIndex; i++) {
+            item = items[i]
+            // if (!item.classList.contains('h-h2')) {
+            item.style.display = '';
+            // }
+          }
+          for (var i = endIndex; i < items.length; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+        }
+
+        // Init menu collapsed
+        doMenuCollapse(-1);
+
+        // Active the menu item
+        window.addEventListener('scroll', function (event) {
+          var lastActive = menuContent.querySelector('.active');
+          var changed = true;
+          var activeIndex = -1;
+          for (var i = headings.length - 1; i >= 0; i--) {
+            var h = headings[i];
+            var headingRect = h.getBoundingClientRect();
+            var headerRect = header.getBoundingClientRect();
+            var headerTop = Math.floor(headerRect.top);
+            var headerHeight = Math.floor(headerRect.height);
+            var headerHeight = headerTop + headerHeight + 20;
+            if (headingRect.top <= headerHeight) {
+              var id = 'h-' + h.getAttribute('id');
+              var a = menuContent.querySelector('a[href="#' + id  + '"]');
+              var curActive = a.parentNode;
+              if (curActive) {
+                curActive.classList.add('active');
+                activeIndex = i;
+              }
+              if (lastActive == curActive) {
+                changed = false;
+              }
+              break;
+            }
+          }
+          if (changed) {
+            if (lastActive) {
+              lastActive.classList.remove('active');
+            }
+            doMenuCollapse(activeIndex);
+          }
+          event.preventDefault();
+        });
+      }
+      generateContent();
+    </script>
+
+  </section>
+</div>
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    width: 1000px; /* Subtract the sidebar width from 100% */
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 500px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
+
+
+
+
+
+
+  </section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

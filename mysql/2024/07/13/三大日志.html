@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MySQL三大日志 | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="MySQL三大日志">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="更多博客请见 我的语雀知识库">
+<meta property="og:description" content="更多博客请见 我的语雀知识库">
+<link rel="canonical" href="/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html">
+<meta property="og:url" content="/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2024-07-13T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="MySQL三大日志">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"xyhao"},"dateModified":"2024-07-13T00:00:00+00:00","datePublished":"2024-07-13T00:00:00+00:00","description":"更多博客请见 我的语雀知识库","headline":"MySQL三大日志","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html"},"url":"/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    html .page-banner .page-banner-img > *:first-child {
+      opacity: 0.9;
+    }
+
+    html[data-theme="dark"] .page-banner .page-banner-img > *:first-child {
+      opacity: 0.6462;
+    }
+  </style>
+<style>
+    html .page-banner .page-banner-inner > *:first-child > *:nth-child(2) {
+      color: gold
+    }
+  </style>
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-13-log.png)"></div>
+        <img class="img-placeholder" src="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-13-log.png">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner">
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">MySQL三大日志</h1>
+  <h2 class="post-subtitle">三大日志支撑了MySQL主从同步、事务回滚、Crash Safe等特性</h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2024-07-13T00:00:00+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Jul 13, 2024
+    </time><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 4 mins</span>
+  </div>
+<div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#MySQL">#MySQL</a></div></header>
+</div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="container">
+  <section class="post">
+
+
+
+
+
+
+
+
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <blockquote>
+  <p>更多博客请见 <a href="https://www.yuque.com/u41117719/xd1qgc">我的语雀知识库</a></p>
+</blockquote>
+
+<h2 id="什么是三大日志">什么是三大日志</h2>
+
+<ul>
+  <li>**bin日志： **保存的是当前数据库中最新的数据以及表结构变更的语句，不包含每行数据的历史版本。</li>
+  <li>
+<strong>undo日志：</strong>不仅保存了最新的数据，也保存了每行数据的历史版本，为事务回滚和MVCC提供了支持。</li>
+  <li>
+<strong>redo日志：</strong>保存内存缓冲区BufferPool中脏页的数据，不保存已经被刷到磁盘中的数据，也就是说，redo日志保存的数据是不全的。redo日志只是为了应对因为断电等原因BufferPool还没来得及刷到磁盘就丢失了的情况。redo日志默认每秒钟都会刷一次盘，事务提交时也会刷盘，mysql关闭时也会刷盘。</li>
+</ul>
+
+<h2 id="总结">总结</h2>
+<p><strong>redo的作用是对Bufferpool中脏页的持久化。</strong>保存的是脏页更新后的值。
+而undo保存的更新前的值。对undo的刷盘是异步的，不知道它什么时候刷。万一刷盘过程中宕机，bufferpool脏页的数据就全没了。为了不让它全没，就有了redo对Bufferpool的持久化。</p>
+
+<h2 id="问题">问题</h2>
+<h3 id="三个log的记录顺序是什么">三个log的记录顺序是什么?</h3>
+<ul>
+  <li>undo：在事务开启时就会记录数据；</li>
+  <li>redo： 在增删改语句执行之前就会记录数据；</li>
+  <li>bin： 在增删改语句执行之后会生成一条binlog。事务提交时这条binlog会写入磁盘的binlog。<br>
+一个log文件写满之后，会创建一个新的log文件接着写入。</li>
+</ul>
+
+<h3 id="为什么有了-binlog-还要有-redo-log">为什么有了 binlog， 还要有 redo log？</h3>
+<p>这个问题跟 MySQL 的时间线有关系。
+最开始 MySQL 里并没有 InnoDB 引擎，MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，binlog 日志只能用于归档。
+而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用 redo log 来实现 crash-safe 能力。</p>
+
+<h3 id="有了undolog为啥还需要redolog呢不能直接undolog最新数据刷盘吗">有了undolog为啥还需要redolog呢，不能直接undolog+最新数据刷盘吗</h3>
+
+<p>最新数据也就是BufferPool里面的内存数据，当增删改的sql执行成功后，一些缓存页就会被修改，这些被修改的数据以脏页的形式存放在BufferPool中。
+一旦服务器宕机，这些脏页的数据就全没了。
+所以要保证脏页的数据在宕机之间就被持久化。而这就靠redolog保证了。
+为了防止断电导致数据丢失的问题，当有一条记录需要更新的时候，InnoDB 引擎就会<strong>先</strong>更新内存（同时标记为脏页），然后将本次对这个页的修改以 redo log 的形式记录下来。
+当系统崩溃时，虽然脏页数据没有持久化，但是 redo log 已经持久化。根据redo就可以恢复完整的原内存数据了。</p>
+
+<h3 id="为什么要增加一个redolog来保证bufferpool脏页的持久化直接把脏页持久化到磁盘不行吗redolog也是持久化到磁盘啊">为什么要增加一个redolog来保证BufferPool脏页的持久化？直接把脏页持久化到磁盘不行吗？redolog也是持久化到磁盘啊？</h3>
+
+<h4 id="直接持久化buffer-pool的局限性">直接持久化Buffer Pool的局限性</h4>
+
+<ol>
+  <li>
+<strong>性能影响</strong>：脏页的数据在B+树中存储的位置基本不是连续的，必然会有大量的随机IO。</li>
+  <li>
+<strong>并发问题</strong>：直接将Buffer Pool的内容写回磁盘会导致更多的锁竞争，因为多个事务可能同时尝试写入相同的页面。</li>
+  <li>
+<strong>数据完整性风险</strong>：如果在事务提交过程中发生崩溃，而修改尚未完全写入磁盘，那么数据可能处于不一致状态。
+    <h4 id="redolog的改善">redoLog的改善</h4>
+  </li>
+  <li>
+<strong>性能影响</strong>：redo的写入是顺序的，是磁盘顺序io，比随机io快得多</li>
+  <li>
+<strong>并发问题</strong>：redo是由后台单线程管理的，天然避免了并发问题。</li>
+  <li>
+<strong>数据完整性风险</strong>：InnoDB维护一个叫做Checkpoint的机制，它记录了最后成功完成的Redo Log的位置。在系统重启时，InnoDB可以从这个位置开始重做，以确保所有已完成的事务都被正确处理</li>
+</ol>
+
+<blockquote>
+  <p>本问题的回答由AI生成
+<a href="https://lxblog.com/qianwen/share?shareId=cf89a692-e026-4745-a132-fe6afc901f2b">https://lxblog.com/qianwen/share?shareId=cf89a692-e026-4745-a132-fe6afc901f2b</a></p>
+</blockquote>
+
+
+
+    </div>
+
+</article>
+</section>
+
+  <section class="sidebar" style="margin-left: 15px;">
+    <style type="text/css" media="screen">
+      .post-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class="post-menu">
+      <div class="post-menu-title">大纲</div>
+      <div class="post-menu-content"></div>
+    </div>
+
+    <script>
+      function generateContent() {
+        var menu = document.querySelector(".post-menu");
+        var menuContent =  menu.querySelector(".post-menu-content");
+        var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+        // Hide menu when no headings
+        if (headings.length === 0) {
+          return menu.style.display = "none";
+        }
+
+        // Generate post menu
+        var menuHTML = '';
+        for (var i = 0; i < headings.length; i++) {
+          var h = headings[i];
+          menuHTML += (
+            '<li class="h-' + h.tagName.toLowerCase() + '">'
+            + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+        }
+
+        menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+        // The header element
+        var header = document.querySelector('header.site-header');
+
+        function doMenuCollapse(index, over_items) {
+          var items = menuContent.firstChild.children;
+
+          if (over_items == undefined) {
+            over_items = 20;
+          }
+
+          if (items.length < over_items) {
+            return;
+          }
+
+          var activeItem = items[index];
+          var beginItem = activeItem
+          var endItem = activeItem
+          var beginIndex = index;
+          var endIndex = index + 1;
+          while (beginIndex >= 0
+          && !items[beginIndex].classList.contains('h-h2')) {
+            beginIndex -= 1;
+          }
+          while (endIndex < items.length
+          && !items[endIndex].classList.contains('h-h2')) {
+            endIndex += 1;
+          }
+          for (var i = 0; i < beginIndex; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+          for (var i = beginIndex + 1; i < endIndex; i++) {
+            item = items[i]
+            // if (!item.classList.contains('h-h2')) {
+            item.style.display = '';
+            // }
+          }
+          for (var i = endIndex; i < items.length; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+        }
+
+        // Init menu collapsed
+        doMenuCollapse(-1);
+
+        // Active the menu item
+        window.addEventListener('scroll', function (event) {
+          var lastActive = menuContent.querySelector('.active');
+          var changed = true;
+          var activeIndex = -1;
+          for (var i = headings.length - 1; i >= 0; i--) {
+            var h = headings[i];
+            var headingRect = h.getBoundingClientRect();
+            var headerRect = header.getBoundingClientRect();
+            var headerTop = Math.floor(headerRect.top);
+            var headerHeight = Math.floor(headerRect.height);
+            var headerHeight = headerTop + headerHeight + 20;
+            if (headingRect.top <= headerHeight) {
+              var id = 'h-' + h.getAttribute('id');
+              var a = menuContent.querySelector('a[href="#' + id  + '"]');
+              var curActive = a.parentNode;
+              if (curActive) {
+                curActive.classList.add('active');
+                activeIndex = i;
+              }
+              if (lastActive == curActive) {
+                changed = false;
+              }
+              break;
+            }
+          }
+          if (changed) {
+            if (lastActive) {
+              lastActive.classList.remove('active');
+            }
+            doMenuCollapse(activeIndex);
+          }
+          event.preventDefault();
+        });
+      }
+      generateContent();
+    </script>
+
+  </section>
+</div>
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    width: 1000px; /* Subtract the sidebar width from 100% */
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 500px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
+
+
+
+
+
+
+  </section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

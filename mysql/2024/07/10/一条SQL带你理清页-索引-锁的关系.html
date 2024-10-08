@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>一条SQL带你理清页、索引、锁的关系 | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="一条SQL带你理清页、索引、锁的关系">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="更多博客请见 我的语雀知识库">
+<meta property="og:description" content="更多博客请见 我的语雀知识库">
+<link rel="canonical" href="/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html">
+<meta property="og:url" content="/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2024-07-10T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="一条SQL带你理清页、索引、锁的关系">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"xyhao"},"dateModified":"2024-07-10T00:00:00+00:00","datePublished":"2024-07-10T00:00:00+00:00","description":"更多博客请见 我的语雀知识库","headline":"一条SQL带你理清页、索引、锁的关系","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html"},"url":"/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    html .page-banner .page-banner-img > *:first-child {
+      opacity: 0.9;
+    }
+
+    html[data-theme="dark"] .page-banner .page-banner-img > *:first-child {
+      opacity: 0.6462;
+    }
+  </style>
+<style>
+    html .page-banner .page-banner-inner > *:first-child > *:nth-child(2) {
+      color: gold
+    }
+  </style>
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-10-Index.png)"></div>
+        <img class="img-placeholder" src="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-10-Index.png">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner">
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">一条SQL带你理清页、索引、锁的关系</h1>
+  <h2 class="post-subtitle">一条SQL带你理清页、索引、锁的关系</h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2024-07-10T00:00:00+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Jul 10, 2024
+    </time><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 7 mins</span>
+  </div>
+<div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#MySQL">#MySQL</a></div></header>
+</div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="container">
+  <section class="post">
+
+
+
+
+
+
+
+
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <blockquote>
+  <p>更多博客请见 <a href="https://www.yuque.com/u41117719/xd1qgc">我的语雀知识库</a></p>
+</blockquote>
+
+<p>user表,id是主键,有a,b,c三个字段，都是int,a有索引，b有索引<br>
+问：<code class="language-plaintext highlighter-rouge">**update user set a = 1 where c = 2**;</code>这条语句怎么执行？<br>
+思考：先干什么？后干什么？全表扫描？扫的对象是什么？数据页？索引页？<br>
+哪个素引？为什么扫这个素引？扫的过程要上锁，上的什么锁？为什么上这个锁？不上行不行？<br>
+拿到锁后要干什么？更新？怎么更新？更新完后还有什么操作吗？直接结束了？<br>
+非聚簇索引上修改了字段值会怎样？有了解吗？为什么这样设计？<br>
+如果此时有其它事务来并发，如何保证事务隔离的？<br>
+<code class="language-plaintext highlighter-rouge">select id from user where a = 1 lock in share mode;</code>怎么办？  <br>
+如果第一条sql变成：<code class="language-plaintext highlighter-rouge">update user set id = id+1 where a = 1;</code>又如何执行？</p>
+
+<h1 id="update-user-set-a--1-where-c--2"><code class="language-plaintext highlighter-rouge">update user set a = 1 where c = 2;</code></h1>
+<p>先执行<code class="language-plaintext highlighter-rouge">update user set a = 1 where c = 2;</code><br>
+再执行<code class="language-plaintext highlighter-rouge">select id from user where a = 1 lock in share mode;</code></p>
+<h2 id="索引结构">索引结构</h2>
+
+<p><img src="/assets/articleSource/2024-07-10-MySQL/img.png" alt="image.png"></p>
+
+<p><img src="/assets/articleSource/2024-07-10-MySQL/img_1.png" alt="image.png">
+<img src="/assets/articleSource/2024-07-10-MySQL/img_2.png" alt="image.png"></p>
+
+<p>除了默认的主键索引之外，还有建立在a,b字段上的普通索引。每个索引一颗B+树。</p>
+<h2 id="执行过程">执行过程</h2>
+<p><strong>“</strong><code class="language-plaintext highlighter-rouge">**update user set a = 1 where c = 2；**</code><strong>”</strong>
+where子句里的条件能用什么索引优化查询吗？没有，c字段没有与之相关联的索引，这条语句的执行只能在主键索引的B+树中逐行扫描（也就是说，加的锁是组合锁，而不是表锁，并不是全表扫描）,
+这里参考up的解释：<img src="/assets/articleSource/2024-07-10-MySQL/img_3.png" alt="image.png"><br>
+简而言之就是，表锁开销太大了没必要，不如用组合锁。虽然效果上是锁住了全表，但不是表锁。</p>
+
+<p>从主键索引B+树中找到对应的行数据后，将a的值设置为1。（索引页节点二分查找，叶子节点遍历查找）<br>
+结束了吗？<br>
+没有，还要维护其它索引的B+树。</p>
+<h2 id="维护索引b树">维护索引B+树</h2>
+<p>b索引因为只包含主键和b字段，和a字段无关，不用维护。<br>
+在维护a索引的过程中，根据主键索引查出来的修改之前a字段所有值去在a索引B+树中查询出对应的叶子节点中的数据。<br>
+然后修改a字段的值就结束了？
+没有。
+a索引的B+树是根据a字段的值有序排列节点的。修改了a字段的值，有序性被打破，就要重建有序性。<br>
+如何重建？<br>
+先删后插。<br>
+<img src="/assets/articleSource/2024-07-10-MySQL/img_4.png" alt="image.png">
+如上图，将涉及到的节点全删了，再把更新后的新节点根据有序性插入到对应的位置上。  <br>
+这样就完成了对索引B+树的维护。</p>
+<h2 id="并发问题">并发问题</h2>
+<p>假设原来a = 1的数据有3行，现在由于update语句，又增加了3行，但是update语句因为维护B+树的原因还没提交。  <br>
+在维护B+树的过程中，如果有新的语句被执行：<br>
+<code class="language-plaintext highlighter-rouge">**select id from user where a = 1 lock in share mode;**</code><strong>（“in share mode”使得这条sql成为当前读）</strong><br>
+会怎么样？查出来3条还是6条？  <br>
+和事务隔离性有关吗？  <br>
+无关。事务隔离性只针对普通的select这样的走MVCC的快照读，顺着版本链读下去。  <br>
+<code class="language-plaintext highlighter-rouge">lock in share mode</code>、<code class="language-plaintext highlighter-rouge">update</code>、<code class="language-plaintext highlighter-rouge">delete</code>、<code class="language-plaintext highlighter-rouge">select ..... for update</code>等等关键字都是当前读，强制读取最新数据。那么这样的语句在并发环境中就涉及到了锁的问题。
+维护a索引B+树期间，是先删后插的形式，那么插入就需要意向锁。此时上文的select语句被执行，且走a索引。需要访问被删除和新增的节点。这样的并发情况下，意向锁是怎么被加上的？</p>
+
+<p>为了便于表述，执行完<code class="language-plaintext highlighter-rouge">**update user set a = 1 where c = 2**;</code>并维护a索引B+树的事务称为A，后续并发执行<code class="language-plaintext highlighter-rouge">**select id from user where a = 1 lock in share mode;**</code>的事务称为B。
+A不会上意向锁，锁是B替A加的。</p>
+
+<p>插入意向锁的上锁过程很有懒加载的思想。有并发情况才上锁，没有就不加。<br>
+也就是说，后续并发执行的B事务通过ReadView得知对最新数据做出修改地事务还没提交，于是为A事务加了插入意向锁，锁不是A事务加的！<br>
+B在替A上锁后，就阻塞等待了，真是个好人我哭死</p>
+
+<h1 id="update-user-set-id--id1-where-a--1"><code class="language-plaintext highlighter-rouge">update user set id = id+1 where a = 1;</code></h1>
+<p>先执行<code class="language-plaintext highlighter-rouge">**update user set id = id + 1 where a = 1;**</code>
+再执行<code class="language-plaintext highlighter-rouge">**select id from user where a = 1 lock in share mode;**</code><br>
+大致情况与前一种情况相同。但是有差异：<br>
+执行第一条sql时<br>
+先走a索引查询,显式地锁住a = 1 的记录，拿到主键id之后再去主键索引上回表找到主键索引的数据，也是显式地锁住。再根据主键索引里的b字段数据去b索引里回表查询找到对应的主键id，隐式地锁住。总共涉及到了两次回表操作，一个隐式锁，两个显式锁。<br>
+由于本次的update语句涉及到了修改主键，那么需要维护的B+树就不止a索引的了。三个B+树都要维护。<br>
+修改后如果不影响有序性，则直接修改即可，但如果影响到了B+树的有序性，就需要先删后插。</p>
+
+<h1 id="如何区分显式锁和隐式锁">如何区分显式锁和隐式锁？</h1>
+<p>显式锁是由开发者手动控制的锁，需要在代码中显式地指定锁的类型和范围。在MySQL中，显式锁通常是指使用<code class="language-plaintext highlighter-rouge">LOCK TABLES</code>语句或者<code class="language-plaintext highlighter-rouge">SELECT ... FOR UPDATE</code>语句来加锁，用于实现对数据的精确控制。</p>
+
+<p>隐式锁是由数据库系统自动管理的锁，不需要开发者手动介入。在MySQL中，隐式锁通常是指数据库系统在执行SQL语句时自动加上的锁，用于保证数据的一致性和事务的原子性。<br>
+<img src="/assets/articleSource/2024-07-10-MySQL/img_5.png" alt="image.png"></p>
+<h1 id="up的总结">up的总结</h1>
+<p><img src="/assets/articleSource/2024-07-10-MySQL/img_6.png" alt="image.png"></p>
+
+<blockquote>
+  <p>优雅_0v0. (2024, June 07). 一条SQL带你理清页、索引、锁的关系，95%的人回答不上来！. Retrieved from<a href="https://www.bilibili.com/video/BV1CM4m127Uq?vd_source=6df57b2b8470f0f2c9187d097a219270">一条SQL带你理清页、索引、锁的关系，95%的人回答不上来！_哔哩哔哩_bilibili</a></p>
+</blockquote>
+
+
+
+    </div>
+
+</article>
+</section>
+
+  <section class="sidebar" style="margin-left: 15px;">
+    <style type="text/css" media="screen">
+      .post-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class="post-menu">
+      <div class="post-menu-title">大纲</div>
+      <div class="post-menu-content"></div>
+    </div>
+
+    <script>
+      function generateContent() {
+        var menu = document.querySelector(".post-menu");
+        var menuContent =  menu.querySelector(".post-menu-content");
+        var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+        // Hide menu when no headings
+        if (headings.length === 0) {
+          return menu.style.display = "none";
+        }
+
+        // Generate post menu
+        var menuHTML = '';
+        for (var i = 0; i < headings.length; i++) {
+          var h = headings[i];
+          menuHTML += (
+            '<li class="h-' + h.tagName.toLowerCase() + '">'
+            + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+        }
+
+        menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+        // The header element
+        var header = document.querySelector('header.site-header');
+
+        function doMenuCollapse(index, over_items) {
+          var items = menuContent.firstChild.children;
+
+          if (over_items == undefined) {
+            over_items = 20;
+          }
+
+          if (items.length < over_items) {
+            return;
+          }
+
+          var activeItem = items[index];
+          var beginItem = activeItem
+          var endItem = activeItem
+          var beginIndex = index;
+          var endIndex = index + 1;
+          while (beginIndex >= 0
+          && !items[beginIndex].classList.contains('h-h2')) {
+            beginIndex -= 1;
+          }
+          while (endIndex < items.length
+          && !items[endIndex].classList.contains('h-h2')) {
+            endIndex += 1;
+          }
+          for (var i = 0; i < beginIndex; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+          for (var i = beginIndex + 1; i < endIndex; i++) {
+            item = items[i]
+            // if (!item.classList.contains('h-h2')) {
+            item.style.display = '';
+            // }
+          }
+          for (var i = endIndex; i < items.length; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+        }
+
+        // Init menu collapsed
+        doMenuCollapse(-1);
+
+        // Active the menu item
+        window.addEventListener('scroll', function (event) {
+          var lastActive = menuContent.querySelector('.active');
+          var changed = true;
+          var activeIndex = -1;
+          for (var i = headings.length - 1; i >= 0; i--) {
+            var h = headings[i];
+            var headingRect = h.getBoundingClientRect();
+            var headerRect = header.getBoundingClientRect();
+            var headerTop = Math.floor(headerRect.top);
+            var headerHeight = Math.floor(headerRect.height);
+            var headerHeight = headerTop + headerHeight + 20;
+            if (headingRect.top <= headerHeight) {
+              var id = 'h-' + h.getAttribute('id');
+              var a = menuContent.querySelector('a[href="#' + id  + '"]');
+              var curActive = a.parentNode;
+              if (curActive) {
+                curActive.classList.add('active');
+                activeIndex = i;
+              }
+              if (lastActive == curActive) {
+                changed = false;
+              }
+              break;
+            }
+          }
+          if (changed) {
+            if (lastActive) {
+              lastActive.classList.remove('active');
+            }
+            doMenuCollapse(activeIndex);
+          }
+          event.preventDefault();
+        });
+      }
+      generateContent();
+    </script>
+
+  </section>
+</div>
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    width: 1000px; /* Subtract the sidebar width from 100% */
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 500px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
+
+
+
+
+
+
+  </section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

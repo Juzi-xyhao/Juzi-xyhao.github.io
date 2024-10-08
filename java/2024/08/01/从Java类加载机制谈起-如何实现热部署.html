@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>从Java类加载机制谈起：如何实现热部署 | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="从Java类加载机制谈起：如何实现热部署">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="更多博客请见 我的语雀知识库 原文地址：从Java类加载机制谈起：如何实现热部署">
+<meta property="og:description" content="更多博客请见 我的语雀知识库 原文地址：从Java类加载机制谈起：如何实现热部署">
+<link rel="canonical" href="/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html">
+<meta property="og:url" content="/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2024-08-01T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="从Java类加载机制谈起：如何实现热部署">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"xyhao"},"dateModified":"2024-08-01T00:00:00+00:00","datePublished":"2024-08-01T00:00:00+00:00","description":"更多博客请见 我的语雀知识库 原文地址：从Java类加载机制谈起：如何实现热部署","headline":"从Java类加载机制谈起：如何实现热部署","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html"},"url":"/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    html .page-banner .page-banner-img > *:first-child {
+      opacity: 0.9;
+    }
+
+    html[data-theme="dark"] .page-banner .page-banner-img > *:first-child {
+      opacity: 0.6462;
+    }
+  </style>
+<style>
+    html .page-banner .page-banner-inner > *:first-child > *:nth-child(2) {
+      color: gold
+    }
+  </style>
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-08-01-arthas.png)"></div>
+        <img class="img-placeholder" src="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-08-01-arthas.png">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner">
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">从Java类加载机制谈起：如何实现热部署</h1>
+  <h2 class="post-subtitle">arthas是怎么实现热部署的呢？</h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2024-08-01T00:00:00+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Aug 01, 2024
+    </time><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 31 mins</span>
+  </div>
+<div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a></div></header>
+</div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="container">
+  <section class="post">
+
+
+
+
+
+
+
+
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <blockquote>
+  <p>更多博客请见 <a href="https://www.yuque.com/u41117719/xd1qgc">我的语雀知识库</a><br>
+原文地址：<a href="https://developer.aliyun.com/article/828000">从Java类加载机制谈起：如何实现热部署</a></p>
+</blockquote>
+
+<h2 id="一-class的热替换">一 、class的热替换</h2>
+<p>ClassLoader中重要的方法:</p>
+<h3 id="loadclass">loadClass:</h3>
+<p>**ClassLoader.loadClass(…) **是ClassLoader的入口点。当一个类没有指明用什么加载器加载的时候，JVM默认采用AppClassLoader加载器加载没有加载过的class，调用的方法的入口就是loadClass(…)。如果一个class被自定义的ClassLoader加载，那么JVM也会调用这个自定义的ClassLoader.loadClass(…)方法来加载class内部引用的一些别的class文件。重载这个方法，能实现自定义加载class的方式，抛弃双亲委托机制，但是即使不采用双亲委托机制，比如java.lang包中的相关类还是不能自定义一个同名的类来代替，主要因为JVM解析、验证class的时候，会进行相关判断。</p>
+<h3 id="defineclass">defineClass:</h3>
+<p>系统自带的ClassLoader，默认加载程序的是AppClassLoader，ClassLoader加载一个class，最终调用的是defineClass(…)方法，这时候就在想是否可以重复调用defineClass(…)方法加载同一个类(或者修改过)，最后发现调用多次的话会有相关错误:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">LinkageError</span> 
+<span class="n">attempted</span> <span class="n">duplicate</span> <span class="kd">class</span> <span class="nc">definition</span>
+</code></pre></div></div>
+<p>所以<strong>一个class被一个ClassLoader实例加载过的话，就不能再被这个ClassLoader实例再次加载</strong>(这里的加载指的是，调用了defileClass(…)放方法，重新加载字节码、解析、验证。)。而系统默认的AppClassLoader加载器，他们内部会缓存加载过的class，重新加载的话，就直接取缓存。所与对于热加载的话，只能重新创建一个ClassLoader，然后再去加载已经被加载过的class文件。</p>
+<h2 id="二class的卸载">二、class的卸载</h2>
+<p>在Java中class也是可以unload。<strong>JVM中class和Meta信息存放在PermGen space区域</strong>。如果加载的class文件很多，那么可能导致PermGen space区域空间溢出。引起：java.lang.OutOfMemoryErrorPermGen space. 对于有些Class我们可能只需要使用一次，就不再需要了，也可能我们修改了class文件，我们需要重新加载 newclass，那么oldclass就不再需要了。那么JVM怎么样才能卸载Class呢。
+JVM中的Class只有满足以下三个条件，才能被GC回收，也就是该Class被卸载（unload）：</p>
+
+<ul>
+  <li>该类所有的实例都已经被GC。</li>
+  <li>加载该类的ClassLoader实例已经被GC。</li>
+  <li>该类的java.lang.Class对象没有在任何地方被引用。</li>
+</ul>
+
+<p>GC的时机我们是不可控的，那么同样的我们对于Class的卸载也是不可控的。</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>有启动类加载器加载的类型在整个运行期间是不可能被卸载的(jvm和jls规范).
+被系统类加载器和标准扩展类加载器加载的类型在运行期间不太可能被卸载，因为系统类加载器实例或者标准扩展类的实例基本上在整个运行期间总能直接或者间接的访问的到，其达到unreachable的可能性极小.(当然，在虚拟机快退出的时候可以，因为不管ClassLoader实例或者Class(java.lang.Class)实例也都是在堆中存在，同样遵循垃圾收集的规则).
+被开发者自定义的类加载器实例加载的类型只有在很简单的上下文环境中才能被卸载，而且一般还要借助于强制调用虚拟机的垃圾收集功能才可以做到.可以预想，稍微复杂点的应用场景中(尤其很多时候，用户在开发自定义类加载器实例的时候采用缓存的策略以提高系统性能)，被加载的类型在运行期间也是几乎不太可能被卸载的(至少卸载的时间是不确定的).
+</code></pre></div></div>
+<p>综合以上三点， 一个已经加载的类型被卸载的几率很小至少被卸载的时间是不确定的.同时，我们可以看的出来，开发者在开发代码时候，不应该对虚拟机的类型卸载做任何假设的前提下来实现系统中的特定功能.</p>
+
+<hr>
+
+<h2 id="三tomcat中关于类的加载与卸载">三、Tomcat中关于类的加载与卸载</h2>
+<p>Tomcat中与其说有热加载，还不如说是热部署来的准确些。因为对于一个应用，其中class文件被修改过，那么Tomcat会先卸载这个应用(Context)，然后重新加载这个应用，其中关键就在于自定义ClassLoader的应用。这里有篇文章很好的介绍了tomcat中对于ClassLoader的应用。
+Tomcat启动的时候，ClassLoader加载的流程：</p>
+
+<ol>
+  <li>system classloader即AppClassLoader加载 {catalina.home}/bin里面的jar包，也就是tomcat启动相关的jar包。</li>
+  <li>Tomcat启动类Bootstrap中有3个classloader属性，catalinaLoader、commonLoader、sharedLoader在Tomcat7中默认他们初始化都为同一个StandardClassLoader实例。具体的也可以在 {catalina.home}/bin/bootstrap.jar包中的catalina.properites中进行配置</li>
+  <li>StandardClassLoader加载 {catalina.home}/lib下面的所有Tomcat用到的jar包</li>
+  <li>一个Context容器，代表了一个app应用。Context–&gt;WebappLoader–&gt;WebClassLoader。并且Thread.contextClassLoader=WebClassLoader。应用程序中的jsp文件、class类、lib/*.jar包，都是WebClassLoader加载的。</li>
+</ol>
+
+<p>当Jsp文件修改的时候，Tomcat更新步骤：</p>
+<ol>
+  <li>当访问1.jsp的时候，1.jsp的包装类JspServletWrapper会去比较1.jsp文件最新修改时间和上次的修改时间，以此判断1.jsp是否修改过</li>
+  <li>1.jsp修改过的话，那么jspservletWrapper会清除相关引用，包括1.jsp编译后的servlet实例和加载这个servlet的JasperLoader实例</li>
+  <li>重新创建一个JasperLoader实例，重新加载修改过后的1.jsp，重新生成一个Servlet实例</li>
+  <li>
+    <p>返回修改后的1.jsp内容给用户。 <br>
+当app下面的class文件修改的时候，Tomcat更新步骤：</p>
+  </li>
+  <li>Context容器会有专门线程监控app下面的类的修改情况</li>
+  <li>如果发现有类被修改了。那么调用Context.reload()。清楚一系列相关的引用和资源</li>
+  <li>然后创新创建一个WebClassLoader实例，重新加载app下面需要的class。</li>
+</ol>
+
+<p>在一个有一定规模的应用中，如果文件修改多次，重启多次的话,<code class="language-plaintext highlighter-rouge">java.lang.OutOfMemoryErrorPermGen space</code>这个错误的的出现非常频繁。主要就是因为每次重启重新加载大量的class，超过了PermGen space设置的大小<br>
+两种情况可能导致PermGen space溢出</p>
+<ol>
+  <li>GC(Garbage Collection)在主程序运行期对PermGen space没有进行清理(GC的不可控行)，</li>
+  <li>重启之前WebClassLoader加载的class在别的地方还存在着引用。
+    <blockquote>
+      <p><a href="http://www.blogjava.net/heavensay/archive/2012/11/07/389685.html">class卸载、热替换和Tomcat的热部署的分析 - heavensay - BlogJava</a></p>
+    </blockquote>
+  </li>
+</ol>
+
+<hr>
+
+<h3 id="类加载的探索">类加载的探索</h3>
+<p>首先谈一下何为热部署（hotswap），<strong>热部署是在不重启 Java 虚拟机的前提下，能自动侦测到 class 文件的变化，更新运行时 class 的行为</strong>。<br>
+Java 类是通过 Java 虚拟机加载的，某个类的 class 文件在被 classloader 加载后，会生成对应的 Class 对象，之后就可以创建该类的实例。<br>
+<strong>默认的虚拟机行为只会在启动时加载类，如果后期有一个类需要更新的话，单纯替换编译的 class 文件，Java 虚拟机是不会更新正在运行的 class</strong>。如果要实现热部署，最根本的方式是修改虚拟机的源代码，改变 classloader 的加载行为，使虚拟机能监听 class 文件的更新，重新加载 class 文件。这样的行为破坏性很大。</p>
+
+<p>另一种友好的方法是创建自己的 classloader 来加载需要监听的 class，这样就能控制类加载的时机，从而实现热部署。<br>
+本文将具体探索如何实现这个方案。首先需要了解一下 Java 虚拟机现有的加载机制。目前的加载机制，称为<strong>双亲委派</strong>。<br>
+系统在使用一个 classloader 来加载类时，会先询问当前 classloader 的父类是否有能力加载，如果父类无法实现加载操作，才会将任务下放到该 classloader 来加载。这种自上而下的加载方式的好处是，让每个 classloader 执行自己的加载任务，不会重复加载类。</p>
+
+<p><strong>但是这种方式却使加载顺序非常难改变，让自定义 classloader 抢先加载需要监听改变的类成为了一个难题。</strong><br>
+不过我们可以换一个思路，虽然无法抢先加载该类，但是仍然可以用自定义 classloader 创建一个功能相同的类，让每次实例化的对象都指向这个新的类。当这个类的 class 文件发生改变的时候，再次创建一个更新的类，之后如果系统再次发出实例化请求，创建的对象讲指向这个全新的类。
+下面来简单列举一下需要做的工作。</p>
+
+<p>创建自定义的 classloader，加载需要监听改变的类，在 class 文件发生改变的时候，重新加载该类。 改变创建对象的行为，使他们在创建时使用自定义 classloader 加载的 class。</p>
+
+<hr>
+
+<h3 id="自定义类加载器的实现">自定义类加载器的实现</h3>
+<p>自定义加载器仍然需要执行类加载的功能。这里却存在一个问题，<strong>同一个类加载器无法同时加载两个相同名称的类</strong>，由于不论类的结构如何发生变化，生成的类名不会变，而 <strong>classloader 只能在虚拟机停止前销毁已经加载的类</strong>，这样 classloader 就无法加载更新后的类了。这里有一个小技巧，让每次加载的类都保存成一个带有版本信息的 class，比如加载 Test.class 时，保存在内存中的类是 Test_v1.class，当类发生改变时，重新加载的类名是 Test_v2.class。但是真正执行加载 class 文件创建 class 的 defineClass 方法是一个 native 的方法，修改起来又变得很困难。所以面前还剩一条路，那就是直接修改编译生成的 class 文件。
+<strong>利用 ASM 修改 class 文件</strong>
+可以修改字节码的框架有很多，比如 ASM，CGLIB。本文使用的是 ASM。先来介绍一下 class 文件的结构，class 文件包含了以下几类信息:</p>
+
+<p>第一个是类的基本信息，包含了访问权限信息，类名信息，父类信息，接口信息。
+第二个是类的变量信息。
+第三个是方法的信息。</p>
+
+<p>ASM 会先加载一个 class 文件，然后严格顺序读取类的各项信息，用户可以按照自己的意愿定义增强组件修改这些信息，最后输出成一个新的 class。
+首先看一下如何利用 ASM 修改类信息。</p>
+
+<ol>
+  <li>利用 ASM 修改字节码
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code> <span class="nc">ClassWriter</span> <span class="n">cw</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassWriter</span><span class="o">(</span><span class="nc">ClassWriter</span><span class="o">.</span><span class="na">COMPUTE_MAXS</span><span class="o">);</span> 
+ <span class="nc">ClassReader</span> <span class="n">cr</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>     
+ <span class="nc">String</span> <span class="n">enhancedClassName</span> <span class="o">=</span> <span class="n">classSource</span><span class="o">.</span><span class="na">getEnhancedName</span><span class="o">();</span> 
+ <span class="k">try</span> <span class="o">{</span> 
+     <span class="n">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassReader</span><span class="o">(</span><span class="k">new</span> <span class="nc">FileInputStream</span><span class="o">(</span> 
+             <span class="n">classSource</span><span class="o">.</span><span class="na">getFile</span><span class="o">()));</span> 
+ <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> 
+     <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span> 
+     <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> 
+ <span class="o">}</span> 
+ <span class="nc">ClassVisitor</span> <span class="n">cv</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">EnhancedModifier</span><span class="o">(</span><span class="n">cw</span><span class="o">,</span> 
+         <span class="n">className</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"."</span><span class="o">,</span> <span class="s">"/"</span><span class="o">),</span> 
+         <span class="n">enhancedClassName</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"."</span><span class="o">,</span> <span class="s">"/"</span><span class="o">));</span> 
+ <span class="n">cr</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">cv</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span>
+</code></pre></div>    </div>
+    <p>ASM 修改字节码文件的流程是一个责任链模式，首先使用一个 ClassReader 读入字节码，然后利用 ClassVisitor 做个性化的修改，最后利用 ClassWriter 输出修改后的字节码。
+之前提过，需要将读取的 class 文件的类名做一些修改，加载成一个全新名字的派生类。这里将之分为了 2 个步骤。
+<strong>第一步，先将原来的类变成接口。</strong></p>
+  </li>
+  <li>重定义的原始类
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">redefineClass</span><span class="o">(</span><span class="nc">String</span> <span class="n">className</span><span class="o">){</span> 
+ <span class="nc">ClassWriter</span> <span class="n">cw</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassWriter</span><span class="o">(</span><span class="nc">ClassWriter</span><span class="o">.</span><span class="na">COMPUTE_MAXS</span><span class="o">);</span> 
+ <span class="nc">ClassReader</span> <span class="n">cr</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> 
+ <span class="nc">ClassSource</span> <span class="n">cs</span> <span class="o">=</span> <span class="n">classFiles</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">className</span><span class="o">);</span> 
+ <span class="k">if</span><span class="o">(</span><span class="n">cs</span><span class="o">==</span><span class="kc">null</span><span class="o">){</span> 
+     <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> 
+ <span class="o">}</span> 
+ <span class="k">try</span> <span class="o">{</span> 
+     <span class="n">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassReader</span><span class="o">(</span><span class="k">new</span> <span class="nc">FileInputStream</span><span class="o">(</span><span class="n">cs</span><span class="o">.</span><span class="na">getFile</span><span class="o">()));</span> 
+ <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> 
+     <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span> 
+     <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> 
+ <span class="o">}</span> 
+ <span class="nc">ClassModifier</span> <span class="n">cm</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassModifier</span><span class="o">(</span><span class="n">cw</span><span class="o">);</span> 
+ <span class="n">cr</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">cm</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span> 
+ <span class="kt">byte</span><span class="o">[]</span> <span class="n">code</span> <span class="o">=</span> <span class="n">cw</span><span class="o">.</span><span class="na">toByteArray</span><span class="o">();</span> 
+ <span class="k">return</span> <span class="nf">defineClass</span><span class="o">(</span><span class="n">className</span><span class="o">,</span> <span class="n">code</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">code</span><span class="o">.</span><span class="na">length</span><span class="o">);</span> 
+</code></pre></div>    </div>
+    <p>首先 load 原始类的 class 文件，此处定义了一个增强组件 ClassModifier，作用是修改原始类的类型，将它转换成接口。原始类的所有方法逻辑都会被去掉。
+<strong>第二步，生成的派生类都实现这个接口，即原始类，并且复制原始类中的所有方法逻辑。</strong>之后如果该类需要更新，会生成一个新的派生类，也会实现这个接口。这样做的目的是不论如何修改，同一个 class 的派生类都有一个共同的接口，他们之间的转换变得对外不透明。</p>
+  </li>
+  <li>定义一个派生类
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="c1">// 在 class 文件发生改变时重新定义这个类</span>
+<span class="kd">private</span> <span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">redefineClass</span><span class="o">(</span><span class="nc">String</span> <span class="n">className</span><span class="o">,</span> <span class="nc">ClassSource</span> <span class="n">classSource</span><span class="o">){</span> 
+<span class="nc">ClassWriter</span> <span class="n">cw</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassWriter</span><span class="o">(</span><span class="nc">ClassWriter</span><span class="o">.</span><span class="na">COMPUTE_MAXS</span><span class="o">);</span> 
+<span class="nc">ClassReader</span> <span class="n">cr</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> 
+<span class="n">classSource</span><span class="o">.</span><span class="na">update</span><span class="o">();</span> 
+<span class="nc">String</span> <span class="n">enhancedClassName</span> <span class="o">=</span> <span class="n">classSource</span><span class="o">.</span><span class="na">getEnhancedName</span><span class="o">();</span>       
+<span class="k">try</span> <span class="o">{</span> 
+    <span class="n">cr</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ClassReader</span><span class="o">(</span> 
+            <span class="k">new</span> <span class="nf">FileInputStream</span><span class="o">(</span><span class="n">classSource</span><span class="o">.</span><span class="na">getFile</span><span class="o">()));</span> 
+<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span> 
+    <span class="n">e</span><span class="o">.</span><span class="na">printStackTrace</span><span class="o">();</span> 
+    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> 
+<span class="o">}</span> 
+<span class="nc">EnhancedModifier</span> <span class="n">em</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">EnhancedModifier</span><span class="o">(</span><span class="n">cw</span><span class="o">,</span> <span class="n">className</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"."</span><span class="o">,</span> <span class="s">"/"</span><span class="o">),</span> 
+        <span class="n">enhancedClassName</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"."</span><span class="o">,</span> <span class="s">"/"</span><span class="o">));</span> 
+<span class="nc">ExtendModifier</span> <span class="n">exm</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ExtendModifier</span><span class="o">(</span><span class="n">em</span><span class="o">,</span> <span class="n">className</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"."</span><span class="o">,</span> <span class="s">"/"</span><span class="o">),</span> 
+        <span class="n">enhancedClassName</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"."</span><span class="o">,</span> <span class="s">"/"</span><span class="o">));</span> 
+<span class="n">cr</span><span class="o">.</span><span class="na">accept</span><span class="o">(</span><span class="n">exm</span><span class="o">,</span> <span class="mi">0</span><span class="o">);</span> 
+<span class="kt">byte</span><span class="o">[]</span> <span class="n">code</span> <span class="o">=</span> <span class="n">cw</span><span class="o">.</span><span class="na">toByteArray</span><span class="o">();</span> 
+<span class="n">classSource</span><span class="o">.</span><span class="na">setByteCopy</span><span class="o">(</span><span class="n">code</span><span class="o">);</span> 
+<span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">clazz</span> <span class="o">=</span> <span class="n">defineClass</span><span class="o">(</span><span class="n">enhancedClassName</span><span class="o">,</span> <span class="n">code</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="n">code</span><span class="o">.</span><span class="na">length</span><span class="o">);</span> 
+<span class="n">classSource</span><span class="o">.</span><span class="na">setClassCopy</span><span class="o">(</span><span class="n">clazz</span><span class="o">);</span> 
+<span class="k">return</span> <span class="n">clazz</span><span class="o">;</span> 
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>再次 load 原始类的 class 文件，此处定义了两个增强组件，一个是 EnhancedModifier，这个增强组件的作用是改变原有的类名。第二个增强组件是 ExtendModifier，这个增强组件的作用是改变原有类的父类，让这个修改后的派生类能够实现同一个原始类（此时原始类已经转成接口了）。
+自定义 classloader 还有一个作用是监听会发生改变的 class 文件，classloader 会管理一个定时器，定时依次扫描这些 class 文件是否改变。</p>
+
+<hr>
+
+<h2 id="四改变创建对象的行为">四、改变创建对象的行为</h2>
+<p>Java 虚拟机常见的创建对象的方法有两种，一种是静态创建，直接 new 一个对象，一种是动态创建，通过反射的方法，创建对象。
+由于已经在自定义加载器中更改了原有类的类型，把它从类改成了接口，所以这两种创建方法都无法成立。我们要做的是将实例化原始类的行为变成实例化派生类。
+对于第一种方法，需要做的是将静态创建，变为通过 classloader 获取 class，然后动态创建该对象。</p>
+
+<ol>
+  <li>替换后的指令集所对应的逻辑
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="c1">// 原始逻辑</span>
+<span class="nc">Greeter</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Greeter</span><span class="o">();</span>
+<span class="c1">// 改变后的逻辑</span>
+<span class="nc">IGreeter</span> <span class="n">p</span> <span class="o">=</span> <span class="o">(</span><span class="nc">IGreeter</span><span class="o">)</span><span class="nc">MyClassLoader</span><span class="o">.</span><span class="na">getInstance</span><span class="o">().</span>
+<span class="n">findClass</span><span class="o">(</span><span class="err">“</span><span class="n">com</span><span class="o">.</span><span class="na">example</span><span class="o">.</span><span class="na">Greeter</span><span class="err">”</span><span class="o">).</span><span class="na">newInstance</span><span class="o">();</span>
+</code></pre></div>    </div>
+    <p>这里又需要用到 ASM 来修改 class 文件了。查找到所有 new 对象的语句，替换成通过 classloader 的形式来获取对象的形式。</p>
+  </li>
+  <li>利用 ASM 修改方法体
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span> 
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">visitTypeInsn</span><span class="o">(</span><span class="kt">int</span> <span class="n">opcode</span><span class="o">,</span> <span class="nc">String</span> <span class="n">type</span><span class="o">)</span> <span class="o">{</span> 
+ <span class="k">if</span><span class="o">(</span><span class="n">opcode</span><span class="o">==</span><span class="nc">Opcodes</span><span class="o">.</span><span class="na">NEW</span> <span class="o">&amp;&amp;</span> <span class="n">type</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="n">className</span><span class="o">)){</span> 
+     <span class="nc">List</span><span class="o">&lt;</span><span class="nc">LocalVariableNode</span><span class="o">&gt;</span> <span class="n">variables</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="na">localVariables</span><span class="o">;</span> 
+     <span class="nc">String</span> <span class="n">compileType</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span> 
+     <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">variables</span><span class="o">.</span><span class="na">size</span><span class="o">();</span><span class="n">i</span><span class="o">++){</span> 
+         <span class="nc">LocalVariableNode</span> <span class="n">localVariable</span> <span class="o">=</span> <span class="n">variables</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span> 
+         <span class="n">compileType</span> <span class="o">=</span> <span class="n">formType</span><span class="o">(</span><span class="n">localVariable</span><span class="o">.</span><span class="na">desc</span><span class="o">);</span> 
+         <span class="k">if</span><span class="o">(</span><span class="n">matchType</span><span class="o">(</span><span class="n">compileType</span><span class="o">)&amp;&amp;!</span><span class="n">valiableIndexUsed</span><span class="o">[</span><span class="n">i</span><span class="o">]){</span> 
+             <span class="n">valiableIndexUsed</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> 
+             <span class="k">break</span><span class="o">;</span> 
+         <span class="o">}</span> 
+     <span class="o">}</span> 
+ <span class="n">mv</span><span class="o">.</span><span class="na">visitMethodInsn</span><span class="o">(</span><span class="nc">Opcodes</span><span class="o">.</span><span class="na">INVOKESTATIC</span><span class="o">,</span> <span class="no">CLASSLOAD_TYPE</span><span class="o">,</span> 
+     <span class="s">"getInstance"</span><span class="o">,</span> <span class="s">"()L"</span><span class="o">+</span><span class="no">CLASSLOAD_TYPE</span><span class="o">+</span><span class="s">";"</span><span class="o">);</span> 
+ <span class="n">mv</span><span class="o">.</span><span class="na">visitLdcInsn</span><span class="o">(</span><span class="n">type</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"/"</span><span class="o">,</span> <span class="s">"."</span><span class="o">));</span> 
+ <span class="n">mv</span><span class="o">.</span><span class="na">visitMethodInsn</span><span class="o">(</span><span class="nc">Opcodes</span><span class="o">.</span><span class="na">INVOKEVIRTUAL</span><span class="o">,</span> <span class="no">CLASSLOAD_TYPE</span><span class="o">,</span> 
+     <span class="s">"findClass"</span><span class="o">,</span> <span class="s">"(Ljava/lang/String;)Ljava/lang/Class;"</span><span class="o">);</span> 
+ <span class="n">mv</span><span class="o">.</span><span class="na">visitMethodInsn</span><span class="o">(</span><span class="nc">Opcodes</span><span class="o">.</span><span class="na">INVOKEVIRTUAL</span><span class="o">,</span> <span class="s">"java/lang/Class"</span><span class="o">,</span> 
+     <span class="s">"newInstance"</span><span class="o">,</span> <span class="s">"()Ljava/lang/Object;"</span><span class="o">);</span> 
+ <span class="n">mv</span><span class="o">.</span><span class="na">visitTypeInsn</span><span class="o">(</span><span class="nc">Opcodes</span><span class="o">.</span><span class="na">CHECKCAST</span><span class="o">,</span> <span class="n">compileType</span><span class="o">);</span> 
+ <span class="n">flag</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> 
+ <span class="o">}</span> <span class="k">else</span> <span class="o">{</span> 
+     <span class="n">mv</span><span class="o">.</span><span class="na">visitTypeInsn</span><span class="o">(</span><span class="n">opcode</span><span class="o">,</span> <span class="n">type</span><span class="o">);</span> 
+ <span class="o">}</span> 
+ <span class="o">}</span>
+</code></pre></div>    </div>
+    <p>对于第二种创建方法，需要通过修改 Class.forName()和 ClassLoader.findClass()的行为，使他们通过自定义加载器加载类。</p>
+  </li>
+</ol>
+
+<hr>
+
+<h2 id="五使用-javaagent-拦截默认加载器的行为">五、使用 JavaAgent 拦截默认加载器的行为</h2>
+<p>之前实现的类加载器已经解决了热部署所需要的功能，可是 JVM 启动时，并不会用自定义的加载器加载 classpath 下的所有 class 文件，取而代之的是通过应用加载器去加载。如果在其之后用自定义加载器重新加载已经加载的 class，有可能会出现 LinkageError 的 exception。所以必须在应用启动之前，重新替换已经加载的 class。如果在 jdk1.4 之前，能使用的方法只有一种，改变 jdk 中 classloader 的加载行为，使它指向自定义加载器的加载行为。好在 jdk5.0 之后，我们有了另一种侵略性更小的办法，这就是 JavaAgent 方法，JavaAgent 可以在 JVM 启动之后，应用启动之前的短暂间隙，提供空间给用户做一些特殊行为。比较常见的应用，是利用 JavaAgent 做面向方面的编程，在方法间加入监控日志等。
+JavaAgent 的实现很容易，只要在一个类里面，定义一个 premain 的方法。</p>
+
+<ol>
+  <li>一个简单的 JavaAgent
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ReloadAgent</span> <span class="o">{</span> 
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">premain</span><span class="o">(</span><span class="nc">String</span> <span class="n">agentArgs</span><span class="o">,</span> <span class="nc">Instrumentation</span> <span class="n">inst</span><span class="o">){</span> 
+    <span class="nc">GeneralTransformer</span> <span class="n">trans</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">GeneralTransformer</span><span class="o">();</span> 
+    <span class="n">inst</span><span class="o">.</span><span class="na">addTransformer</span><span class="o">(</span><span class="n">trans</span><span class="o">);</span> 
+<span class="o">}</span> 
+ <span class="o">}</span>
+</code></pre></div>    </div>
+    <p>然后编写一个 manifest 文件，将 Premain-Class属性设置成定义一个拥有 premain方法的类名即可。
+生成一个包含这个 manifest 文件的 jar 包。</p>
+    <div class="language-yaml highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="na">manifest-Version</span><span class="pi">:</span> <span class="s">1.0</span> 
+<span class="na">Premain-Class</span><span class="pi">:</span> <span class="s">com.example.ReloadAgent</span> 
+<span class="na">Can-Redefine-Classes</span><span class="pi">:</span> <span class="kc">true</span>
+</code></pre></div>    </div>
+    <p>最后需要在执行应用的参数中增加 -javaagent参数 , 加入这个 jar。同时可以为 Javaagent增加参数，下图中的参数是测试代码中 test project 的绝对路径。这样在执行应用的之前，会优先执行 premain方法中的逻辑，并且预解析需要加载的 class。
+这里利用 JavaAgent替换原始字节码，阻止原始字节码被 Java 虚拟机加载。只需要实现 一个 ClassFileTransformer的接口，利用这个实现类完成 class 替换的功能。</p>
+  </li>
+  <li>替换 class
+    <div class="language-java highlighter-rouge">
+<div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span> 
+<span class="kd">public</span> <span class="kt">byte</span> <span class="o">[]</span> <span class="n">transform</span><span class="o">(</span><span class="nc">ClassLoader</span> <span class="n">paramClassLoader</span><span class="o">,</span> <span class="nc">String</span> <span class="n">paramString</span><span class="o">,</span> 
+                      <span class="nc">Class</span><span class="o">&lt;?&gt;</span> <span class="n">paramClass</span><span class="o">,</span> <span class="nc">ProtectionDomain</span> <span class="n">paramProtectionDomain</span><span class="o">,</span> 
+                      <span class="kt">byte</span> <span class="o">[]</span> <span class="n">paramArrayOfByte</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IllegalClassFormatException</span> <span class="o">{</span> 
+ <span class="nc">String</span> <span class="n">className</span> <span class="o">=</span> <span class="n">paramString</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s">"/"</span><span class="o">,</span> <span class="s">"."</span><span class="o">);</span> 
+ <span class="k">if</span><span class="o">(</span><span class="n">className</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">"com.example.Test"</span><span class="o">)){</span> 
+     <span class="nc">MyClassLoader</span> <span class="n">cl</span> <span class="o">=</span> <span class="nc">MyClassLoader</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span> 
+     <span class="n">cl</span><span class="o">.</span><span class="na">defineReference</span><span class="o">(</span><span class="n">className</span><span class="o">,</span> <span class="s">"com.example.Greeter"</span><span class="o">);</span> 
+     <span class="k">return</span> <span class="n">cl</span><span class="o">.</span><span class="na">getByteCode</span><span class="o">(</span><span class="n">className</span><span class="o">);</span> 
+ <span class="o">}</span><span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">className</span><span class="o">.</span><span class="na">equals</span><span class="o">(</span><span class="s">"com.example.Greeter"</span><span class="o">)){</span> 
+     <span class="nc">MyClassLoader</span> <span class="n">cl</span> <span class="o">=</span> <span class="nc">MyClassLoader</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span> 
+     <span class="n">cl</span><span class="o">.</span><span class="na">redefineClass</span><span class="o">(</span><span class="n">className</span><span class="o">);</span> 
+     <span class="k">return</span> <span class="n">cl</span><span class="o">.</span><span class="na">getByteCode</span><span class="o">(</span><span class="n">className</span><span class="o">);</span> 
+ <span class="o">}</span> 
+ <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> 
+<span class="o">}</span>
+</code></pre></div>    </div>
+    <p>至此，所有的工作大功告成。</p>
+  </li>
+</ol>
+
+
+
+    </div>
+
+</article>
+</section>
+
+  <section class="sidebar" style="margin-left: 15px;">
+    <style type="text/css" media="screen">
+      .post-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class="post-menu">
+      <div class="post-menu-title">大纲</div>
+      <div class="post-menu-content"></div>
+    </div>
+
+    <script>
+      function generateContent() {
+        var menu = document.querySelector(".post-menu");
+        var menuContent =  menu.querySelector(".post-menu-content");
+        var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+        // Hide menu when no headings
+        if (headings.length === 0) {
+          return menu.style.display = "none";
+        }
+
+        // Generate post menu
+        var menuHTML = '';
+        for (var i = 0; i < headings.length; i++) {
+          var h = headings[i];
+          menuHTML += (
+            '<li class="h-' + h.tagName.toLowerCase() + '">'
+            + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+        }
+
+        menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+        // The header element
+        var header = document.querySelector('header.site-header');
+
+        function doMenuCollapse(index, over_items) {
+          var items = menuContent.firstChild.children;
+
+          if (over_items == undefined) {
+            over_items = 20;
+          }
+
+          if (items.length < over_items) {
+            return;
+          }
+
+          var activeItem = items[index];
+          var beginItem = activeItem
+          var endItem = activeItem
+          var beginIndex = index;
+          var endIndex = index + 1;
+          while (beginIndex >= 0
+          && !items[beginIndex].classList.contains('h-h2')) {
+            beginIndex -= 1;
+          }
+          while (endIndex < items.length
+          && !items[endIndex].classList.contains('h-h2')) {
+            endIndex += 1;
+          }
+          for (var i = 0; i < beginIndex; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+          for (var i = beginIndex + 1; i < endIndex; i++) {
+            item = items[i]
+            // if (!item.classList.contains('h-h2')) {
+            item.style.display = '';
+            // }
+          }
+          for (var i = endIndex; i < items.length; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+        }
+
+        // Init menu collapsed
+        doMenuCollapse(-1);
+
+        // Active the menu item
+        window.addEventListener('scroll', function (event) {
+          var lastActive = menuContent.querySelector('.active');
+          var changed = true;
+          var activeIndex = -1;
+          for (var i = headings.length - 1; i >= 0; i--) {
+            var h = headings[i];
+            var headingRect = h.getBoundingClientRect();
+            var headerRect = header.getBoundingClientRect();
+            var headerTop = Math.floor(headerRect.top);
+            var headerHeight = Math.floor(headerRect.height);
+            var headerHeight = headerTop + headerHeight + 20;
+            if (headingRect.top <= headerHeight) {
+              var id = 'h-' + h.getAttribute('id');
+              var a = menuContent.querySelector('a[href="#' + id  + '"]');
+              var curActive = a.parentNode;
+              if (curActive) {
+                curActive.classList.add('active');
+                activeIndex = i;
+              }
+              if (lastActive == curActive) {
+                changed = false;
+              }
+              break;
+            }
+          }
+          if (changed) {
+            if (lastActive) {
+              lastActive.classList.remove('active');
+            }
+            doMenuCollapse(activeIndex);
+          }
+          event.preventDefault();
+        });
+      }
+      generateContent();
+    </script>
+
+  </section>
+</div>
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    width: 1000px; /* Subtract the sidebar width from 100% */
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 500px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
+
+
+
+
+
+
+  </section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

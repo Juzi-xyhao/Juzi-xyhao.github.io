@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>synchronized底层 | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="synchronized底层">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="更多博客请见 我的语雀知识库">
+<meta property="og:description" content="更多博客请见 我的语雀知识库">
+<link rel="canonical" href="/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html">
+<meta property="og:url" content="/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2024-04-05T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="synchronized底层">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"xyhao"},"dateModified":"2024-04-05T00:00:00+00:00","datePublished":"2024-04-05T00:00:00+00:00","description":"更多博客请见 我的语雀知识库","headline":"synchronized底层","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html"},"url":"/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    html .page-banner .page-banner-img > *:first-child {
+      opacity: 0.9;
+    }
+
+    html[data-theme="dark"] .page-banner .page-banner-img > *:first-child {
+      opacity: 0.6462;
+    }
+  </style>
+<style>
+    html .page-banner .page-banner-inner > *:first-child > *:nth-child(2) {
+      color: gold
+    }
+  </style>
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png)"></div>
+        <img class="img-placeholder" src="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner">
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">synchronized底层</h1>
+  <h2 class="post-subtitle">锁升级的过程</h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2024-04-05T00:00:00+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Apr 05, 2024
+    </time><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 10 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#JUC">#JUC</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Synchronized">#Synchronized</a>
+</div></header>
+</div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="container">
+  <section class="post">
+
+
+
+
+
+
+
+
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <blockquote>
+  <p>更多博客请见 <a href="https://www.yuque.com/u41117719/xd1qgc">我的语雀知识库</a></p>
+</blockquote>
+
+<p><br></p>
+
+<p>synchronized可以修饰方法、静态方法、代码块。修饰方法和静态方法时，方法的字节码文件中会多一个标识：ACC_SYNCHRONIZED。
+当调用设置了 ACC_SYNCHRONIZED 的方法时，执行线程进入监视器（monitor），然后执行这个方法，方法执行完毕后退出监视器。需要注意的是，无论这个方法是正常完成还是突然完成，在执行线程拥有监视器期间，没有其他线程可以进入这个方法。</p>
+
+<h2 id="关于monitor">关于monitor</h2>
+<p>上文我们总是把 monitor 翻译为监视器，其实各位如果系统地学习过操作系统，对 monitor 一定不陌生，它也被翻译为管程。常见的进程同步与互斥机制就是信号量和管程，相比起信号量，管程有一个重要特性：在一个时刻只能有一个进程使用管程，即进程在无法继续执行的时候不能一直占用管程，否则其它进程将永远不能使用管程。也就是说管程天生支持进程互斥。
+其实使用管程是能够实现信号量的，并且也能用信号量实现管程。但是管程封装的比较好，相比起信号量来需要我们编写的代码更少，更加易用。
+把管程翻译为 Java 领域的语言，就是管理类的成员变量和成员方法，让这个类是线程安全的。
+而对象和monitor是一一对应的</p>
+<h2 id="monitorenter">monitorenter</h2>
+<p>执行 monitorenter 的线程会尝试获得监视器的所有权，或者说尝试获得对象的锁（反过来说就是不加 synchronized 的对象是不会被锁住的）。
+另外，每个监视器都维护着一个自己被持有次数的计数器，具体如下：
+如果与对象关联的监视器的计数器为零，则线程进入监视器成为该监视器的拥有者，并将计数器设置为 1。
+当同一个线程再次进入该对象的监视器的时候，计数器会再次自增(这也说明了synchronized是可重入锁)。
+当其他线程想获得该对象关联的监视器的时候，就会被阻塞住，直到该监视器的计数器为 0 才会再次尝试获得其所有权</p>
+<h2 id="关于monitorexit">关于monitorexit</h2>
+<p>某个线程想要执行 monitorexit 指令，那它一定得是某个监视器的拥有者才行。
+当某个线程执行 monitorexit 指令的时候，该线程拥有的监视器的计数器就会减一。如果计数器为 0，就表明该线程不再拥有监视器了，这样，其他线程就可以去尝试获得这个监视器了。</p>
+
+<p>当synchronized修饰代码块时，代码块所处的那个方法的字节码中会多出两个指令 monitorenter 和 monitorexit，也就是说在同步方法块中，JVM 使用 monitorenter 和 monitorexit 这两个指令实现同步。</p>
+<h2 id="锁是如何升级的呢">锁是如何升级的呢？</h2>
+<p><img src="/assets/articleSource/2024-04-05-synchonized/img.png" alt=""></p>
+
+<p>锁标志位 “01” + 是否是偏向锁 “0” 表示无锁状态，也就是说该对象没有被锁定
+锁标志位 “01” + 是否是偏向锁 “1” 表示偏向锁状态</p>
+
+<h3 id="轻量级锁加锁的过程是这样的">轻量级锁加锁的过程是这样的：</h3>
+
+<ol>
+  <li>Mark Word 的初始状态：在代码即将进入同步块的时候，如果此同步对象没有被锁定，也即 Mark Word 中的锁标志位 “01” + 是否是偏向锁 “0”：</li>
+</ol>
+
+<p><img src="/assets/articleSource/2024-04-05-synchonized/img_1.png" alt=""></p>
+
+<ol>
+  <li>在当前线程的栈帧中建立一个锁记录：Java 虚拟机会在将在当前线程的栈帧中建立一个名为 锁记录（Lock Record） 的空间，Lock Record 中有一个字段 displaced_header，用于后续存储锁对象的 Mark Word 的拷贝：</li>
+</ol>
+
+<p><img src="/assets/articleSource/2024-04-05-synchonized/img_2.png" alt=""></p>
+
+<ol>
+  <li>复制锁对象的 Mark Word 到锁记录中：把锁对象的 Mark Word 复制到锁记录中，更具体来讲，是将 Mark Word 放到锁记录的 displaced_header 属性中。官方给这个复制过来的记录起名 Displaced Mark Word：</li>
+</ol>
+
+<p><img src="/assets/articleSource/2024-04-05-synchonized/img_3.png" alt=""></p>
+
+<ol>
+  <li>使用 CAS 操作更新锁对象的 Mark Word。Java 虚拟机使用 CAS 操作尝试把锁对象的 Mark Word 更新为指向锁记录的指针，并将锁记录里的 owner 指针指向对象的 Mark Word。如果这个更新操作成功了，就表明获取轻量级锁成功，也就是说该线程拥有了这个对象的锁！并且该对象 Mark Word 的锁标志位会被改为 00，即表示此对象处于轻量级锁定状态。如果这个更新操作失败了，那有两种可能性：
+    <ol>
+      <li>当前线程已经拥有了这个对象锁（直接进入同步块继续执行）</li>
+      <li>存在其他的线程竞争获取这个对象锁（膨胀成重量级锁，锁标志的状态值变为 10，Mark Word 中存储的就是指向重量级锁（互斥量）的指针</li>
+    </ol>
+  </li>
+</ol>
+
+<p>为了证实到底是哪种情况，虚拟机首先会检查该对象的 Mark Word 是否指向当前线程的栈帧，如果是就说明当前线程已经拥有了这个对象的锁，那就可以直接进入同步块继续执行（synchronized 是可重入锁）。</p>
+
+<p>假设锁的状态是轻量级锁，下图反应了对象的 Mark word 和线程栈中锁记录的状态，可以看到左边线程栈中包含3个指向当前锁对象的 Lock Record。其中栈中最高位的锁记录为第一次获取轻量级锁时分配的，其 Displaced Mark word 的值为锁对象 obj 加锁之前的 Mark word，之后的每次锁重入都会在线程栈中分配一个 Displaced Mark word 为 null 的锁记录。
+<img src="/assets/articleSource/2024-04-05-synchonized/img_4.png" alt="">
+那么问题来了，为什么 synchronized 重入的时候 Java 虚拟机要在线程栈中添加 Displaced Mark word 为 null 的锁记录呢？
+首先锁重入次数是一定要记录下来的，因为每次解锁都需要对应一次加锁，只有解锁次数等于加锁次数时，该锁才真正的被释放，也就是在解锁时需要用到说锁的重入次数。
+最简单的记录锁重入次数的方案就是将其记录在对象头的 Mark word 中，但 Mark word 大小有限，没有多出来的地方存放该信息了。另一个方案就是在锁纪录中记录重入次数，但这样做的话，每次重入获得锁的时候都需要遍历该线程的栈找到对应的锁纪录，然后去修改重入次数的值，显然这样效率不是很高。
+所以最终 Hotspot 选择了每次重入获得锁都添加一个锁记录来表示锁的重入，这样有几个 Displaced Mark word 为 null 的锁记录就表示发生了几次锁重入，非常简单。
+以上，就是 synchronized 锁重入的原理。</p>
+
+<p>再来看 CAS 更新操作失败的第二种情况，如果这个更新操作失败了并且该对象的 Mark Word 并没有指向当前线程的栈帧，就说明多个线程竞争锁。注意！！！这里就是我说的《Java 并发编程的艺术》书中出现错误的地方，我们来看原文</p>
+<blockquote>
+  <p>线程在执行同步块之前，JVM 会先在当前线程的栈桢中创建用于存储锁记录的空间，并将对象头中的 Mark Word 复制到锁记录中，官方称为 Displaced Mark Word。然后线程尝试使用 CAS 将对象头中的 Mark Word 替换为指向锁记录的指针。如果成功，当前线程获得锁，<u>如果失败，表示其他线程竞争锁，当前线程便尝试使用自旋来获取锁。</u></p>
+
+</blockquote>
+
+<p><img src="/assets/articleSource/2024-04-05-synchonized/img_5.png" alt="">
+看上方划线的句子，话不多说，我们接着上面那段源码往下看：
+可以看到并没有什么自旋操作，如果 CAS 成功就直接 return 了，如果失败就会执行下面的锁膨胀方法 ObjectSynchronizer::inflate，这里面同样也没有自旋操作。
+<strong>注意，从这段源码可以看到，锁的升级是用C++方法实现的</strong>
+所以从源码来看轻量级锁 CAS 失败（存在其他的线程竞争获取这个对象锁的情况）并不会自旋而是直接膨胀成重量级锁。</p>
+
+<h2 id="关于对象头">关于对象头</h2>
+<p>我们上述讲到的所有底层原理，其实都在这句话的基础之上：Each object is associated with a monitor
+那么，一个对象和一个 monitor 是如何关联起来的呢？
+在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：对象头（Header）、实例数据（Instance Data）和对齐填充（Padding）。
+其中，如果对象是数组类型，则虚拟机用 3 个字宽（Word）存储对象头（Mard Word、类型指针、数组长度），如果对象是非数组类型，则用 2 字宽存储对象头（Mard Word、类型指针）。在 32 位虚拟机中，1 字宽等于 4 字节，即 32 bit，如表所示：
+<img src="/assets/articleSource/2024-04-05-synchonized/img_6.png" alt="">
+<img src="/assets/articleSource/2024-04-05-synchonized/img_7.png" alt="img.png">
+Mark Word 就是对象与 monitor 关联的重点所在！ 《深入理解 Java 虚拟机 - 第 3 版》中是这样描述 Mark Word 的：</p>
+<blockquote>
+  <p>HotSpot 虚拟机对象的对象头部分包括两类信息。第一类是用于存储对象自身的运行时数据，如哈希码（HashCode）、GC 分代年龄、锁状态标志、线程持有的锁、偏向线程 ID、偏向时间戳等，这部分数据的长度在 32 位和 64 位的虚拟机（未开启压缩指针）中分别为 32 个比特和 64 个比特，官方称它为 “Mark Word”。
+对象需要存储的运行时数据很多，其实已经超出了 32、64 位 Bitmap 结构所能记录的最大限度，但对象头里的信息是与对象自身定义的数据无关的额外存储成本，考虑到虚拟机的空间效率，Mark Word 被设计成一个有着动态定义的数据结构，以便在极小的空间内存储尽量多的数据，根据对象的状态复用自己的存储空间。</p>
+</blockquote>
+
+<blockquote>
+  <p>参考：<a href="https://leetcode.cn/leetbook/read/concurrency/aty716/">力扣</a></p>
+</blockquote>
+
+<p>TODO  JDK21有对对象头的瘦身</p>
+
+
+    </div>
+
+</article>
+</section>
+
+  <section class="sidebar" style="margin-left: 15px;">
+    <style type="text/css" media="screen">
+      .post-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class="post-menu">
+      <div class="post-menu-title">大纲</div>
+      <div class="post-menu-content"></div>
+    </div>
+
+    <script>
+      function generateContent() {
+        var menu = document.querySelector(".post-menu");
+        var menuContent =  menu.querySelector(".post-menu-content");
+        var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+        // Hide menu when no headings
+        if (headings.length === 0) {
+          return menu.style.display = "none";
+        }
+
+        // Generate post menu
+        var menuHTML = '';
+        for (var i = 0; i < headings.length; i++) {
+          var h = headings[i];
+          menuHTML += (
+            '<li class="h-' + h.tagName.toLowerCase() + '">'
+            + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+        }
+
+        menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+        // The header element
+        var header = document.querySelector('header.site-header');
+
+        function doMenuCollapse(index, over_items) {
+          var items = menuContent.firstChild.children;
+
+          if (over_items == undefined) {
+            over_items = 20;
+          }
+
+          if (items.length < over_items) {
+            return;
+          }
+
+          var activeItem = items[index];
+          var beginItem = activeItem
+          var endItem = activeItem
+          var beginIndex = index;
+          var endIndex = index + 1;
+          while (beginIndex >= 0
+          && !items[beginIndex].classList.contains('h-h2')) {
+            beginIndex -= 1;
+          }
+          while (endIndex < items.length
+          && !items[endIndex].classList.contains('h-h2')) {
+            endIndex += 1;
+          }
+          for (var i = 0; i < beginIndex; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+          for (var i = beginIndex + 1; i < endIndex; i++) {
+            item = items[i]
+            // if (!item.classList.contains('h-h2')) {
+            item.style.display = '';
+            // }
+          }
+          for (var i = endIndex; i < items.length; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+        }
+
+        // Init menu collapsed
+        doMenuCollapse(-1);
+
+        // Active the menu item
+        window.addEventListener('scroll', function (event) {
+          var lastActive = menuContent.querySelector('.active');
+          var changed = true;
+          var activeIndex = -1;
+          for (var i = headings.length - 1; i >= 0; i--) {
+            var h = headings[i];
+            var headingRect = h.getBoundingClientRect();
+            var headerRect = header.getBoundingClientRect();
+            var headerTop = Math.floor(headerRect.top);
+            var headerHeight = Math.floor(headerRect.height);
+            var headerHeight = headerTop + headerHeight + 20;
+            if (headingRect.top <= headerHeight) {
+              var id = 'h-' + h.getAttribute('id');
+              var a = menuContent.querySelector('a[href="#' + id  + '"]');
+              var curActive = a.parentNode;
+              if (curActive) {
+                curActive.classList.add('active');
+                activeIndex = i;
+              }
+              if (lastActive == curActive) {
+                changed = false;
+              }
+              break;
+            }
+          }
+          if (changed) {
+            if (lastActive) {
+              lastActive.classList.remove('active');
+            }
+            doMenuCollapse(activeIndex);
+          }
+          event.preventDefault();
+        });
+      }
+      generateContent();
+    </script>
+
+  </section>
+</div>
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    width: 1000px; /* Subtract the sidebar width from 100% */
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 500px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
+
+
+
+
+
+
+  </section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

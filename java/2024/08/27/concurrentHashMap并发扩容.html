@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>ConcurrentHashMap并发扩容 | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="ConcurrentHashMap并发扩容">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="更多博客请见 我的语雀知识库 更多细节见ConcurrentHashMap 源码分析">
+<meta property="og:description" content="更多博客请见 我的语雀知识库 更多细节见ConcurrentHashMap 源码分析">
+<link rel="canonical" href="/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html">
+<meta property="og:url" content="/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="2024-08-27T00:00:00+00:00">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="ConcurrentHashMap并发扩容">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"xyhao"},"dateModified":"2024-08-27T00:00:00+00:00","datePublished":"2024-08-27T00:00:00+00:00","description":"更多博客请见 我的语雀知识库 更多细节见ConcurrentHashMap 源码分析","headline":"ConcurrentHashMap并发扩容","mainEntityOfPage":{"@type":"WebPage","@id":"/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html"},"url":"/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style>
+    html .page-banner .page-banner-img > *:first-child {
+      opacity: 0.9;
+    }
+
+    html[data-theme="dark"] .page-banner .page-banner-img > *:first-child {
+      opacity: 0.6462;
+    }
+  </style>
+<style>
+    html .page-banner .page-banner-inner > *:first-child > *:nth-child(2) {
+      color: gold
+    }
+  </style>
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png)"></div>
+        <img class="img-placeholder" src="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner">
+<header class="post-header">
+  <h1 class="post-title p-name" itemprop="name headline">ConcurrentHashMap并发扩容</h1>
+  <h2 class="post-subtitle">JDK 8使用细粒度更高的cas并发扩容</h2>
+
+  <div class="post-meta">
+    <time class="dt-published" datetime="2024-08-27T00:00:00+00:00" itemprop="datePublished"><i class="fa fa-calendar"></i> Aug 27, 2024
+    </time><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 33 mins</span>
+  </div>
+<div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#HashMap">#HashMap</a>
+</div></header>
+</div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="container">
+  <section class="post">
+
+
+
+
+
+
+
+
+
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+    <div class="post-content e-content" itemprop="articleBody">
+
+      <blockquote>
+  <p>更多博客请见 <a href="https://www.yuque.com/u41117719/xd1qgc">我的语雀知识库</a><br>
+更多细节见<a href="https://javaguide.cn/java/collection/concurrent-hash-map-source-code.html#_3-put">ConcurrentHashMap 源码分析</a></p>
+</blockquote>
+
+<p>JDK7和JDK8两个版本的扩容有点不一样。</p>
+<h2 id="jdk7">JDK7</h2>
+<p>JDK7版本中，扩容是在持有锁时发生的。
+<img src="/assets/articleSource/2024-08-27-concurrentHashMap/img_4.png" alt="image.png">
+35行的rehash是扩容函数。直到46行的finally代码块才释放锁。<br>
+拿到锁的线程执行put方法时会检查要不要扩容（已有元素个数 / table数组的长度  &gt; 负载因子）。<br>
+因此只有一个线程可以执行扩容操作，不存在并发问题。<br>
+但是map扩容了总得让其它线程知道吧。具体是怎么知道的呢？<br>
+其实数组table是一个volatile变量，这就保证了可见性。<br>
+证据见JDK 8中源码778行。我没有装JDK 7,但JDK7里也肯定是一个volatile变量。<br>
+<img src="/assets/articleSource/2024-08-27-concurrentHashMap/img.png" alt="image.png"></p>
+
+<h2 id="jdk8">JDK8</h2>
+<p>JDK8版本中，扩容是在不持有锁时发生的。<br>
+<img src="/assets/articleSource/2024-08-27-concurrentHashMap/img_1.png" alt="image.png"><br>
+倒数第三行的addCount是扩容的检查函数，可以清晰的看到，它不在syncronized代码块里。</p>
+
+<p>先看看add方法：<br>
+<img src="/assets/articleSource/2024-08-27-concurrentHashMap/img_2.png" alt="image.png"> <br>
+<strong>扩容检查流程：</strong></p>
+
+<ul>
+  <li>计算元素总量 size，若 CAS 冲突严重则放弃扩容。</li>
+  <li>若 size 计算成功，有新元素加入，且检测到元素总量大于阈值 size &gt; sizeCtl。
+    <ul>
+      <li>如果检查到当前已有线程在进行扩容。
+        <ul>
+          <li>扩容已经接近完成或足够多的线程参与到扩容中了，当前线程直接返回。</li>
+          <li>当前线程参与扩容。</li>
+        </ul>
+      </li>
+      <li>如果没有其他线程在进行扩容，则修改 sizeCtl 标识，进行扩容。</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="扩容流程">扩容流程</h4>
+<p>上述流程只是扩容之前的准备，扩容的核心逻辑在 transfer() 方法中。</p>
+<h5 id="transfer-源码">transfer() 源码</h5>
+<p>看源码之前，提前梳理一下扩容过程：</p>
+
+<ol>
+  <li>创建 nextTable，新容量是旧容量的 2 倍。</li>
+  <li>将原 table 的所有桶逆序分配给多个线程，每个线程每次最小分配 16 个桶，防止资源竞争导致的效率下降。指定范围的桶可能分配给多个线程同时处理。</li>
+  <li><strong>扩容时遇到空的桶，采用 CAS 设置为 ForwardingNode 节点，表示该桶扩容完成。</strong></li>
+  <li><strong>扩容时遇到 ForwardingNode 节点，表示该桶已扩容过了，直接跳过。</strong></li>
+  <li>
+<strong>单个桶内元素的迁移是加锁的</strong>，将旧 table 的 i 位置上所有元素迁移到新表。</li>
+  <li>最后将旧 table 的 i 位置设置为 ForwardingNode 节点。</li>
+  <li>所有桶扩容完毕，将 table 指向 nextTable，设置 sizeCtl 为新容量 0.75 倍</li>
+</ol>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">transfer</span><span class="o">(</span><span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;[]</span> <span class="n">tab</span><span class="o">,</span> <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;[]</span> <span class="n">nextTab</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="na">length</span><span class="o">,</span> <span class="n">stride</span><span class="o">;</span>
+    <span class="k">if</span> <span class="o">((</span><span class="n">stride</span> <span class="o">=</span> <span class="o">(</span><span class="no">NCPU</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">?</span> <span class="o">(</span><span class="n">n</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span><span class="o">)</span> <span class="o">/</span> <span class="no">NCPU</span> <span class="o">:</span> <span class="n">n</span><span class="o">)</span> <span class="o">&lt;</span> <span class="no">MIN_TRANSFER_STRIDE</span><span class="o">)</span> <span class="c1">// 每核处理的桶的数目，最小为16</span>
+        <span class="n">stride</span> <span class="o">=</span> <span class="no">MIN_TRANSFER_STRIDE</span><span class="o">;</span> <span class="c1">// MIN_TRANSFER_STRIDE写死了16，每个线程每次只分配16个桶</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">nextTab</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>            <span class="c1">// initiating</span>
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">"unchecked"</span><span class="o">)</span>
+            <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;[]</span> <span class="n">nt</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;[])</span><span class="k">new</span> <span class="nc">Node</span><span class="o">&lt;?,?&gt;[</span><span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="o">];</span> <span class="c1">// 构建nextTable，其容量为原来容量的两倍</span>
+            <span class="n">nextTab</span> <span class="o">=</span> <span class="n">nt</span><span class="o">;</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">Throwable</span> <span class="n">ex</span><span class="o">)</span> <span class="o">{</span>      <span class="c1">// try to cope with OOME</span>
+            <span class="n">sizeCtl</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">nextTable</span> <span class="o">=</span> <span class="n">nextTab</span><span class="o">;</span>
+        <span class="n">transferIndex</span> <span class="o">=</span> <span class="n">n</span><span class="o">;</span> <span class="c1">// 迁移总进度，值范围为[0,n]，表示从table的第n-1位开始处理直到第0位。</span>
+    <span class="o">}</span>
+    <span class="kt">int</span> <span class="n">nextn</span> <span class="o">=</span> <span class="n">nextTab</span><span class="o">.</span><span class="na">length</span><span class="o">;</span>
+    <span class="nc">ForwardingNode</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">fwd</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ForwardingNode</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;(</span><span class="n">nextTab</span><span class="o">);</span> <span class="c1">// 扩容时的特殊节点，hash固定为-1，标明此节点正在进行迁移。扩容期间的元素查找要调用其find方法在nextTable中查找元素</span>
+    <span class="kt">boolean</span> <span class="n">advance</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// 当前线程是否需要继续寻找下一个可处理的节点</span>
+    <span class="kt">boolean</span> <span class="n">finishing</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span> <span class="c1">// to ensure sweep before committing nextTab // 所有桶是否都已迁移完成</span>
+    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">,</span> <span class="n">bound</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;;)</span> <span class="o">{</span>
+        <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">;</span> <span class="kt">int</span> <span class="n">fh</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">advance</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 此循环的作用是 1.确定当前线程要迁移的桶的范围；2.通过更新i的值确定当前范围内下一个要处理的节点</span>
+            <span class="kt">int</span> <span class="n">nextIndex</span><span class="o">,</span> <span class="n">nextBound</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(--</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">bound</span> <span class="o">||</span> <span class="n">finishing</span><span class="o">)</span> <span class="c1">// 每次循环都检查结束条件：i自减没有超过下界，finishing标识为true时，跳出while循环</span>
+                <span class="n">advance</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="k">else</span> <span class="nf">if</span> <span class="o">((</span><span class="n">nextIndex</span> <span class="o">=</span> <span class="n">transferIndex</span><span class="o">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 迁移总进度&lt;=0，表示所有桶都已迁移完成</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+                <span class="n">advance</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+                 <span class="cm">/*
+                    下面这段代码通过cas的方式确定自己负责的桶范围。
+                    假如有多个线程都执行到了下面这行代码，
+                    怎么保证只有一个线程可以cas成功？
+                    或者说，32-16的桶范围只有一个线程可以拿到？
+                    U是一个unsafe对象，可以直接操作内存
+                    TRANSFERINDEX通过U这个unsafe对象获取了transferIndex的内存地址，
+                    修改TRANSFERINDEX就等于直接修改transferIndex
+                    而transferIndex是一个volatile变量
+                    每个线程在TRANSFERINDEX=nextIndex时都会发出写屏障修改TRANSFERINDEX
+                    但是CPU的总线仲裁机制能够保证：
+                    只有一个线程可以发出写屏障更新TRANSFERINDEX(transferIndex)
+                    并且向CPU总线发出广播，让其它核心（线程）的缓存块失效
+                    等它们从主内存更新缓存块后，cas的条件已经不成立了。于是陷入自旋
+                    自旋超时后，会返回false，执行后面的代码。
+                    可能这时已经扩容完了没它事。
+                    竞争失败后就像个陪读一样走了个过场。
+                    我真的没有在说高考
+                */</span>
+            <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="no">U</span><span class="o">.</span><span class="na">compareAndSwapInt</span>
+                     <span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="no">TRANSFERINDEX</span><span class="o">,</span> <span class="n">nextIndex</span><span class="o">,</span>
+                      <span class="n">nextBound</span> <span class="o">=</span> <span class="o">(</span><span class="n">nextIndex</span> <span class="o">&gt;</span> <span class="n">stride</span> <span class="o">?</span>
+                                   <span class="n">nextIndex</span> <span class="o">-</span> <span class="n">stride</span> <span class="o">:</span> <span class="mi">0</span><span class="o">)))</span> <span class="o">{</span> <span class="c1">// CAS执行transferIndex=transferIndex-stride，即transferIndex减去已分配出去的桶，得到边界，这里为下界</span>
+                <span class="n">bound</span> <span class="o">=</span> <span class="n">nextBound</span><span class="o">;</span> <span class="c1">// 当前线程需要处理的桶下标的下界</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// 当前线程需要处理的桶下标</span>
+                <span class="n">advance</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">n</span> <span class="o">||</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="n">nextn</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 当前线程自己的活已经做完或所有线程的活都已做完</span>
+            <span class="kt">int</span> <span class="n">sc</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">finishing</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 已经完成所有节点复制了。所有线程已干完活，最后才走这里</span>
+                <span class="n">nextTable</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                <span class="n">table</span> <span class="o">=</span> <span class="n">nextTab</span><span class="o">;</span> <span class="c1">// table指向nextTable</span>
+                <span class="n">sizeCtl</span> <span class="o">=</span> <span class="o">(</span><span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">-</span> <span class="o">(</span><span class="n">n</span> <span class="o">&gt;&gt;&gt;</span> <span class="mi">1</span><span class="o">);</span> <span class="c1">// 设置sizeCtl为新容量0.75倍</span>
+                <span class="k">return</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="no">U</span><span class="o">.</span><span class="na">compareAndSwapInt</span><span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="no">SIZECTL</span><span class="o">,</span> <span class="n">sc</span> <span class="o">=</span> <span class="n">sizeCtl</span><span class="o">,</span> <span class="n">sc</span> <span class="o">-</span> <span class="mi">1</span><span class="o">))</span> <span class="o">{</span> <span class="c1">// 当前线程已结束扩容，sizeCtl-1表示参与扩容线程数-1</span>
+                <span class="k">if</span> <span class="o">((</span><span class="n">sc</span> <span class="o">-</span> <span class="mi">2</span><span class="o">)</span> <span class="o">!=</span> <span class="n">resizeStamp</span><span class="o">(</span><span class="n">n</span><span class="o">)</span> <span class="o">&lt;&lt;</span> <span class="no">RESIZE_STAMP_SHIFT</span><span class="o">)</span> <span class="c1">// 相等时说明没有线程在参与扩容了，置finishing=advance=true，为保险让i=n再检查一次</span>
+                    <span class="k">return</span><span class="o">;</span>
+                <span class="n">finishing</span> <span class="o">=</span> <span class="n">advance</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">n</span><span class="o">;</span> <span class="c1">// recheck before commit</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">else</span> <span class="nf">if</span> <span class="o">((</span><span class="n">f</span> <span class="o">=</span> <span class="n">tabAt</span><span class="o">(</span><span class="n">tab</span><span class="o">,</span> <span class="n">i</span><span class="o">))</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="c1">// 遍历到i位置为null，则放入ForwardingNode节点，标志该桶扩容完成。</span>
+            <span class="n">advance</span> <span class="o">=</span> <span class="n">casTabAt</span><span class="o">(</span><span class="n">tab</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">fwd</span><span class="o">);</span>
+        <span class="k">else</span> <span class="nf">if</span> <span class="o">((</span><span class="n">fh</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="na">hash</span><span class="o">)</span> <span class="o">==</span> <span class="no">MOVED</span><span class="o">)</span> <span class="c1">// f.hash == -1 表示遍历到了ForwardingNode节点，意味着该节点已经处理过了</span>
+            <span class="n">advance</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span> <span class="c1">// already processed</span>
+        <span class="k">else</span> <span class="o">{</span>
+            <span class="kd">synchronized</span> <span class="o">(</span><span class="n">f</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 桶内元素迁移需要加锁</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">tabAt</span><span class="o">(</span><span class="n">tab</span><span class="o">,</span> <span class="n">i</span><span class="o">)</span> <span class="o">==</span> <span class="n">f</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">ln</span><span class="o">,</span> <span class="n">hn</span><span class="o">;</span>
+                    <span class="k">if</span> <span class="o">(</span><span class="n">fh</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 链表节点。非链表节点hash值小于0</span>
+                        <span class="kt">int</span> <span class="n">runBit</span> <span class="o">=</span> <span class="n">fh</span> <span class="o">&amp;</span> <span class="n">n</span><span class="o">;</span> <span class="c1">// 根据 hash&amp;n 的结果，将所有结点分为两部分</span>
+                        <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">lastRun</span> <span class="o">=</span> <span class="n">f</span><span class="o">;</span>
+                        <span class="k">for</span> <span class="o">(</span><span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="na">next</span><span class="o">;</span> <span class="n">p</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">hash</span> <span class="o">&amp;</span> <span class="n">n</span><span class="o">;</span> <span class="c1">// 遍历链表的每个节点，依次计算 hash&amp;n</span>
+                            <span class="k">if</span> <span class="o">(</span><span class="n">b</span> <span class="o">!=</span> <span class="n">runBit</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="n">runBit</span> <span class="o">=</span> <span class="n">b</span><span class="o">;</span>
+                                <span class="n">lastRun</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                            <span class="o">}</span>
+                        <span class="o">}</span>
+                        <span class="k">if</span> <span class="o">(</span><span class="n">runBit</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="n">ln</span> <span class="o">=</span> <span class="n">lastRun</span><span class="o">;</span>
+                            <span class="n">hn</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                        <span class="o">}</span>
+                        <span class="k">else</span> <span class="o">{</span>
+                            <span class="n">hn</span> <span class="o">=</span> <span class="n">lastRun</span><span class="o">;</span>
+                            <span class="n">ln</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                        <span class="o">}</span>
+                        <span class="k">for</span> <span class="o">(</span><span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">f</span><span class="o">;</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">lastRun</span><span class="o">;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="kt">int</span> <span class="n">ph</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">hash</span><span class="o">;</span> <span class="no">K</span> <span class="n">pk</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">key</span><span class="o">;</span> <span class="no">V</span> <span class="n">pv</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="na">val</span><span class="o">;</span>
+                            <span class="k">if</span> <span class="o">((</span><span class="n">ph</span> <span class="o">&amp;</span> <span class="n">n</span><span class="o">)</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span>
+                                <span class="n">ln</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;(</span><span class="n">ph</span><span class="o">,</span> <span class="n">pk</span><span class="o">,</span> <span class="n">pv</span><span class="o">,</span> <span class="n">ln</span><span class="o">);</span> <span class="c1">// hash&amp;n为0，索引位置不变，作低位链表</span>
+                            <span class="k">else</span>
+                                <span class="n">hn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;(</span><span class="n">ph</span><span class="o">,</span> <span class="n">pk</span><span class="o">,</span> <span class="n">pv</span><span class="o">,</span> <span class="n">hn</span><span class="o">);</span> <span class="c1">// hash&amp;n不为0，索引变成“原索引+oldCap”，作高位链表</span>
+                        <span class="o">}</span>
+                        <span class="n">setTabAt</span><span class="o">(</span><span class="n">nextTab</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">ln</span><span class="o">);</span> <span class="c1">// 低位链表放在i处</span>
+                        <span class="n">setTabAt</span><span class="o">(</span><span class="n">nextTab</span><span class="o">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="o">,</span> <span class="n">hn</span><span class="o">);</span> <span class="c1">// 高位链表放在i+n处</span>
+                        <span class="n">setTabAt</span><span class="o">(</span><span class="n">tab</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">fwd</span><span class="o">);</span> <span class="c1">// 在原table的i位置设置ForwardingNode节点，以提示该桶扩容完成</span>
+                        <span class="n">advance</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                    <span class="o">}</span>
+                    <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">f</span> <span class="k">instanceof</span> <span class="nc">TreeBin</span><span class="o">)</span> <span class="o">{</span>
+                        <span class="nc">TreeBin</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">t</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TreeBin</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;)</span><span class="n">f</span><span class="o">;</span>
+                        <span class="nc">TreeNode</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">lo</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span> <span class="n">loTail</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                        <span class="nc">TreeNode</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">hi</span> <span class="o">=</span> <span class="kc">null</span><span class="o">,</span> <span class="n">hiTail</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+                        <span class="kt">int</span> <span class="n">lc</span> <span class="o">=</span> <span class="mi">0</span><span class="o">,</span> <span class="n">hc</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+                        <span class="k">for</span> <span class="o">(</span><span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="na">first</span><span class="o">;</span> <span class="n">e</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span> <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">next</span><span class="o">)</span> <span class="o">{</span>
+                            <span class="kt">int</span> <span class="n">h</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">hash</span><span class="o">;</span>
+                            <span class="nc">TreeNode</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">TreeNode</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span>
+                                <span class="o">(</span><span class="n">h</span><span class="o">,</span> <span class="n">e</span><span class="o">.</span><span class="na">key</span><span class="o">,</span> <span class="n">e</span><span class="o">.</span><span class="na">val</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+                            <span class="k">if</span> <span class="o">((</span><span class="n">h</span> <span class="o">&amp;</span> <span class="n">n</span><span class="o">)</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                                <span class="k">if</span> <span class="o">((</span><span class="n">p</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">loTail</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+                                    <span class="n">lo</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                                <span class="k">else</span>
+                                    <span class="n">loTail</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                                <span class="n">loTail</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                                <span class="o">++</span><span class="n">lc</span><span class="o">;</span>
+                            <span class="o">}</span>
+                            <span class="k">else</span> <span class="o">{</span>
+                                <span class="k">if</span> <span class="o">((</span><span class="n">p</span><span class="o">.</span><span class="na">prev</span> <span class="o">=</span> <span class="n">hiTail</span><span class="o">)</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+                                    <span class="n">hi</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                                <span class="k">else</span>
+                                    <span class="n">hiTail</span><span class="o">.</span><span class="na">next</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                                <span class="n">hiTail</span> <span class="o">=</span> <span class="n">p</span><span class="o">;</span>
+                                <span class="o">++</span><span class="n">hc</span><span class="o">;</span>
+                            <span class="o">}</span>
+                        <span class="o">}</span>
+                        <span class="n">ln</span> <span class="o">=</span> <span class="o">(</span><span class="n">lc</span> <span class="o">&lt;=</span> <span class="no">UNTREEIFY_THRESHOLD</span><span class="o">)</span> <span class="o">?</span> <span class="n">untreeify</span><span class="o">(</span><span class="n">lo</span><span class="o">)</span> <span class="o">:</span>
+                            <span class="o">(</span><span class="n">hc</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="k">new</span> <span class="nc">TreeBin</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;(</span><span class="n">lo</span><span class="o">)</span> <span class="o">:</span> <span class="n">t</span><span class="o">;</span>
+                        <span class="n">hn</span> <span class="o">=</span> <span class="o">(</span><span class="n">hc</span> <span class="o">&lt;=</span> <span class="no">UNTREEIFY_THRESHOLD</span><span class="o">)</span> <span class="o">?</span> <span class="n">untreeify</span><span class="o">(</span><span class="n">hi</span><span class="o">)</span> <span class="o">:</span>
+                            <span class="o">(</span><span class="n">lc</span> <span class="o">!=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">?</span> <span class="k">new</span> <span class="nc">TreeBin</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;(</span><span class="n">hi</span><span class="o">)</span> <span class="o">:</span> <span class="n">t</span><span class="o">;</span>
+                        <span class="n">setTabAt</span><span class="o">(</span><span class="n">nextTab</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">ln</span><span class="o">);</span>
+                        <span class="n">setTabAt</span><span class="o">(</span><span class="n">nextTab</span><span class="o">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="o">,</span> <span class="n">hn</span><span class="o">);</span>
+                        <span class="n">setTabAt</span><span class="o">(</span><span class="n">tab</span><span class="o">,</span> <span class="n">i</span><span class="o">,</span> <span class="n">fwd</span><span class="o">);</span>
+                        <span class="n">advance</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h5 id="一些并发问题">一些并发问题：</h5>
+<h6 id="怎么保证一个桶范围和一个线程一一对应">怎么保证一个桶范围和一个线程一一对应？</h6>
+<p>有一个全局的volatile变量transferIndex。它记录最新的哈希桶迁移索引。<br>
+每个线程通过cas的方式获取自己的哈希桶范围。如果有多个线程预期的哈希桶范围都一样，<br>
+那么因为cas的原因，只有一个线程可以拥有这段范围并且更新transferIndex的值。其它线程自旋等待，超时才进入下一步<br>
+具体见下面这段解释：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Node</span><span class="o">&lt;</span><span class="no">K</span><span class="o">,</span><span class="no">V</span><span class="o">&gt;</span> <span class="n">f</span><span class="o">;</span> <span class="kt">int</span> <span class="n">fh</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="n">advance</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 此循环的作用是 1.确定当前线程要迁移的桶的范围；2.通过更新i的值确定当前范围内下一个要处理的节点</span>
+            <span class="kt">int</span> <span class="n">nextIndex</span><span class="o">,</span> <span class="n">nextBound</span><span class="o">;</span>
+            <span class="k">if</span> <span class="o">(--</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">bound</span> <span class="o">||</span> <span class="n">finishing</span><span class="o">)</span> <span class="c1">// 每次循环都检查结束条件：i自减没有超过下界，finishing标识为true时，跳出while循环</span>
+                <span class="n">advance</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="k">else</span> <span class="nf">if</span> <span class="o">((</span><span class="n">nextIndex</span> <span class="o">=</span> <span class="n">transferIndex</span><span class="o">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="c1">// 迁移总进度&lt;=0，表示所有桶都已迁移完成</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span>
+                <span class="n">advance</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+                <span class="cm">/*
+                    下面这段代码通过cas的方式确定自己负责的桶范围。
+                    假如有多个线程都执行到了下面这行代码，
+                    怎么保证只有一个线程可以cas成功？或者说，32-16的桶范围只有一个线程可以拿到？
+                    U是一个unsafe对象，可以直接操作内存
+                    TRANSFERINDEX通过U这个unsafe对象获取了transferIndex的内存地址，
+                    修改TRANSFERINDEX就等于直接修改transferIndex
+                    而transferIndex是一个volatile变量
+                    每个线程在TRANSFERINDEX = nextIndex时都会请求发出写屏障修改TRANSFERINDEX
+                    但是CPU的总线仲裁机制能够保证：
+                    只有一个线程可以发出写屏障更新TRANSFERINDEX(transferIndex)
+                    并且向CPU总线发出广播，让其它线程的缓存块失效
+                    等它们从主内存更新缓存块后，cas的条件已经不成立了。于是陷入自旋
+                    自旋超时后，会返回false，执行后面的代码。
+                    可能这时已经扩容完了没它事。
+                    竞争失败后就像个陪读一样走了个过场。
+                    我真的没有在说高考
+                */</span>
+            <span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="no">U</span><span class="o">.</span><span class="na">compareAndSwapInt</span>
+                     <span class="o">(</span><span class="k">this</span><span class="o">,</span> <span class="no">TRANSFERINDEX</span><span class="o">,</span> <span class="n">nextIndex</span><span class="o">,</span>
+                      <span class="n">nextBound</span> <span class="o">=</span> <span class="o">(</span><span class="n">nextIndex</span> <span class="o">&gt;</span> <span class="n">stride</span> <span class="o">?</span>
+                                   <span class="n">nextIndex</span> <span class="o">-</span> <span class="n">stride</span> <span class="o">:</span> <span class="mi">0</span><span class="o">)))</span> <span class="o">{</span> <span class="c1">// CAS执行transferIndex=transferIndex-stride，即transferIndex减去已分配出去的桶，得到边界，这里为下界</span>
+                <span class="n">bound</span> <span class="o">=</span> <span class="n">nextBound</span><span class="o">;</span> <span class="c1">// 当前线程需要处理的桶下标的下界</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">nextIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="o">;</span> <span class="c1">// 当前线程需要处理的桶下标</span>
+                <span class="n">advance</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+</code></pre></div></div>
+
+<p>TRANSFERINDEX在源码的6357行通过unsafe对象获取了transferIndex的内存地址<br>
+<img src="/assets/articleSource/2024-08-27-concurrentHashMap/img_3.png" alt="image.png"></p>
+
+
+
+    </div>
+
+</article>
+</section>
+
+  <section class="sidebar" style="margin-left: 15px;">
+    <style type="text/css" media="screen">
+      .post-menu ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class="post-menu">
+      <div class="post-menu-title">大纲</div>
+      <div class="post-menu-content"></div>
+    </div>
+
+    <script>
+      function generateContent() {
+        var menu = document.querySelector(".post-menu");
+        var menuContent =  menu.querySelector(".post-menu-content");
+        var headings = document.querySelector(".post-content").querySelectorAll("h2, h3, h4, h5, h6");
+
+        // Hide menu when no headings
+        if (headings.length === 0) {
+          return menu.style.display = "none";
+        }
+
+        // Generate post menu
+        var menuHTML = '';
+        for (var i = 0; i < headings.length; i++) {
+          var h = headings[i];
+          menuHTML += (
+            '<li class="h-' + h.tagName.toLowerCase() + '">'
+            + '<a href="#h-' + h.getAttribute('id') + '">' + h.textContent + '</a></li>');
+        }
+
+        menuContent.innerHTML = '<ul>' + menuHTML + '</ul>';
+
+        // The header element
+        var header = document.querySelector('header.site-header');
+
+        function doMenuCollapse(index, over_items) {
+          var items = menuContent.firstChild.children;
+
+          if (over_items == undefined) {
+            over_items = 20;
+          }
+
+          if (items.length < over_items) {
+            return;
+          }
+
+          var activeItem = items[index];
+          var beginItem = activeItem
+          var endItem = activeItem
+          var beginIndex = index;
+          var endIndex = index + 1;
+          while (beginIndex >= 0
+          && !items[beginIndex].classList.contains('h-h2')) {
+            beginIndex -= 1;
+          }
+          while (endIndex < items.length
+          && !items[endIndex].classList.contains('h-h2')) {
+            endIndex += 1;
+          }
+          for (var i = 0; i < beginIndex; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+          for (var i = beginIndex + 1; i < endIndex; i++) {
+            item = items[i]
+            // if (!item.classList.contains('h-h2')) {
+            item.style.display = '';
+            // }
+          }
+          for (var i = endIndex; i < items.length; i++) {
+            item = items[i]
+            if (!item.classList.contains('h-h2')) {
+              item.style.display = 'none';
+            }
+          }
+        }
+
+        // Init menu collapsed
+        doMenuCollapse(-1);
+
+        // Active the menu item
+        window.addEventListener('scroll', function (event) {
+          var lastActive = menuContent.querySelector('.active');
+          var changed = true;
+          var activeIndex = -1;
+          for (var i = headings.length - 1; i >= 0; i--) {
+            var h = headings[i];
+            var headingRect = h.getBoundingClientRect();
+            var headerRect = header.getBoundingClientRect();
+            var headerTop = Math.floor(headerRect.top);
+            var headerHeight = Math.floor(headerRect.height);
+            var headerHeight = headerTop + headerHeight + 20;
+            if (headingRect.top <= headerHeight) {
+              var id = 'h-' + h.getAttribute('id');
+              var a = menuContent.querySelector('a[href="#' + id  + '"]');
+              var curActive = a.parentNode;
+              if (curActive) {
+                curActive.classList.add('active');
+                activeIndex = i;
+              }
+              if (lastActive == curActive) {
+                changed = false;
+              }
+              break;
+            }
+          }
+          if (changed) {
+            if (lastActive) {
+              lastActive.classList.remove('active');
+            }
+            doMenuCollapse(activeIndex);
+          }
+          event.preventDefault();
+        });
+      }
+      generateContent();
+    </script>
+
+  </section>
+</div>
+
+<style>
+  .container {
+    display: flex;
+  }
+
+  .post {
+    flex-grow: 1;
+    width: 1000px; /* Subtract the sidebar width from 100% */
+    /* Add any other styles you need for the post section */
+  }
+
+  .sidebar {
+    width: 500px;
+    position: sticky;
+    top: 0;
+    /* Add any other styles you need for the sidebar section */
+  }
+</style>
+
+
+
+
+
+
+  </section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

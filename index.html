@@ -1,0 +1,3915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-translate-customization" content="108d9124921d80c3-80e20d618ff053c8-g4f02ec6f3dba68b7-c">
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Home | xyhao’s Blog</title>
+<meta name="generator" content="Jekyll v4.3.4">
+<meta property="og:title" content="Home">
+<meta name="author" content="xyhao">
+<meta property="og:locale" content="zh_CN">
+<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+<meta property="og:description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.">
+<link rel="canonical" href="/jekyll-theme-yat/">
+<meta property="og:url" content="/jekyll-theme-yat/">
+<meta property="og:site_name" content="xyhao’s Blog">
+<meta property="og:type" content="website">
+<link rel="next" href="/jekyll-theme-yat/page2">
+<meta name="twitter:card" content="summary">
+<meta property="twitter:title" content="Home">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","author":{"@type":"Person","name":"xyhao"},"description":"Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.","headline":"Home","name":"xyhao’s Blog","url":"/jekyll-theme-yat/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="icon" href="/favicon.png">
+  <link rel="canonical" href="">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-noto-sans@0.0.72/index.min.css">
+  <link rel="stylesheet" href="/jekyll-theme-yat/assets/css/main.css">
+  <script src="/jekyll-theme-yat/assets/js/main.js"></script><link type="application/atom+xml" rel="alternate" href="/jekyll-theme-yat/feed.xml" title="xyhao's Blog">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+<!-- and it's easy to individually load additional languages -->
+<script charset="UTF-8" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/languages/go.min.js" async></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Init highlight js
+document.addEventListener('DOMContentLoaded', function(event) {
+  var els = document.querySelectorAll('pre code')
+
+  function addLangData(block) {
+    var outer = block.parentElement.parentElement.parentElement;
+    var lang = block.getAttribute('data-lang');
+    for (var i = 0; i < outer.classList.length; i++) {
+      var cls = outer.classList[i];
+      if (cls.startsWith('language-')) {
+        lang = cls;
+        break;
+      }
+    }
+    if (!lang) {
+      cls = block.getAttribute('class');
+      lang = cls ? cls.replace('hljs ', '') : '';
+    }
+    if (lang.startsWith('language-')) {
+      lang = lang.substr(9);
+    }
+    block.setAttribute('class', 'hljs ' + lang);
+    block.parentNode.setAttribute('data-lang', lang);
+  }
+
+  function addBadge(block) {
+    var enabled = ('true' || 'true').toLowerCase();
+    if (enabled == 'true') {
+      var pre = block.parentElement;
+      pre.classList.add('badge');
+    }
+  }
+
+  function handle(block) {
+    addLangData(block);
+    addBadge(block)
+    hljs.highlightBlock(block);
+  }
+
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    handle(el);
+  }
+});
+</script>
+
+<style>
+  /* code language badge */
+  pre.badge::before {
+    content: attr(data-lang);
+    color: #fff;
+    background-color: #ff4e00;
+    padding: 0 .5em;
+    border-radius: 0 2px;
+    text-transform: uppercase;
+    text-align: center;
+    min-width: 32px;
+    display: inline-block;
+    position: absolute;
+    right: 0;
+  }
+
+  /* fix wrong badge display for firefox browser */
+  code > table pre::before {
+    display: none;
+  }
+</style>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe-lightbox.umd.min.js" async></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/umd/photoswipe.umd.min.js" async></script>
+<link href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/5.3.7/photoswipe.min.css" rel="stylesheet">
+<style>
+  .pswp .pswp__container .pswp__img {
+    background-color: white;
+  }
+</style>
+
+<script>
+  function initPhotoSwipe() {
+    let customOptions = {};
+
+    try {
+      const data = ``.replaceAll("=>", ":");
+      customOptions = JSON.parse(data);
+    } catch (e) {
+      console.info("Invalid custom photo previewer options! " + e.message);
+    }
+
+    // Define object and gallery options
+    const options = Object.assign(
+      {
+        gallery: "section.main",
+        children: "a.photo-swipe",
+        photo_scale: 2,
+        // dynamic import is not supported in UMD version
+        pswpModule: PhotoSwipe,
+      },
+      customOptions
+    );
+
+    const galleryEl = document.querySelector(options.gallery);
+    if (!galleryEl) {
+      return;
+    }
+
+    const imgEls = [];
+    const els = galleryEl.querySelectorAll("img:not(.emoji)");
+    els.forEach((el) => {
+      if (el.src.trim() == "") {
+        return;
+      }
+      if (!imgEls.includes(el)) {
+        imgEls.push(el);
+      }
+    });
+
+    if (imgEls.length === 0) {
+      return;
+    }
+
+    imgEls.forEach((imgEl) => {
+      imgEl.outerHTML = `
+      <a class="photo-swipe"
+        href="${imgEl.src}"
+        data-pswp-width="${
+          Math.max(imgEl.naturalWidth, imgEl.width) * options.photo_scale
+        }"
+        data-pswp-height="${
+          Math.max(imgEl.naturalHeight, imgEl.height) * options.photo_scale
+        }"
+        data-pswp-caption="${imgEl.getAttribute("caption") || imgEl.alt}"
+        target="_blank">
+        ${imgEl.outerHTML}
+      </a>`;
+    });
+
+    // Initialize PhotoSwipe 5
+    var lightbox = new PhotoSwipeLightbox(options);
+
+    lightbox.init();
+  }
+
+  window.addEventListener("load", initPhotoSwipe);
+</script>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="site-header site-header-transparent" role="banner">
+
+  <div class="wrapper">
+    <div class="site-header-inner">
+<span class="site-brand"><a class="site-brand-inner" rel="author" href="/jekyll-theme-yat/">
+  <img class="site-favicon" title="xyhao's Blog" src="/favicon.png" onerror="this.style.display='none'">
+  xyhao's Blog
+</a>
+</span><nav class="site-nav">
+          <input type="checkbox" id="nav-trigger" class="nav-trigger">
+          <label for="nav-trigger">
+            <span class="menu-icon">
+              <svg viewbox="0 0 18 15" width="18px" height="15px">
+                <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"></path>
+              </svg>
+            </span>
+          </label>
+
+          <div class="trigger">
+<a class="page-link" href="/jekyll-theme-yat/about.html">ABOUT</a><a class="page-link" href="/jekyll-theme-yat/archives.html">ARCHIVES</a><a class="page-link" href="/jekyll-theme-yat/categories.html">CATEGORIES</a><a class="page-link" href="/jekyll-theme-yat/">HOME</a><a class="page-link" href="/jekyll-theme-yat/tags.html">TAGS</a>
+
+
+
+
+
+
+
+
+
+<div class="page-link" style="display: inline;">
+
+
+
+<div id="google_translate_element" style="display: none;">
+</div>
+
+<div class="ct-language">
+  <ul class="list-unstyled ct-language-dropdown">
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="en">
+          
+          <img src="https://cdn.countryflags.com/thumbs/united-states-of-america/flag-400.png" title="English">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="fr">
+          
+          <img src="https://cdn.countryflags.com/thumbs/france/flag-400.png" title="French">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="zh-CN">
+          
+          <img src="https://cdn.countryflags.com/thumbs/china/flag-400.png" title="Chinese(Simple)">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ja">
+          
+          <img src="https://cdn.countryflags.com/thumbs/japan/flag-400.png" title="Japanese">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ko">
+          
+          <img src="https://cdn.countryflags.com/thumbs/south-korea/flag-400.png" title="Korean">
+          
+        </a>
+      </li>
+    
+      <li>
+        <a href="#" class="lang-select" data-lang="ru">
+          
+          <img src="https://cdn.countryflags.com/thumbs/russia/flag-400.png" title="Russian">
+          
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'zh-CN',
+    autoDisplay: false,
+    layout: google.translate.TranslateElement.InlineLayout.VERTICAL
+  }, 'google_translate_element');
+
+  // Links to cross-origin destinations are unsafe
+  var gll = document.getElementsByClassName('goog-logo-link')[0];
+  if (gll) {
+    gll.setAttribute('rel', 'noopener');
+  }
+
+  function restoreLang() {
+    var iframe = document.getElementsByClassName('goog-te-banner-frame')[0];
+    if (!iframe) return;
+
+    var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+    var restore_el = innerDoc.getElementsByTagName("button");
+
+    for (var i = 0; i < restore_el.length; i++) {
+      if (restore_el[i].id.indexOf("restore") >= 0) {
+        restore_el[i].click();
+        var close_el = innerDoc.getElementsByClassName("goog-close-link");
+        close_el[0].click();
+        return;
+      }
+    }
+  }
+
+  function triggerHtmlEvent(element, eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent('HTMLEvents');
+      event.initEvent(eventName, true, true);
+      element.dispatchEvent(event);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+      element.fireEvent('on' + event.eventType, event);
+    }
+  }
+
+  var googleCombo = document.querySelector("select.goog-te-combo");
+  var langSelect = document.querySelector('.ct-language');
+  langSelect.addEventListener('click', function(event) {
+    if (!event.target) {
+      return;
+    }
+
+    var selected = document.querySelector('.ct-language .ct-language-selected');
+    if (selected) {
+      selected.classList.remove('ct-language-selected');
+    }
+
+    var target = event.target;
+    while (target && target !== langSelect ) {
+      if (target.matches('.lang-select')) {
+        break;
+      }
+      target = target.parentElement;
+    }
+
+    if (target && target.matches('.lang-select')) {
+      var lang = target.getAttribute('data-lang');
+      if (googleCombo.value == lang) {
+        restoreLang();
+      } else {
+        target.parentElement.classList.add('ct-language-selected');
+        googleCombo.value = lang;
+        triggerHtmlEvent(googleCombo, 'change');
+      }
+    }
+
+    event.preventDefault();
+  });
+}
+</script>
+
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+</div>
+</div>
+        </nav>
+</div>
+  </div>
+</header>
+
+<script>
+  function initHeader() {
+    var lastScrollY = getScrollPos().y;
+    var documentElement = document.documentElement;
+
+    function storeScrollData() {
+      var y = getScrollPos().y;documentElement.setAttribute("data-header-transparent", "");var scrollStatus = "";
+
+      if (y <= 0) {
+        scrollStatus = "top";
+      } else if ((window.innerHeight + y) >= document.body.offsetHeight) {
+        scrollStatus = "bottom";
+      } else {
+        var isScrollDown = (y - lastScrollY > 0) ? true : false;
+        scrollStatus = isScrollDown ? "down" : "up";
+      }
+
+      lastScrollY = y;
+      documentElement.setAttribute("data-scroll-status", scrollStatus);
+    }
+
+    window.addEventListener('scroll', function(e) {
+      storeScrollData();
+    });
+
+    storeScrollData();
+  }
+  document.addEventListener('DOMContentLoaded', initHeader);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<section class="page-banner">
+    <div class="page-banner-img">
+<div style="background-image: url(/jekyll-theme-yat/assets/images/banners/home.jpeg)"></div>
+        <img class="img-placeholder" src="/jekyll-theme-yat/assets/images/banners/home.jpeg">
+</div>
+    <div class="wrapper">
+      <div class="page-banner-inner"><div class="page-banner-default">
+            <h1 class="page-banner-heading">
+              Learning to be good at thinking, thinking, thinking.
+            </h1>
+            <h2 class="page-banner-subheading">
+              Try not to become a man of success, but rather try to become a man of value.
+            </h2>
+          </div></div>
+    </div>
+  </section><script>
+  function hashLocate(hashValue) {
+    hashValue = hashValue.replace(/^.*#h-/, '');
+    hashValue = decodeURIComponent(hashValue);
+    var element = document.getElementById(hashValue);
+
+    if (!element) {
+      return;
+    }
+
+    var header = document.querySelector('header.site-header');
+    var headerRect = header.getBoundingClientRect();
+    var headerTop = Math.floor(headerRect.top);
+    var headerHeight = Math.floor(headerRect.height);
+    var scrollPos = getScrollPos();
+    var offsetY = element.offsetTop - (headerTop + headerHeight + 20);
+
+    if (offsetY == scrollPos.y) {
+      return;
+    }
+
+    if (headerTop == 0  && offsetY > scrollPos.y) {
+      offsetY += headerHeight + 2;
+    } else if (headerTop < 0  && offsetY < scrollPos.y) {
+      offsetY -= headerHeight - 2;
+    }
+
+    smoothScrollTo(offsetY);
+  }
+
+  // The first event occurred
+  window.addEventListener('load', function(event) {
+    if (window.location.hash) {
+      hashLocate(window.location.hash);
+    }
+  });
+
+  // The first event occurred
+  window.addEventListener('click', function(event) {
+    if (event.target.tagName.toLowerCase() == 'a') {
+      hashLocate(event.target.getAttribute('href'));
+    }
+  });
+</script>
+<div class="theme-toggle">
+  <input type="checkbox" id="theme-switch">
+  <label for="theme-switch">
+    <div class="toggle"></div>
+    <div class="names">
+      <p class="light">Light</p>
+      <p class="dark">Dark</p>
+    </div>
+  </label>
+</div>
+
+
+
+
+<script>
+  (function() {
+    var sw = document.getElementById('theme-switch');
+    var html = document.getElementsByTagName('html')[0];
+    var nightModeOption = ('auto' || 'auto').toLowerCase();
+    var storage = nightModeOption === 'manual'
+        ? localStorage
+        : sessionStorage;
+    var themeData = loadThemeData();
+
+    function saveThemeData(data) {
+      storage.setItem('theme', JSON.stringify(data));
+    }
+
+    function loadThemeData() {
+      var data = storage.getItem('theme');
+      try {
+        data = JSON.parse(data ? data : '');
+      } catch(e) {
+        data = { nightShift: undefined, autoToggleAt: 0 };
+        saveThemeData(data);
+      }
+      return data;
+    }
+
+    function handleThemeToggle(nightShift) {
+      themeData.nightShift = nightShift;
+      saveThemeData(themeData);
+      html.dataset.theme = nightShift ? 'dark' : 'light';
+      setTimeout(function() {
+        sw.checked = nightShift ? true : false;
+      }, 50);
+    }
+
+    function autoThemeToggle() {
+      // Next time point of theme toggle
+      var now = new Date();
+      var toggleAt = new Date();
+      var hours = now.getHours();
+      var nightShift = hours >= 19 || hours <=7;
+
+      if (nightShift) {
+        if (hours > 7) {
+          toggleAt.setDate(toggleAt.getDate() + 1);
+        }
+        toggleAt.setHours(7);
+      } else {
+        toggleAt.setHours(19);
+      }
+
+      toggleAt.setMinutes(0);
+      toggleAt.setSeconds(0);
+      toggleAt.setMilliseconds(0)
+
+      var delay = toggleAt.getTime() - now.getTime();
+
+      // auto toggle theme mode
+      setTimeout(function() {
+        handleThemeToggle(!nightShift);
+      }, delay);
+
+      return {
+        nightShift: nightShift,
+        toggleAt: toggleAt.getTime()
+      };
+    }
+
+    // Listen the theme toggle event
+    sw.addEventListener('change', function(event) {
+      handleThemeToggle(event.target.checked);
+    });
+
+    if (nightModeOption == 'auto') {
+      var data = autoThemeToggle();
+
+      // Toggle theme by local setting
+      if (data.toggleAt > themeData.autoToggleAt) {
+        themeData.autoToggleAt = data.toggleAt;
+        handleThemeToggle(data.nightShift);
+      } else {
+        handleThemeToggle(themeData.nightShift);
+      }
+    } else if (nightModeOption == 'manual') {
+      handleThemeToggle(themeData.nightShift);
+    } else {
+      var nightShift = themeData.nightShift;
+      if (nightShift === undefined) {
+        nightShift = nightModeOption === 'on';
+      }
+      handleThemeToggle(nightShift);
+    }
+  })();
+</script>
+<div id="click-to-top" class="click-to-top">
+  <i class="fa fa-arrow-up"></i>
+</div>
+<script>
+  (function () {
+    const clickToTop = document.getElementById('click-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        clickToTop.classList.add('show')
+      }else {
+        clickToTop.classList.remove('show')
+      }
+    });
+    clickToTop.addEventListener('click', () => {
+      window.smoothScrollTo(0);
+    });
+  })();
+</script>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="framework">
+  <section class="main">
+
+    <div class="articles">
+  
+
+  
+
+
+  
+
+
+
+
+<div class="pagination">
+  <!-- Post list links -->
+  <ul class="post-list z-image-style">
+    <!-- Top list item -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/2024/10/02/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93.html">
+      文件上传流程总结<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Oct 02, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 24 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/2024/10/02/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-10-02-fileUpLoad.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/2024/10/02/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93.html">
+      <p>
+  更多博客请见 我的语雀知识库
+之所以延时任务就是为了将更新数据库的时间延时到下一个文件片更新之后，然后延时任务刷新，避免反复请求数据库。
+个人理解这是一种动态延时任务。
+
+
+1. 背景
+文件上传是一个很古老的业务了，业界在设计的时候都会规划三个功能：秒传、分片上传、断点续传。
+
+1.1 M... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#%E5%BB%B6%E6%97%B6%E4%BB%BB%E5%8A%A1">#延时任务</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6">#任务调度</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/2024/08/30/%E9%AB%98%E6%80%A7%E8%83%BD%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%80%BB%E7%BB%93.html">
+      高性能调度系统设计总结<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 30, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> 腾讯技术工程</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 23 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/2024/08/30/%E9%AB%98%E6%80%A7%E8%83%BD%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%80%BB%E7%BB%93.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/Tencent.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/2024/08/30/%E9%AB%98%E6%80%A7%E8%83%BD%E8%B0%83%E5%BA%A6%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1%E6%80%BB%E7%BB%93.html">
+      <p>
+  更多博客请见 我的语雀知识库
+作者：akinwang
+调度模块在很多系统中都是常用的模块，比如实习生的每天签到邮件，预约银行的业务短信，学习通的上课通知，腾讯视频push中台的任务下发，调度系统在中间起到关键作用。
+原文链接：高性能调度系统设计总结
+
+
+那么什么是调度？本质就是通过一些自定义... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6">#任务调度</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html">
+      ConcurrentHashMap并发扩容<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 27, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 33 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/08/27/concurrentHashMap%E5%B9%B6%E5%8F%91%E6%89%A9%E5%AE%B9.html">
+      <p>
+  更多博客请见 我的语雀知识库
+更多细节见ConcurrentHashMap 源码分析
+
+
+JDK7和JDK8两个版本的扩容有点不一样。
+JDK7
+JDK7版本中，扩容是在持有锁时发生的。
+
+35行的rehash是扩容函数。直到46行的finally代码块才释放锁。
+拿到锁的线程执行put方法时会检查要不要扩容（已有元素个数 / table... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#HashMap">#HashMap</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/hashmap/2024/08/21/HashMap%E7%BA%BF%E7%A8%8B%E4%B8%8D%E5%AE%89%E5%85%A8%E4%B8%BE%E4%BE%8B.html">
+      HashMap线程不安全举例<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 21, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 25 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/hashmap/2024/08/21/HashMap%E7%BA%BF%E7%A8%8B%E4%B8%8D%E5%AE%89%E5%85%A8%E4%B8%BE%E4%BE%8B.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/hashmap/2024/08/21/HashMap%E7%BA%BF%E7%A8%8B%E4%B8%8D%E5%AE%89%E5%85%A8%E4%B8%BE%E4%BE%8B.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+链表成环
+这个问题是JDK7中put方法是头插法导致的
+JDK8及后续版本已经改成尾插法修复此问题
+哈希表成环
+数据丢失
+共有两种数据丢失的位置：
+
+  
+    table[i]为null时的哈希桶头部
+有两个线程：B插入（2，”two”）,A插入（1，”one”）。
+假如table[15]这个哈希桶是... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#HashMap">#HashMap</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/08/18/arthas%E5%AE%9E%E6%88%98-%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5.html">
+      Arthas实战-排查死锁<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 18, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 9 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/08/18/arthas%E5%AE%9E%E6%88%98-%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-08-01-arthas.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/08/18/arthas%E5%AE%9E%E6%88%98-%E6%AD%BB%E9%94%81%E6%8E%92%E6%9F%A5.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+一、 准备测试应用
+
+  新建一个测试程序，写一段线程死锁的代码：
+
+
+import java.util.*;
+
+public class Test {
+    static List&lt;Integer&gt; resource1 = new ArrayList&lt;&gt;();
+    st... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Arthas">#Arthas</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E8%B7%AF%E7%94%B1%E7%AD%96%E7%95%A5.html">
+      Kafka路由策略<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 18, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 1 min</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E8%B7%AF%E7%94%B1%E7%AD%96%E7%95%A5.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/Kafka.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E8%B7%AF%E7%94%B1%E7%AD%96%E7%95%A5.html">
+      <p>
+  更多博客请见 我的语雀知识库
+生产者的路由策略决定了消息应该写入哪个分区。选择合适的路由策略可以优化生产者的性能和负载均衡 。
+
+
+粘性路由策略
+
+
+  粘性路由策略尝试将一段时间内的消息发送到相同的分区。这个策略在生产者启动时选择一个分区，并在接下来的时间里尽量将所有消息发... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#Kafka">#Kafka</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E9%87%8D%E5%A4%8D.html">
+      Kafka如何保证消息不重复<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 18, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 9 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E9%87%8D%E5%A4%8D.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/Kafka.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E9%87%8D%E5%A4%8D.html">
+      <p>
+  更多博客请见 我的语雀知识库
+Kafka支持幂等操作，保证了消息不重复，不丢失。从Kafka3.0版本开始默认开启幂等。
+开启幂等需要配置消息发送的重试次数
+  // 开启生产者幂等
+props.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONF... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Kafka">#Kafka</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F.html">
+      Kafka发送消息的三种模式<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 18, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 7 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/Kafka.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E7%9A%84%E4%B8%89%E7%A7%8D%E6%A8%A1%E5%BC%8F.html">
+      <p>
+  更多博客请见 我的语雀知识库
+省流：推荐使用带回调方法的异步发送
+
+
+发后即忘
+这种模式只管往broker里发数据，但是broker收没收到它不管。
+通常情况下，这种发后即忘(fire-and-forget)的方式并不会出现问题，但也有意外情况：
+
+
+  遇到可重试异常，如果发送消息到broker时抛出异常，且是可重... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Kafka">#Kafka</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E4%BA%8B%E5%8A%A1%E5%8C%96%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF.html">
+      Kafka事务化发送消息<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 18, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 12 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E4%BA%8B%E5%8A%A1%E5%8C%96%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/Kafka.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/kafka/2024/08/18/Kafka%E4%BA%8B%E5%8A%A1%E5%8C%96%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF.html">
+      <p>
+  更多博客请见 我的语雀知识库
+Kafka的事务由Broker的事务协调器负责，也有ACID特性。但一致性由于CAP限制只保证最终一致性且隔离级别只有读未提交和读已提交
+
+
+示例代码
+ KafkaProducer&lt;String, String&gt; producer = new KafkaP... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Kafka">#Kafka</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/08/02/Vector-API%E4%BB%8B%E7%BB%8D&amp;%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8.html">
+      Vector API介绍&amp;简单使用<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 02, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 10 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/08/02/Vector-API%E4%BB%8B%E7%BB%8D&amp;%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://bit.ly/3xTmdUP); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/08/02/Vector-API%E4%BB%8B%E7%BB%8D&amp;%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8.html">
+      <p>
+  更多博客请见 我的语雀知识库
+  
+    我在参与腾讯犀牛鸟开源时，认领了有关Vector API的issue。但找遍全网也找不到关于Vector API具体使用的介绍。于是我简单学习Vector API之后写下这篇简单的介绍供大家参考。个人水平有限。不足之处请大家多多指正。
+  
+
+  【JEP咖啡屋18[熟肉... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Vector">#Vector</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html">
+      从Java类加载机制谈起：如何实现热部署<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Aug 01, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 31 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-08-01-arthas.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/08/01/%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7-%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2.html">
+      <p>
+  更多博客请见 我的语雀知识库
+原文地址：从Java类加载机制谈起：如何实现热部署
+
+
+一 、class的热替换
+ClassLoader中重要的方法:
+loadClass:
+**ClassLoader.loadClass(…) **是ClassLoader的入口点。当一个类没有指明用什么加载器加载的时候，JVM默认采用... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html">
+      GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 14, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 5 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/07/14/GraalVM-%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B-OTel-Java-Agent-%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0.html">
+      <p>
+  这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读
+GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现
+本文档讨论的动态、静态编译仅限于java语言
+更多博客请见 我的语雀知识库
+
+
+什么是动态编译？
+启动jar运行程序时，热点代码... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#JVM">#JVM</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html">
+      MySQL三大日志<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 13, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 4 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-13-log.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/mysql/2024/07/13/%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+什么是三大日志
+
+
+  **bin日志： **保存的是当前数据库中最新的数据以及表结构变更的语句，不包含每行数据的历史版本。
+  undo日志：不仅保存了最新的数据，也保存了每行数据的历史版本，为事务回滚和MVCC提供了支持。
+  redo日志：保存... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#MySQL">#MySQL</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2024/07/11/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81.html">
+      分布式锁<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 11, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 1 min</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2024/07/11/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-24-lock.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2024/07/11/%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+set nx命令设置锁， key是锁名，value是自定义结构。
+set成功会返回1，没有成功会返回0.单线程执行使得争夺锁的那些进程具有了互斥性
+
+一个进程持有锁之后，如果它挂了，那么这把锁不是永远都无法释放了吗？
+最简单的方式可以给锁设置一个过期时间
+... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#%E5%88%86%E5%B8%83%E5%BC%8F">#分布式</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Redis">#Redis</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html">
+      一条SQL带你理清页、索引、锁的关系<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 10, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 7 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-10-Index.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/mysql/2024/07/10/%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5-%E7%B4%A2%E5%BC%95-%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+user表,id是主键,有a,b,c三个字段，都是int,a有索引，b有索引
+问：**update user set a = 1 where c = 2**;这条语句怎么执行？
+思考：先干什么？后干什么？全表扫描？扫的对象是什么？数据页？索引页？
+哪个素引？为什么扫这个素引？扫的... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#MySQL">#MySQL</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/mysql/2024/07/03/MySQL%E8%A1%A8%E7%A9%BA%E9%97%B4%E7%BB%93%E6%9E%84.html">
+      MySQL表空间结构<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 03, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 5 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/mysql/2024/07/03/MySQL%E8%A1%A8%E7%A9%BA%E9%97%B4%E7%BB%93%E6%9E%84.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-03-MySQL.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/mysql/2024/07/03/MySQL%E8%A1%A8%E7%A9%BA%E9%97%B4%E7%BB%93%E6%9E%84.html">
+      <p>
+  更多博客请见 我的语雀知识库
+小林coding那边已经很详细了，这里我只对一些比较重要的点和不太懂的地方做出补充
+小林coding. (n.d.). MySQL 一行记录是怎么存储的？. Retrieved from MySQL 一行记录是怎么存储的？
+
+
+表空间结构
+
+
+
+  行， 自然对应数据表中的每一行数据... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#MySQL">#MySQL</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/redis/2024/07/02/AOF&amp;RDB.html">
+      RDB&amp;AOF<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 02, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 7 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/redis/2024/07/02/AOF&amp;RDB.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/Redis.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/redis/2024/07/02/AOF&amp;RDB.html">
+      <p>
+  小林coding那边已经很详细了，这里我只对一些比较重要的点和不太懂的地方做出补充
+小林Coding/Redis
+更多博客请见 我的语雀知识库
+
+
+AOF
+介绍
+AOF是将kv以命令的形式保存在缓存区。缓存区的数据会被追加到AOF文件中，每秒一次
+三种刷盘策略
+每次新增kv时，先执行写... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#Redis">#Redis</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2024/07/01/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6.html">
+      Redis主从复制<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jul 01, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 2 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2024/07/01/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-01-Redis.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/2024/07/01/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6.html">
+      <p>
+  小林coding那边已经很详细了，这里我只对一些比较重要的点和不太懂的地方做出补充
+小林Coding/Redis
+更多博客请见 我的语雀知识库
+
+
+分摊主服务器的压力
+在主服务器和从服务器同步数据期间，如果从服务器数量非常多，那么传输RDB文件会大大占据主服务器的网络带宽，影响服务... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#%E5%88%86%E5%B8%83%E5%BC%8F">#分布式</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Redis">#Redis</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/mysql/2024/05/13/%E5%B9%BB%E8%AF%BB%E4%B8%8E%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84%E5%8C%BA%E5%88%AB.html">
+      幻读与不可重复读的区别<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> May 13, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 1 min</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/mysql/2024/05/13/%E5%B9%BB%E8%AF%BB%E4%B8%8E%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84%E5%8C%BA%E5%88%AB.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-05-13-phantomReading.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/mysql/2024/05/13/%E5%B9%BB%E8%AF%BB%E4%B8%8E%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84%E5%8C%BA%E5%88%AB.html">
+      <p>
+  更多博客请见 我的语雀知识库
+不可重复读是由其他事务的更新操作造成的，而幻读则是由本事务的更新操作造成的
+
+
+不可重复读指的是：某事务第一次读取变量A的值为1，其它事务将其更新为2。后这个某事务读到了其它事务对A更新后的值2。前后读取的这个变量的值不相同。
+
+而幻读指的是：某事务第... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags"><a class="post-tag" href="/jekyll-theme-yat/tags.html#MySQL">#MySQL</a></div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/05/02/%E5%93%88%E5%B8%8C%E8%A1%A8%E6%88%90%E7%8E%AF%E9%97%AE%E9%A2%98.html">
+      哈希表成环问题<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> May 02, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 1 min</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/05/02/%E5%93%88%E5%B8%8C%E8%A1%A8%E6%88%90%E7%8E%AF%E9%97%AE%E9%A2%98.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-05-02-Hash.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/05/02/%E5%93%88%E5%B8%8C%E8%A1%A8%E6%88%90%E7%8E%AF%E9%97%AE%E9%A2%98.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+默认此情况仅发生在1.7版本下并发对哈希表扩容的情况下
+
+第一步：线程启动，有线程T1和线程T2都准备对HashMap进行扩容操作， 此时T1和T2指向的都是链表的头节点A，而T1和T2的下一个节点分别是T1.next和T2.next，它们都... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#HashMap">#HashMap</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/04/28/TreeMap&amp;HashMap.html">
+      TreeMap &amp; HashMap<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Apr 28, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 13 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/04/28/TreeMap&amp;HashMap.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-05-02-Hash.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/04/28/TreeMap&amp;HashMap.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+内部实现：
+
+  HashMap 使用哈希表（基于数组和链表/红黑树的组合）实现，通过计算键的哈希值来快速访问值。
+  TreeMap 使用红黑树实现，这使得它能够保持键的自然排序或自定义排序。
+    排序特性：
+  
+  HashMap 不保证任何特定的顺序，键值对的存储和检索顺序可能随时间... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">#数据结构</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html">
+      synchronized底层<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Apr 05, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 10 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/04/05/synchronized%E5%BA%95%E5%B1%82.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+synchronized可以修饰方法、静态方法、代码块。修饰方法和静态方法时，方法的字节码文件中会多一个标识：ACC_SYNCHRONIZED。
+当调用设置了 ACC_SYNCHRONIZED 的方法时，执行线程进入监视器（monitor），然后执行这个方法... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#JUC">#JUC</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Synchronized">#Synchronized</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/03/24/%E8%A3%85%E7%AE%B1%E7%B1%BB%E4%B8%8Esynchronized.html">
+      装箱类与synchronized<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Mar 24, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 3 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/03/24/%E8%A3%85%E7%AE%B1%E7%B1%BB%E4%B8%8Esynchronized.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-24-lock.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/03/24/%E8%A3%85%E7%AE%B1%E7%B1%BB%E4%B8%8Esynchronized.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+package org.Solution.Algorithm;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Third {
+    private static Integer i = 0;
+    private stat... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#JUC">#JUC</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Synchronized">#Synchronized</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/03/09/ProcessBuilder&amp;Runtime.getRuntime().exec().html">
+      Java里两种执行命令的方式比较<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Mar 09, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 4 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/03/09/ProcessBuilder&amp;Runtime.getRuntime().exec().html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-09-ProcessBuilder.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/03/09/ProcessBuilder&amp;Runtime.getRuntime().exec().html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+
+  我的网盘程序部署在服务器上，前端资源通过nginx托管。但不知为何，nginx总是每隔几天就被kill了。所以我在后台程序内部搞了一个定时任务
+每隔一段时间重启nginx。执行重启命令使用了Runtime.exec方法。但后来在实习过程中发现公... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#%E5%91%BD%E4%BB%A4">#命令</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/02/16/volatile.html">
+      volatile<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Feb 16, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 10 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/02/16/volatile.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-02-16-volatile.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/02/16/volatile.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+
+第一个作用：保证可见性
+当一个共享变量被volatile修饰时，它会保证修改的值会立即被更新到主内存中，当其他线程读取此变量时，会去主内存中读取新值。这样就保证了多个线程之间的可见性
+
+** 假如B线程时刻X去主存里读volatile修饰的变量的值，A线程在... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#JUC">#JUC</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/02/13/Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB.html">
+      Java线程和操作系统线程的区别<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Feb 13, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 2 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/02/13/Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-02-13-Thread.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/02/13/Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+在 JDK 1.2 及以后，JVM 选择了更加稳定且方便使用的操作系统原生的内核级线程，通过系统调用，将线程的调度交给了操作系统内核。而操作系统内核线程和Java线程有一对一、一对多、多对多这几种模型。具体与操作系统有关。
+
+线程模型
+多对一模型
+多个用户级线程对... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#JUC">#JUC</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a>
+</div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="post-item top-post">
+  <h2 class="post-title">
+    <a class="post-link" href="/jekyll-theme-yat/java/2024/01/31/%E7%94%B1%E4%B8%80%E9%81%93%E5%8A%9B%E6%89%A3%E9%A2%98%E5%BC%95%E5%8F%91%E7%9A%84%E5%AF%B9Java%E4%B8%ADHashMap%E7%9A%84%E6%80%9D%E8%80%83.html">
+      2024-01-31-由一道力扣题引发的对Java中HashMap的思考<span class="post-badges">
+  <span class="post-badge badge-top">TOP</span>
+  <span class="post-badge badge-new">NEW</span>
+</span>
+</a>
+  </h2>
+  <div class="post-meta">
+    <span class="post-date"><i class="fa fa-calendar"></i> Jan 31, 2024</span><span class="post-author left-vsplit"><i class="fa fa-pencil"></i> xyhao</span><span class="post-reading-time left-vsplit"><i class="fa fa-clock-o"></i> About 15 mins</span>
+  </div>
+  <div class="post-excerpt">
+<a class="post-image" href="/jekyll-theme-yat/java/2024/01/31/%E7%94%B1%E4%B8%80%E9%81%93%E5%8A%9B%E6%89%A3%E9%A2%98%E5%BC%95%E5%8F%91%E7%9A%84%E5%AF%B9Java%E4%B8%ADHashMap%E7%9A%84%E6%80%9D%E8%80%83.html" style="flex: 0 1 38.2%">
+      <div style="background-image: url(https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png); height: 160px"></div>
+    </a><a class="post-text" href="/jekyll-theme-yat/java/2024/01/31/%E7%94%B1%E4%B8%80%E9%81%93%E5%8A%9B%E6%89%A3%E9%A2%98%E5%BC%95%E5%8F%91%E7%9A%84%E5%AF%B9Java%E4%B8%ADHashMap%E7%9A%84%E6%80%9D%E8%80%83.html">
+      <p>
+  更多博客请见 我的语雀知识库
+
+
+
+
+哈希表插入是在尾节点插入，因为需要遍历哈希桶内所有链表节点判断重复
+
+哈希表的底层是由数组、链表和红黑树实现的，数组作为哈希桶。桶内的结点个数小于8链表实现，大于等于8红黑树实现Java中所有类都继承了Object类，该类中有一个hashCode方法，是C++实现的native方法，将key的内存地址转化为32位... <span class="read_more">Read More</span></p>
+    </a>
+  </div>
+  <div class="post-tags">
+<a class="post-tag" href="/jekyll-theme-yat/tags.html#Java">#Java</a><a class="post-tag" href="/jekyll-theme-yat/tags.html#HashMap">#HashMap</a>
+</div>
+</li>
+<!-- Normal list item -->
+</ul>
+
+  <!-- Pagination links -->
+
+
+  <div class="paginator">
+    <span class="previous">
+    
+      <span>Prev</span>
+    
+    </span>
+
+    <span class="indicator"> 1/3</span>
+
+    <span class="next">
+    
+      <a href="/jekyll-theme-yat/page2">Next</a>
+    
+    </span>
+  </div>
+
+</div>
+</div>
+
+
+  </section>
+  <section class="sidebar" style="margin-left: 15px;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="common-list">
+  <ul>
+    <li>
+      <a href="/jekyll-theme-yat/index.html">
+        All<span>27</span>
+      </a>
+    </li>
+
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-HashMap">
+          HashMap <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-Java">
+          Java <span>13</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-Kafka">
+          Kafka <span>4</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-MySQL">
+          MySQL <span>4</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-Redis">
+          Redis <span>1</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F">
+          分布式系统 <span>2</span>
+        </a>
+      </li>
+    
+      <li>
+        <a href="/jekyll-theme-yat/categories.html#h-%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1">
+          系统设计 <span>2</span>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+</section>
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/jekyll-theme-yat/"></data>
+
+  <div class="wrapper">
+    <div class="site-footer-inner" style="text-align: center;">
+<div style="text-align: center;">Copyright © 2024-2024 xyhao</div>
+      <div style="text-align: center;">Powered by <a title="Jekyll is a simple, blog-aware, static site generator." href="https://jekyllrb.com/" style="text-align: center;">Jekyll</a> &amp; <a title="Yat,
+       yet another theme." href="https://github.com/jeffreytse/jekyll-theme-yat" style="text-align: center;">Yat Theme</a>.</div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
