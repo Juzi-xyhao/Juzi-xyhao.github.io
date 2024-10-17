@@ -196,7 +196,7 @@ subtitle:
 # 首页文章佈局
 # 1: 行佈局
 # 2: 列布局
-index_layout: 7
+index_layout: 3
 
 # 在首页显示文章简介
 # 1: 描述
@@ -338,7 +338,7 @@ aside:
       # 按钮文本
       text: Follow Me
       # 按钮链接
-      link: https://github.com/xxxxxx
+      link: https://github.com/Juzi-xyhao
   card_announcement:
     # 是否显示公告卡片
     enable: true
@@ -977,7 +977,7 @@ canvas_fluttering_ribbon:
 # https://github.com/hustcc/canvas-nest.js
 canvas_nest:
   # 是否启用 canvas_nest
-  enable: true
+  enable: false
   # 线条颜色，默认: '0,0,0'; RGB 值: (R,G,B).(注意: 使用 ',' 分隔.)
   color: '0,0,255'
   # 线条的不透明度 (0~1)
