@@ -2,7 +2,9 @@
 title: 2024-01-31-由一道力扣题引发的对Java中HashMap的思考
 date: 2024-01-31
 updated: 2024-02-01
-tags: Java HashMap
+tags:
+  - Java
+  - HashMap
 categories: Java
 author: xyhao
 keywords: 开始背JUC八股的起点
