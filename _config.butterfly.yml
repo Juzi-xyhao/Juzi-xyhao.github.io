@@ -49,7 +49,7 @@ code_blocks:
 social:
   fab fa-github: https://github.com/Juzi-xyhao || Github || "#hdhfbb"
   fas fa-envelope: mailto:xyhaomail@163.com || Email || "#000000"
-  fas fa-tv: https://space.bilibili.com/11111111 || Bilibili
+#  fas fa-tv: https://space.bilibili.com/11111111 || Bilibili
 
 
 # --------------------------------------
@@ -99,8 +99,8 @@ footer_img: false
 
 # 网站背景
 # 可以设置为颜色或图片
-# 图片格式: url(http://xxxxxx.com/xxx.jpg)
-background: url(https://i.loli.net/2019/09/09/5oDRkWVKctx2b6A.png)
+# 图片格式: url(https://i.loli.net/2019/09/09/5oDRkWVKctx2b6A.png)
+background:
 
 # 封面设置
 cover:
@@ -968,9 +968,9 @@ canvas_ribbon:
 # Fluttering Ribbon
 canvas_fluttering_ribbon:
   # 是否启用 Fluttering Ribbon
-  enable: false
+  enable: true
   # 是否在移动设备上启用
-  mobile: false
+  mobile: true
 
 # canvas_nest
 # https://github.com/hustcc/canvas-nest.js
