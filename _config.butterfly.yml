@@ -515,6 +515,20 @@ busuanzi:
   # 页面 PV 统计
   page_pv: false
 
+
+umami_analytics:
+  enable: true
+  # For self-hosted setups, configure the hostname of the Umami instance
+  serverURL:
+  website_id:
+  option:
+  UV_PV:
+    site_uv: true
+    site_pv: true
+    page_pv: true
+    # Umami Cloud (API key) / self-hosted Umami (token)
+    token: GIavIQd5ls6rab5DTfY42p1VRA4DfPQo
+
 # --------------------------------------
 # 数学公式设置
 # --------------------------------------
@@ -1119,9 +1133,9 @@ instantpage: true
 # https://github.com/vinta/pangu.js
 pangu:
   # 是否启用 Pangu
-  enable: true
+  enable: false
   # 指定使用 Pangu 的范围(site 或 post)
-  field: site
+  field: post
 
 # Lazyload
 # https://github.com/verlok/vanilla-lazyload
@@ -1212,6 +1226,8 @@ inject:
   head:
     - <link rel="stylesheet" href="/css/mycss.css">
     - <link rel="stylesheet" href="/css/modify.css">
+    - <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    - <script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script>
   bottom:
     - <div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div>
     - <script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script>
@@ -1236,4 +1252,4 @@ CDN:
   custom_format:
 
   option:
-    busuanzi: https://raw.githubusercontent.com/JoeyBling/busuanzi.pure.js/refs/heads/master/busuanzi.pure.js
+    busuanzi: https://busuanzi.icodeq.com/busuanzi.pure.mini.js
