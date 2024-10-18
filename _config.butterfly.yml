@@ -197,7 +197,7 @@ subtitle:
 # 首页文章佈局
 # 1: 行佈局
 # 2: 列布局
-index_layout: 7
+index_layout: 3
 
 # 在首页显示文章简介
 # 1: 描述
@@ -921,7 +921,7 @@ beautify:
 font:
   global-font-size:
   code-font-size:
-  font-family: OPPOSans
+  font-family:
   code-font-family:
 
 # 网站标题和副标题的字体设置
