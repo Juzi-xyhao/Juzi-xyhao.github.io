@@ -1199,12 +1199,3 @@ CDN:
 
   option:
     busuanzi: https://raw.githubusercontent.com/JoeyBling/busuanzi.pure.js/refs/heads/master/busuanzi.pure.js
-
-
-
-about:
-  Personal_Introduction:
-    # 个人简介
-    img:
-    describe: 末流211软件工程大四，服务端开发方向，秋招ing
-    tips:
