@@ -36,15 +36,19 @@
     filter: brightness(0.8)
 
 // 页脚
-#footer:before
-  background-color: alpha(#FFF, .5)
+#footer:before {
+  background-color: transparent; // 完全透明
 
-  [data-theme='dark'] &
-    background-color: alpha(#000, .5)
+  [data-theme='dark'] & {
+    background-color: transparent; // 完全透明
+  }
+}
 
-#footer-wrap, #footer-wrap a
-  color: #111
-  transition: unset
+#footer-wrap, #footer-wrap a {
+  color: white; // 字体颜色改为白色
+  transition: unset;
 
-  [data-theme='dark'] &
-    color: var(--light-grey)
+  [data-theme='dark'] & {
+    color: var(--light-grey); // 暗主题下的字体颜色保持不变
+  }
+}

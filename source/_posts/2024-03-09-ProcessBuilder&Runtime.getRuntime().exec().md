@@ -1,15 +1,18 @@
 ---
 title: Java里两种执行命令的方式比较
-date: 2024-03-09
 tags:
-- 命令
-- Java
+  - 命令
+  - Java
 categories: Java
 author: xyhao
 keywords: ProcessBuilder VS Runtime.exec()
 description: ProcessBuilder VS Runtime.exec()
-top_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-09-ProcessBuilder.png
-cover: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-09-ProcessBuilder.png
+top_img: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-09-ProcessBuilder.png
+cover: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-09-ProcessBuilder.png
+abbrlink: c56a813c
+date: 2024-03-09 00:00:00
 ---
 > 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 

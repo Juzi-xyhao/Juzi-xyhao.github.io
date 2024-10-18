@@ -1,6 +1,5 @@
 ---
 title: ConcurrentHashMap并发扩容
-date: 2024-08-27
 tags:
   - HashMap
   - Java
@@ -8,8 +7,12 @@ categories: Java
 author: xyhao
 keywords: JDK8使用细粒度更高的cas并发扩容
 description: JDK8使用细粒度更高的cas并发扩容
-top_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png
-cover: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png
+top_img: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png
+cover: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/ConcurrentHashMap.png
+abbrlink: fa7a6888
+date: 2024-08-27 00:00:00
 ---
 
 

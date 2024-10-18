@@ -1,14 +1,15 @@
 ---
 title: Vector API介绍&简单使用
-date: 2024-08-02
 tags:
   - Java
 categories: Java
 author: xyhao
 keywords: Vector API是Java用于科学计算的新API
 description: Vector API是Java用于科学计算的新API
-top_img: https://vjs.zencdn.net/v/oceans.mp4
-cover: https://vjs.zencdn.net/v/oceans.mp4
+top_img: 'https://vjs.zencdn.net/v/oceans.mp4'
+cover: 'https://vjs.zencdn.net/v/oceans.mp4'
+abbrlink: 836246b3
+date: 2024-08-02 00:00:00
 ---
 
 > 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)  

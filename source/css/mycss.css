@@ -6,6 +6,15 @@
     /* 字体文件路径 */
     font-display: swap;
 }
+
+#footer {
+    position: relative;
+    background-attachment: scroll;
+    background-position: bottom;
+    background-size: cover;
+    background-color: transparent; /* 或者使用rgba值如上所述 */
+}
+
 body,
 .gitcalendar {
     font-family: tzy !important;

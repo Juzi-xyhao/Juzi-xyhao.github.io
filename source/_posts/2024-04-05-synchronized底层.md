@@ -1,6 +1,5 @@
 ---
 title: synchronized底层
-date: 2024-04-05
 tags:
   - JUC
   - Java
@@ -9,8 +8,12 @@ categories: Java
 author: xyhao
 keywords: 锁升级的过程
 description: 锁升级的过程
-top_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png
-cover: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png
+top_img: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png
+cover: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-04-05-synchronized.png
+abbrlink: 5e93ca9c
+date: 2024-04-05 00:00:00
 ---
 > 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 

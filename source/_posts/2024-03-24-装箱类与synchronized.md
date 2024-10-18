@@ -1,6 +1,5 @@
 ---
 title: 装箱类与synchronized
-date: 2024-03-24
 tags:
   - JUC
   - Java
@@ -9,8 +8,12 @@ categories: Java
 author: xyhao
 keywords: 装箱类缓存了一些数据，这些数据只有一个内存地址
 description: 装箱类缓存了一些数据，这些数据只有一个内存地址
-top_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-24-lock.png
-cover: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-24-lock.png
+top_img: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-24-lock.png
+cover: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-03-24-lock.png
+abbrlink: bdd01c69
+date: 2024-03-24 00:00:00
 ---
 > 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 

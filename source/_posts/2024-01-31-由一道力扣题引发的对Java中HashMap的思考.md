@@ -1,7 +1,5 @@
 ---
 title: 2024-01-31-由一道力扣题引发的对Java中HashMap的思考
-date: 2024-01-31
-updated: 2024-02-01
 tags:
   - Java
   - HashMap
@@ -9,9 +7,14 @@ categories: Java
 author: xyhao
 keywords: 开始背JUC八股的起点
 description: 开始背JUC八股的起点111
-top_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png
-cover: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png
+top_img: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png
+cover: >-
+  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-01-31-Hash.png
 comments: true
+abbrlink: 422bd100
+date: 2024-01-31 00:00:00
+updated: 2024-02-01 00:00:00
 toc:
 toc_number:
 toc_style_simple:
