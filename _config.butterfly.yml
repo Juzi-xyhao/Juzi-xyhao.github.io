@@ -1111,13 +1111,13 @@ snackbar:
 
 # Instant.page
 # https://instant.page/
-instantpage: false
+instantpage: true
 
 # Pangu - 在中文字符和英文字符之间插入空格
 # https://github.com/vinta/pangu.js
 pangu:
   # 是否启用 Pangu
-  enable: false
+  enable: true
   # 指定使用 Pangu 的范围(site 或 post)
   field: site
 
