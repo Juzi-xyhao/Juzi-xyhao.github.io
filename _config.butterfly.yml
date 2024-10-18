@@ -190,7 +190,7 @@ subtitle:
   source: 3
   # 如果关闭打字机效果，副标题将仅显示 sub 的第一行内容
   sub:
-    -
+    - 回望过去，思绪万千
 
 # 首页文章佈局
 # 1: 行佈局
@@ -496,7 +496,7 @@ copy:
 # 需要安装 hexo-wordcount 插件
 wordcount:
   # 是否启用字数统计
-  enable: false
+  enable: true
   # 在文章元信息中显示字数统计
   post_wordcount: true
   # 在文章元信息中显示閲读时间
