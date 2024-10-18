@@ -519,7 +519,7 @@ busuanzi:
 umami_analytics:
   enable: true
   # For self-hosted setups, configure the hostname of the Umami instance
-  serverURL: https://cloud.umami.is
+  serverURL:
   website_id: 5b9ef408-bff2-4b30-8d1e-28cb3c95721a
   option:
   UV_PV:
@@ -1226,7 +1226,6 @@ inject:
   head:
     - <link rel="stylesheet" href="/css/mycss.css">
     - <link rel="stylesheet" href="/css/modify.css">
-    - <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
     - <script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script>
   bottom:
     - <div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div>
