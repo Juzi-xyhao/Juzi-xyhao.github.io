@@ -72,7 +72,7 @@ disable_top_img: false
 # 如果页面未设置横幅，则显示默认的横幅图片
 default_top_img: false
 
-footer_bg: transparent
+footer_bg: false
 
 # 主页的横幅图片
 index_img: transparent
@@ -197,7 +197,7 @@ subtitle:
 # 首页文章佈局
 # 1: 行佈局
 # 2: 列布局
-index_layout: 3
+index_layout: 6
 
 # 在首页显示文章简介
 # 1: 描述
@@ -337,7 +337,7 @@ aside:
       # 按钮图标
       icon: fab fa-github
       # 按钮文本
-      text: Follow Me
+      text: Github
       # 按钮链接
       link: https://github.com/Juzi-xyhao
   card_announcement:
@@ -415,7 +415,7 @@ aside:
     # 发佈日期与当前日期的时间差
     # 格式：Month/Day/Year Time 或 Year/Month/Day Time
     # 如果不启用此功能，请留空
-    runtime_date:
+    runtime_date: 10/17/2024
 
 # --------------------------------------
 # 右下角按钮设置
@@ -452,10 +452,10 @@ darkmode:
   # autoChangeMode: 1  跟随系统设置，如果系统不支持暗黑模式，则在晚上 6 点到早上 6 点之间切换暗黑模式
   # autoChangeMode: 2  在晚上 6 点到早上 6 点之间切换暗黑模式
   # autoChangeMode: false  不自动切换
-  autoChangeMode: 1
+  autoChangeMode: false
   # 设置明亮模式时间，值在 0 到 24 之间。如果未设置，默认值为 6 和 18
-  start:
-  end:
+  start: 0
+  end: 24
 
 # 在返回顶部按钮中显示滚动百分比
 rightside_scroll_percent: true
