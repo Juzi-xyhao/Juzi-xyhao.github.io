@@ -95,7 +95,7 @@ category_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/
 category_per_img: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/Term-background.png
 
 # 页脚的背景图片
-footer_img: false
+footer_img: transparent
 
 # 网站背景
 # 可以设置为颜色或图片
@@ -298,7 +298,7 @@ footer:
     # 网站创建年份
     since: 2024
   # 自定义文本
-  custom_text: Hi, welcome to myBlog!
+  custom_text: <p><a style="margin-inline:5px" target="_blank" href="https://hexo.io/"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a><a style="margin-inline:5px" target="_blank" href="https://butterfly.js.org/"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a><a style="margin-inline:5px" target="_blank" href="https://github.com/"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a><a style="margin-inline:5px" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p>
   # 主题和框架的版权声明
   copyright: true
 
@@ -507,11 +507,11 @@ wordcount:
 # 不蒜子 PV / UV 统计
 busuanzi:
   # 网站 UV 统计
-  site_uv: true
+  site_uv: false
   # 网站 PV 统计
   site_pv: false
   # 页面 PV 统计
-  page_pv: true
+  page_pv: false
 
 # --------------------------------------
 # 数学公式设置
@@ -1171,12 +1171,13 @@ css_prefix: true
 inject:
   head:
     - <link rel="stylesheet" href="/css/mycss.css">
-    - <link rel="stylesheet" href="https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/source/css/transpancy.css">
-    - <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    - <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+    - <script>LA.init({id:"3K1gEbd0agcY8IUo",ck:"3K1gEbd0agcY8IUo"})</script>
   bottom:
-    - <div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="true" data-order="random"> </div>
+    - <div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div>
     - <script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script>
-    - <script src='/js/blurBk.js' defer ></script>
+    - <script src='/js/blurBk.js' defer ></script>\
+    - <script type="text/javascript" src="/js/about.js"></script> # about关于页 - 处理函数
 
 # CDN 设置
 # 除非你知道它们的工作原理，否则不要修改以下设置
@@ -1197,3 +1198,12 @@ CDN:
 
   option:
     busuanzi: https://raw.githubusercontent.com/JoeyBling/busuanzi.pure.js/refs/heads/master/busuanzi.pure.js
+
+
+
+about:
+  Personal_Introduction:
+    # 个人简介
+    img:
+    describe: 末流211软件工程大四，服务端开发方向，秋招ing
+    tips:
