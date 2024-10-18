@@ -102,7 +102,7 @@ footer_img: transparent
 # 网站背景
 # 可以设置为颜色或图片
 # 图片格式: url(https://i.loli.net/2019/09/09/5oDRkWVKctx2b6A.png)
-background: https://cdn.lmark.cc/blog/IMG_0152.JPG
+background: https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/Term-background.png
 
 # 封面设置
 cover:
