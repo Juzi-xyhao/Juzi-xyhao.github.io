@@ -452,10 +452,10 @@ darkmode:
   # autoChangeMode: 1  跟随系统设置，如果系统不支持暗黑模式，则在晚上 6 点到早上 6 点之间切换暗黑模式
   # autoChangeMode: 2  在晚上 6 点到早上 6 点之间切换暗黑模式
   # autoChangeMode: false  不自动切换
-  autoChangeMode: false
+  autoChangeMode: 1
   # 设置明亮模式时间，值在 0 到 24 之间。如果未设置，默认值为 6 和 18
-  start: 0
-  end: 24
+  start:
+  end:
 
 # 在返回顶部按钮中显示滚动百分比
 rightside_scroll_percent: true
