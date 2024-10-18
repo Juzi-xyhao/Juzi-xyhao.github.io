@@ -519,7 +519,7 @@ busuanzi:
 umami_analytics:
   enable: true
   # For self-hosted setups, configure the hostname of the Umami instance
-  serverURL: https://api.umami.is/v1
+  serverURL: https://cloud.umami.is
   website_id: 5b9ef408-bff2-4b30-8d1e-28cb3c95721a
   option:
   UV_PV:
