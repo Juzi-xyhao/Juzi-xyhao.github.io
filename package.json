@@ -16,7 +16,7 @@
     "hexo": "^7.3.0",
     "hexo-abbrlink": "^2.2.1",
     "hexo-blog-encrypt": "^3.1.9",
-    "hexo-butterfly-extjs": "^1.4.11",
+    "hexo-butterfly-extjs": "^1.4.13",
     "hexo-butterfly-footer-beautify": "^1.0.6",
     "hexo-butterfly-wowjs": "^1.0.5",
     "hexo-deployer-git": "^4.0.0",
