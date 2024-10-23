@@ -3,7 +3,7 @@ title: ConcurrentHashMap并发扩容
 tags:
   - HashMap
   - Java
-categories: Java
+categories: [Java,HashMap,ConcurrentHashMap并发扩容]
 author: xyhao
 keywords: JDK8使用细粒度更高的cas并发扩容
 description: JDK8使用细粒度更高的cas并发扩容

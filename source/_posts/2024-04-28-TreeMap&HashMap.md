@@ -4,7 +4,7 @@ tags:
   - JUC
   - Java
   - Synchronized
-categories: Java
+categories: [Java,HashMap,TreeMap && HashMap]
 author: xyhao
 keywords: TreeMap由红黑树实现，HashMap由数组+链表+红黑树实现
 description: TreeMap由红黑树实现，HashMap由数组+链表+红黑树实现

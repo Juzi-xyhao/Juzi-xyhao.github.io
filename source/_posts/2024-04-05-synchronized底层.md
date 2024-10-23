@@ -4,7 +4,7 @@ tags:
   - JUC
   - Java
   - Synchronized
-categories: Java
+categories: [Java,JUC,synchronized底层]
 author: xyhao
 keywords: 锁升级的过程
 description: 锁升级的过程

@@ -9,32 +9,44 @@ def download_and_convert_image(url, output_path):
     response = requests.get(url)
     if response.status_code == 200:
         image = Image.open(BytesIO(response.content))
-        # Convert the image to PNG and save it
-        image.save(output_path, 'PNG')
-        print(f"Image saved as {output_path}")
+        # Check if the image is already PNG
+        if image.format not in ['PNG', 'JPEG', 'JPG']:
+            # Convert the image to PNG and save it
+            image.save(output_path, 'PNG')
+            print(f"Image saved as {output_path}")
+        else:
+            # If it's already PNG or JPEG/JPG, just save it as PNG
+            image.save(output_path, 'PNG')
+            print(f"Image in {image.format} format saved as {output_path}")
     else:
         print(f"Failed to download image from {url}")
 
+
+
 def update_md_with_local_paths(md_content, base_url, local_dir, date_str, md_filename):
-    # Define a pattern to match the webp image URLs
-    pattern = r'\!\[.*?\]\((https://cdn\.nlark\.com/.*?\.webp)\)'
+    # Define a pattern to match the webp and png image URLs
+    pattern = r'\!\[.*?\]\((https://cdn\.nlark\.com/.*?\.(webp|png))\)'
     matches = re.findall(pattern, md_content)
 
     for i, match in enumerate(matches):
+        # Extract the URL from the match tuple
+        url = match[0]  # Get the actual URL
+
         # Create a new filename for the converted image
         img_name = f'img_{i}.png' if i > 0 else 'img.png'
         local_img_path = os.path.join(local_dir, img_name)
 
         # Download and convert the image
-        download_and_convert_image(match, local_img_path)
+        download_and_convert_image(url, local_img_path)
 
         # Construct the new URL for the image
         new_url = f'{base_url}{date_str}-{md_filename}/{img_name}'
 
         # Replace the old URL with the new one in the markdown content
-        md_content = md_content.replace(match, new_url)
+        md_content = md_content.replace(url, new_url)
 
     return md_content
+
 
 def rename_md_file(md_file_path, date_str):
     # Get the original file name without extension

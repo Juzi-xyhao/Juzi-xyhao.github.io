@@ -1,10 +1,10 @@
 ---
-title: 装箱类与synchronized
+title: 装箱类
 tags:
   - JUC
   - Java
   - Synchronized
-categories: Java
+categories: [Java,其它,装箱类与synchronized]
 author: xyhao
 keywords: 装箱类缓存了一些数据，这些数据只有一个内存地址
 description: 装箱类缓存了一些数据，这些数据只有一个内存地址
