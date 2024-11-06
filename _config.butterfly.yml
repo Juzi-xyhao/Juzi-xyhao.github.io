@@ -452,7 +452,7 @@ darkmode:
   # autoChangeMode: 1  跟随系统设置，如果系统不支持暗黑模式，则在晚上 6 点到早上 6 点之间切换暗黑模式
   # autoChangeMode: 2  在晚上 6 点到早上 6 点之间切换暗黑模式
   # autoChangeMode: false  不自动切换
-  autoChangeMode: 1
+  autoChangeMode: false
   # 设置明亮模式时间，值在 0 到 24 之间。如果未设置，默认值为 6 和 18
   start:
   end:
@@ -1226,6 +1226,7 @@ inject:
   head:
     - <link rel="stylesheet" href="/css/mycss.css">
     - <link rel="stylesheet" href="/css/modify.css">
+    - <link rel="stylesheet" href="/css/transpancy.css">
     - <script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script>
   bottom:
     - <div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div>
