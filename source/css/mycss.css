@@ -6,9 +6,13 @@
     /* 字体文件路径 */
     font-display: swap;
 }
-p,font {
+p {
     font-family: 'tzy', sans-serif;
-    font-size: 16px; /* 这里定义了字体大小 */
+    font-size: 16px;
+}
+font {
+    font-family: 'tzy', sans-serif;
+    font-size: 16px;
 }
 /*导航栏居中*/
 #nav .menus_items {
