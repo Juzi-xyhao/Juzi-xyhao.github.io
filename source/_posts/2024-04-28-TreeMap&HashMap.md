@@ -9,9 +9,9 @@ author: xyhao
 keywords: TreeMap由红黑树实现，HashMap由数组+链表+红黑树实现
 description: TreeMap由红黑树实现，HashMap由数组+链表+红黑树实现
 top_img: >-
-  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-05-02-Hash.png
+  http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/2024-05-02-Hash.png
 cover: >-
-  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-05-02-Hash.png
+  http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/2024-05-02-Hash.png
 abbrlink: '81482818'
 date: 2024-04-28 00:00:00
 ---
@@ -153,7 +153,7 @@ void createEntry(int hash, K key, V value, int bucketIndex) {
 
 - 扩容时发生死循环（头插法造成，Java8已修复）
 
-![](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-04-28-TreeMap/v2-114b7455a189ab16390d60491b5c47b2_720w.jpeg)
+![](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-04-28-TreeMap/v2-114b7455a189ab16390d60491b5c47b2_720w.jpeg)
 
 如果有两个线程同时发现自己都key不存在，而这两个线程的key实际是相同的，在向链表中写入的时候第一线程将e设置为了自己的Entry,而第二个线程执行到了e.next，此时拿到的是最后一个节点，依然会将自己持有是数据插入到链表中，这样就出现了数据 重复。 通过商品put源码可以发现，是先将数据写入到map中，再根据元素到个数再决定是否做resize.在resize过程中还会出现一个更为诡异都问题死循环。 这个原因主要是因为hashMap在resize过程中对链表进行了一次倒序处理。假设两个线程同时进行resize, A->B 第一线程在处理过程中比较慢，第二个线程已经完成了倒序，变成了B-A 那么就出现了循环，B->A->B.这样就出现了就会出现CPU使用率飙升。 在下午突然收到其中一台机器CPU利用率不足告警，将jstack内容分析发现，可能出现了死循环和数据丢失情况，当然对于链表的操作同样存在问题。
  PS:在这个过程中可以发现，之所以出现死循环，主要还是在于对于链表对倒序处理，在Java 8中，已经不在使用倒序列表，死循环问题得到了极大改善。 

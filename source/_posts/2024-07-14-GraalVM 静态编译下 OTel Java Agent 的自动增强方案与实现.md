@@ -8,9 +8,9 @@ author: xyhao
 keywords: 静态编译导致Java程序很多特性都失效了
 description: 静态编译导致Java程序很多特性都失效了
 top_img: >-
-  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png
+  http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/2024-07-14-GraalVM.png
 cover: >-
-  https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleCover/2024-07-14-GraalVM.png
+  http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/2024-07-14-GraalVM.png
 copyright_author: 阿里巴巴中间件
 copyright_url: 'https://mp.weixin.qq.com/s/kEqBut3gcV9RM86DAMJLRA'
 abbrlink: 1105307b
@@ -72,11 +72,11 @@ copyright_info:
 总的来说，静态编译导致的字节码缺失是java程序的许多特性都失效的根本原因。
 
 ## 如何解决静态编译带来的问题？
-参考原文第二部分：![image.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-07-14-GraalVM/img.png)
+参考原文第二部分：![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-07-14-GraalVM/img.png)
 
-![image.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-07-14-GraalVM/img_1.png)
-![image.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-07-14-GraalVM/img_2.png)
-![image.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-07-14-GraalVM/img_3.png)
+![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-07-14-GraalVM/img_1.png)
+![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-07-14-GraalVM/img_2.png)
+![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-07-14-GraalVM/img_3.png)
 
 
 总的来说，是通过在native编译前先用普通的jvm执行一遍，把需要修改和增强的扩展点识别出来保存下来，然后native编译的时候再基于这些东西去增强。

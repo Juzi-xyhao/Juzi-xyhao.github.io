@@ -115,8 +115,8 @@ int sum = v2.reduceLanes(VectorOperators.ADD);
 
     </build>
 ```
-对我而言并没有用。<br />在IDEA的运行配置中添加也没有用：<br />![image.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-08-02-VectorAPI/img_1.png)<br /><br />
-于是我只能使用最原始的办法。在命令行中运行<br /><br />![image.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-08-02-VectorAPI/img_2.png)![img.png](https://raw.githubusercontent.com/Juzi-xyhao/Juzi-xyhao.github.io/master/assets/articleSource/2024-08-02-VectorAPI/img_3.png)<br /><br />
+对我而言并没有用。<br />在IDEA的运行配置中添加也没有用：<br />![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-02-VectorAPI/img_1.png)<br /><br />
+于是我只能使用最原始的办法。在命令行中运行<br /><br />![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-02-VectorAPI/img_2.png)![img.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-02-VectorAPI/img_3.png)<br /><br />
 我的机器上的JDK版本是21。想使用Vector API最低也要JDK16。<br /><br />
 
 
