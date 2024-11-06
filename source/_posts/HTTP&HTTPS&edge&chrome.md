@@ -1,6 +1,6 @@
 ---
-title: 2024-11-06-edge和chrome的调试工具
-categories: [其它,edge和chrome的调试工具]
+title: HTTP&HTTPS&edge&chrome
+categories: [其它,HTTP&HTTPS&edge&chrome]
 author:  xyhao
 keywords: 偶然发现edge调试http类型url被屏蔽时状态码一栏空空如也
 description: 偶然发现edge调试http类型url被屏蔽时状态码一栏空空如也？
@@ -14,6 +14,8 @@ cover: >-
 tags:
   - 其它
 ---
+
+
 ## 前情提要
 原本博客直接部署在github.io上，并白嫖GitHub的免费图床，但访问需要挂梯子，为了更方便地访问，我注册了一个域名并使用免费的cloudflare做CDN分发。  
 但这样做确实博客里的文字可以被加载出来，但是图床还是GitHub，不挂梯子图片自然还是加载不出来。
@@ -22,10 +24,12 @@ tags:
 ![img.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-11-06-edgechrome/img_2.png)  
 
 
-![img_1.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-11-06-edgechrome/img_3.png)  
+![img_1.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-11-06-edgechrome/img_3.png)
 
 
 但还好我还有华为云的个人服务器，于是自己简易搭建了一个图床服务器。相关代码在文末给出。
+
+## 状态码：`已屏蔽：mixed-content`
 图床建好后修改图片链接，重新访问看看？
 发现还是显示上面两张图，图片一张都没加载出来。按理说我的服务器在国内，不可能访问不了，所以我在电脑上打开chrome浏览器开始调试:
 
@@ -47,5 +51,69 @@ tags:
 还好先用chrome调试，不然这个问题不知道得到什么时候才能发现。
 
 ![img_1.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-11-06-edgechrome/img.png)  
+
+
+## 图床简易代码
+将文件写入HTTP的response即可，记得设置一些HTTP的头部字段
+```java
+@RestController("fileInfoController")
+@RequestMapping("/file")
+public class FileInfoController extends CommonFileController {
+    // url举例：http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/2024-01-31-Hash.png
+    @RequestMapping("/getBlogImage")
+    public void getImage1(HttpServletResponse response,
+                          String imagePath) {
+        if (StringUtils.isBlank(imagePath)) {
+            return;
+        }
+        String imageSuffix = StringTools.getFileSuffix(imagePath);
+        String filePath = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE  + "/" + imagePath;
+        imageSuffix = imageSuffix.replace(".", "");
+        String contentType = "image/" + imageSuffix;
+        response.setContentType(contentType);
+        response.setHeader("Cache-Control", "max-age=2592000");
+        readFile(response, filePath);
+    }
+
+    protected void readFile(HttpServletResponse response, String filePath) {
+        if (!StringTools.pathIsOk(filePath)) {
+            return;
+        }
+        OutputStream out = null;
+        FileInputStream in = null;
+        try {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                return;
+            }
+            in = new FileInputStream(file);
+            byte[] byteData = new byte[1024];
+            out = response.getOutputStream();
+            int len = 0;
+            while ((len = in.read(byteData)) != -1) {
+                out.write(byteData, 0, len);
+            }
+            out.flush();
+        } catch (Exception e) {
+            logger.error("读取文件异常", e);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    logger.error("IO异常", e);
+                }
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    logger.error("IO异常", e);
+                }
+            }
+        }
+    }
+}
+```
 
 
