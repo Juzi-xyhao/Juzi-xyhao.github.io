@@ -344,7 +344,7 @@ aside:
     # 是否显示公告卡片
     enable: true
     # 公告内容
-    content: 如果发现图片不能加载，请手动将协议由HTTPS修改为HTTP，我的图床服务器没有装SSL证书。另外手机端edge和chrome浏览器会强制使用HTTPS，请尽可能在电脑上访问。
+    content: this is xyhao`s Blog
   card_recent_post:
     # 是否显示最近文章卡片
     enable: true

@@ -1,17 +1,17 @@
 /* 修改字体 ------------------------------------------------------- */
-@font-face {
-    font-family: 'tzy';
-    /* 字体名自定义即可 */
-    src: url("https://cdn.jsdelivr.net/gh/tzy13755126023/BLOG_SOURCE/font/ZhuZiAWan.woff2");
-    /* 字体文件路径 */
-    font-display: swap;
-}
+/*@font-face {*/
+/*    font-family: 'tzy';*/
+/*    !* 字体名自定义即可 *!*/
+/*    src: url("https://cdn.jsdelivr.net/gh/tzy13755126023/BLOG_SOURCE/font/ZhuZiAWan.woff2");*/
+/*    !* 字体文件路径 *!*/
+/*    font-display: swap;*/
+/*}*/
 p {
-    font-family: 'tzy', sans-serif;
+    /*font-family: 'tzy', sans-serif;*/
     font-size: 16px;
 }
 font {
-    font-family: 'tzy', sans-serif;
+    /*font-family: 'tzy', sans-serif;*/
     font-size: 16px;
 }
 /*导航栏居中*/
@@ -46,7 +46,7 @@ font {
 
 body,
 .gitcalendar {
-    font-family: tzy !important;
+    /*font-family: tzy !important;*/
     font-size: 16px;
 
 }
