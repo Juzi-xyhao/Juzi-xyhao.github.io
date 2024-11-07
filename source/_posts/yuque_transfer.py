@@ -87,7 +87,7 @@ def process_markdown_file():
     os.makedirs(local_dir, exist_ok=True)
 
     # Base URL for the GitHub repository
-    base_url = 'http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/'
+    base_url = 'https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/'
 
     # Update the markdown content with the local paths
     updated_content = update_md_with_local_paths(md_content, base_url, local_dir, date_str, md_filename)

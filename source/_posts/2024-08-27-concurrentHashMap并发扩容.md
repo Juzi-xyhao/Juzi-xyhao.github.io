@@ -8,9 +8,9 @@ author: xyhao
 keywords: JDK8使用细粒度更高的cas并发扩容
 description: JDK8使用细粒度更高的cas并发扩容
 top_img: >-
-  http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/ConcurrentHashMap.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/ConcurrentHashMap.png
 cover: >-
-  http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/ConcurrentHashMap.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/ConcurrentHashMap.png
 abbrlink: fa7a6888
 date: 2024-08-27 00:00:00
 ---
@@ -23,24 +23,24 @@ date: 2024-08-27 00:00:00
 JDK7和JDK8两个版本的扩容有点不一样。
 ## JDK7
 JDK7版本中，扩容是在持有锁时发生的。
-![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-27-concurrentHashMap/img_4.png)
+![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_4.png)
 35行的rehash是扩容函数。直到46行的finally代码块才释放锁。  
 拿到锁的线程执行put方法时会检查要不要扩容（已有元素个数 / table数组的长度  > 负载因子）。  
 因此只有一个线程可以执行扩容操作，不存在并发问题。  
 但是map扩容了总得让其它线程知道吧。具体是怎么知道的呢？  
 其实数组table是一个volatile变量，这就保证了可见性。  
 证据见JDK 8中源码778行。我没有装JDK 7,但JDK7里也肯定是一个volatile变量。  
-![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-27-concurrentHashMap/img.png)
+![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img.png)
 
 
 
 ## JDK8
 JDK8版本中，扩容是在不持有锁时发生的。  
-![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-27-concurrentHashMap/img_1.png)  
+![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_1.png)  
 倒数第三行的addCount是扩容的检查函数，可以清晰的看到，它不在syncronized代码块里。  
 
 先看看add方法：  
-![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-27-concurrentHashMap/img_2.png)   
+![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_2.png)   
 **扩容检查流程：**
 
 - 计算元素总量 size，若 CAS 冲突严重则放弃扩容。  
@@ -272,7 +272,7 @@ Node<K,V> f; int fh;
 
 
 TRANSFERINDEX在源码的6357行通过unsafe对象获取了transferIndex的内存地址  
-![image.png](http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleSource/2024-08-27-concurrentHashMap/img_3.png) 
+![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_3.png) 
 
 
 
