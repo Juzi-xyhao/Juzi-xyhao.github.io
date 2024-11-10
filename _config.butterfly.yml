@@ -344,7 +344,7 @@ aside:
     # 是否显示公告卡片
     enable: true
     # 公告内容
-    content: this is xyhao`s Blog
+    content: my Blog is not for you
   card_recent_post:
     # 是否显示最近文章卡片
     enable: true
