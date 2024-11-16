@@ -344,7 +344,7 @@ aside:
     # 是否显示公告卡片
     enable: true
     # 公告内容
-    content: my Blog is not for you
+    content: 未来几期更新：谈谈我理解的高并发 && 谈谈我理解的RPC && 个人项目：文件上传如何校验完整性以及分布式文件读写 && 系统设计：B站弹幕系统 && 直播系统：英雄联盟S赛百万长连接。争取2024年12月前全部更完
   card_recent_post:
     # 是否显示最近文章卡片
     enable: true
