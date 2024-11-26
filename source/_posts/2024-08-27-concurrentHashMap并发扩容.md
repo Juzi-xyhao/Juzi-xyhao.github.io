@@ -21,26 +21,26 @@ date: 2024-08-27 00:00:00
 
 
 JDK7和JDK8两个版本的扩容有点不一样。
-## JDK7
+# JDK7
 JDK7版本中，扩容是在持有锁时发生的。
-![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_4.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_4.png)
 35行的rehash是扩容函数。直到46行的finally代码块才释放锁。  
 拿到锁的线程执行put方法时会检查要不要扩容（已有元素个数 / table数组的长度  > 负载因子）。  
 因此只有一个线程可以执行扩容操作，不存在并发问题。  
 但是map扩容了总得让其它线程知道吧。具体是怎么知道的呢？  
 其实数组table是一个volatile变量，这就保证了可见性。  
 证据见JDK 8中源码778行。我没有装JDK 7,但JDK7里也肯定是一个volatile变量。  
-![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img.png)
 
 
 
-## JDK8
+# JDK8
 JDK8版本中，扩容是在不持有锁时发生的。  
-![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_1.png)  
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_1.png)  
 倒数第三行的addCount是扩容的检查函数，可以清晰的看到，它不在syncronized代码块里。  
 
 先看看add方法：  
-![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_2.png)   
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_2.png)   
 **扩容检查流程：**
 
 - 计算元素总量 size，若 CAS 冲突严重则放弃扩容。  
@@ -50,9 +50,9 @@ JDK8版本中，扩容是在不持有锁时发生的。
       - 当前线程参与扩容。  
    - 如果没有其他线程在进行扩容，则修改 sizeCtl 标识，进行扩容。  
 
-#### 扩容流程
+## 扩容流程
 上述流程只是扩容之前的准备，扩容的核心逻辑在 transfer() 方法中。  
-##### transfer() 源码
+### transfer() 源码
 看源码之前，提前梳理一下扩容过程：  
 
 1. 创建 nextTable，新容量是旧容量的 2 倍。  
@@ -111,8 +111,7 @@ private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
                     等它们从主内存更新缓存块后，cas的条件已经不成立了。于是陷入自旋
                     自旋超时后，会返回false，执行后面的代码。
                     可能这时已经扩容完了没它事。
-                    竞争失败后就像个陪读一样走了个过场。
-                    我真的没有在说高考
+                    竞争失败后就相当于走了个过场。
                 */
             else if (U.compareAndSwapInt
                      (this, TRANSFERINDEX, nextIndex,
@@ -223,8 +222,8 @@ private final void transfer(Node<K,V>[] tab, Node<K,V>[] nextTab) {
 
 
 
-##### 一些并发问题：
-###### 怎么保证一个桶范围和一个线程一一对应？  
+## 一些并发问题：
+### 怎么保证一个桶范围和一个线程一一对应？  
 有一个全局的volatile变量transferIndex。它记录最新的哈希桶迁移索引。  
 每个线程通过cas的方式获取自己的哈希桶范围。如果有多个线程预期的哈希桶范围都一样，  
 那么因为cas的原因，只有一个线程可以拥有这段范围并且更新transferIndex的值。其它线程自旋等待，超时才进入下一步  
@@ -256,8 +255,7 @@ Node<K,V> f; int fh;
                     等它们从主内存更新缓存块后，cas的条件已经不成立了。于是陷入自旋
                     自旋超时后，会返回false，执行后面的代码。
                     可能这时已经扩容完了没它事。
-                    竞争失败后就像个陪读一样走了个过场。
-                    我真的没有在说高考
+                    竞争失败后就相当于走了个过场。
                 */
             else if (U.compareAndSwapInt
                      (this, TRANSFERINDEX, nextIndex,
@@ -270,9 +268,12 @@ Node<K,V> f; int fh;
         }
 ```
 
+### 只用CAS操作也能做到可见性，为什么transferIndex还要用volatile修饰？
+CAS的可见性很局限，对于CAS操作里的变量，只有在执行CAS操作时才能得知它在主内存里的最新值，不通过CAS去访问变量得到的还是线程本地内存里的旧值。  
+所以还需要volatile去保证任意时刻的可见性
 
 TRANSFERINDEX在源码的6357行通过unsafe对象获取了transferIndex的内存地址  
-![image.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_3.png) 
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-08-27-concurrentHashMap/img_3.png) 
 
 
 
