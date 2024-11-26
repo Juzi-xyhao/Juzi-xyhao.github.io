@@ -47,7 +47,7 @@ code_blocks:
 # 格式:
 #   icon: 链接 || 描述 || 颜色
 social:
-  fab fa-github: https://github.com || Github || "#hdhfbb"
+  fab fa-github: https://github.com/Juzi-xyhao || Github || "#hdhfbb"
   fas fa-envelope: mailto:xyhaomail@163.com || Email || "#000000"
   fas fa-tv: https://space.bilibili.com || Bilibili
 
@@ -339,7 +339,7 @@ aside:
       # 按钮文本
       text: GitHub
       # 按钮链接
-      link: https://github.com
+      link: https://github.com/Juzi-xyhao
   card_announcement:
     # 是否显示公告卡片
     enable: true
