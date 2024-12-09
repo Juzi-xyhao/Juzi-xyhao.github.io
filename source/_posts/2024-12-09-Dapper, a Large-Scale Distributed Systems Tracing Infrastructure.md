@@ -7,8 +7,8 @@ description: Dapper, a Large-Scale Distributed Systems Tracing Infrastructure
 comments: true
 date: 2024-12-09 11:00:00
 abbrlink: '0'
-copyright_author: 
-copyright_url:
+copyright_author: alphawang
+copyright_url: http://alphawang.com/blog/google-dapper-translation
 top_img: >-
   https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/dapper.png
 cover: >-
