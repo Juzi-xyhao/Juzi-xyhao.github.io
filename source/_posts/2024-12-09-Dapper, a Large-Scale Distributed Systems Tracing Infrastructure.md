@@ -1,8 +1,27 @@
 ---
+title: Dapper链路追踪论文翻译
+categories: [其它]
+author:  xyhao
+keywords: Dapper, a Large-Scale Distributed Systems Tracing Infrastructure
+description: Dapper, a Large-Scale Distributed Systems Tracing Infrastructure
+comments: true
+date: 2024-12-09 11:00:00
 abbrlink: '0'
+copyright_author: 
+copyright_url:
+top_img: >-
+  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/dapper.png
+cover: >-
+  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/dapper.png
+tags:
+- RPC
+- 链路追踪
 ---
+
+>最近在研究如何在RPC框架内部实现RPC链路追踪，中途发现了Google的这篇论文。于是找了翻译版本放博客上
+>  
 > 原文：[https://ai.google/research/pubs/pub36356](https://ai.google/research/pubs/pub36356)
->
+> 
 > 译文：[http://alphawang.com/blog/google-dapper-translation](http://alphawang.com/blog/google-dapper-translation)
 >
 
