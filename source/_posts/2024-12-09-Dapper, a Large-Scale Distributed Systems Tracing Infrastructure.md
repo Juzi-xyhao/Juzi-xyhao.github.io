@@ -38,7 +38,7 @@ abbrlink: '0'
 ## <font style="color:rgb(31, 35, 40);">2 Dapper 的分布式跟踪</font>
 <font style="color:rgb(31, 35, 40);">分布式服务的跟踪系统需要记录在一次请求后系统完成的所有工作的信息。举个例子，图-1展示了拥有 5 台服务器的服务：一个前端服务器 A，两个中间层 B 和 C，两个后端服务器 D 和 E。当用户发起请求到前端服务器 A 之后，会发送两个 RPC 调用到 B 和 C。B 马上会返回结果，但是 C 还需要继续调用后端服务器 D 和 E，然后返回结果给 A，A 再响应最初的请求。对这个请求来说，一个简单的分布式跟踪系统需要记录每台机器上的每次信息发送和接收的信息标识符和时间戳。</font>
 
-![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-1_tree.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img.png)
 
 _<font style="color:rgb(31, 35, 40);">(图-1. 由用户请求X 发起的穿过一个简单服务系统的请求路径。字母标识的节点表示分布式系统中的处理过程)</font>_
 
@@ -49,13 +49,13 @@ _<font style="color:rgb(31, 35, 40);">(图-1. 由用户请求X 发起的穿过�
 ### <font style="color:rgb(31, 35, 40);">2.1 跟踪树与span</font>
 <font style="color:rgb(31, 35, 40);">在 Dapper 跟踪树中，树节点是基本单元，我们称之为</font><font style="color:rgb(31, 35, 40);"> </font>`<font style="color:rgb(31, 35, 40);">span</font>`<font style="color:rgb(31, 35, 40);">。节点之间的连线表示 span 与其</font>`<font style="color:rgb(31, 35, 40);">父span</font>`<font style="color:rgb(31, 35, 40);"> </font><font style="color:rgb(31, 35, 40);">之间的关系。虽然节点在整个跟踪树中的位置是独立的，但 span 也是一个简单的时间戳日志，其中编码了这个 span 的开始时间、结束时间、RPC 时间数据、以及 0 或多个应用程序相关的标注，我们将在 2.3 节讨论这些内容。</font>
 
-![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-2_span.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img_1.png)
 
 _<font style="color:rgb(31, 35, 40);">(图-2. Dapper 跟踪树中5个 span 的因果和实时关系)</font>_
 
 <font style="color:rgb(31, 35, 40);">图2 阐释了 span 是如何构造成更大的跟踪结构的。Dapper 为每个 span 记录了一个可读的</font>`<font style="color:rgb(31, 35, 40);">span name</font>`<font style="color:rgb(31, 35, 40);">、</font>`<font style="color:rgb(31, 35, 40);">span id </font>`<font style="color:rgb(31, 35, 40);">和</font><font style="color:rgb(31, 35, 40);"> </font>`<font style="color:rgb(31, 35, 40);">parent id</font>`<font style="color:rgb(31, 35, 40);">，这样就能重建出一次分布式跟踪过程中不同 span 之间的关系。没有parent id 的 span被称为</font><font style="color:rgb(31, 35, 40);"> </font>`<font style="color:rgb(31, 35, 40);">根span</font>`<font style="color:rgb(31, 35, 40);">。一次特定跟踪的所有相关 span 会共享同一个通用的</font>`<font style="color:rgb(31, 35, 40);">trace id</font>`<font style="color:rgb(31, 35, 40);"> </font><font style="color:rgb(31, 35, 40);">（trace id在图中没有绘出）。所有这些 ID 可能是唯一的 64 位整数。在一个典型的 Dapper 跟踪中，我们希望每个 RPC 对应一个 span，每一个组件层对应跟踪树上的一个层级。</font>
 
-![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-3_span_detail.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img_2.png)
 
 _<font style="color:rgb(31, 35, 40);">(图-3. span 的详细视图)</font>_
 
@@ -75,7 +75,7 @@ _<font style="color:rgb(31, 35, 40);">(图-3. span 的详细视图)</font>_
 ### <font style="color:rgb(31, 35, 40);">2.3 标注 Annotation</font>
 <font style="color:rgb(31, 35, 40);">上述性能测量点足够推导出复杂分布式系统的跟踪细节，这使得 Dapper 的核心功能也适用于那些不可修改的 Google 应用程序。然而，Dapper 也允许应用程序开发者添加额外的信息，以丰富 Dapper 的跟踪数据，从而帮助监控更高级别的系统行为，或者帮助调试问题。我们允许用户通过一个简单的 API 来定义带时间戳的标注，其核心代码如图4 所示。这些标注支持任意内容。为了保护 Dapper 用户不至于意外加入太多日志，每个跟踪 span 都可配置一个标注量的上限。应用程序级别的标注是不能替代结构化的 span 信息以及 RPC 信息的。</font>
 
-![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-4_annotation.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img_3.png)
 
 _<font style="color:rgb(31, 35, 40);">(图-4. Dapper 标注 API 在 C++ 和 Java 中的通用使用模式)</font>_
 
@@ -85,7 +85,7 @@ _<font style="color:rgb(31, 35, 40);">(图-4. Dapper 标注 API 在 C++ 和 Java
 <font style="color:rgb(31, 35, 40);">Dapper 的一个关键设计目标是低损耗，因为如果一个新工具的价值还未证实，而对性能有影响的话，服务运维人员是不会愿意去部署这个工具的。而且，我们还想要允许开发人员使用标注 API，而无需担心额外的损耗。我们同时也发现 web 服务确实对性能测量的损耗很敏感。所以，除了把 Dapper 的基本性能测量损耗限制得尽可能小，我们还通过仅记录一部分跟踪信息，来进一步降低损耗。我们将在 4.4 节详细讨论这种跟踪采样模式。</font>
 
 ### <font style="color:rgb(31, 35, 40);">2.5 跟踪收集</font>
-![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-5_collection.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img_4.png)
 
 _<font style="color:rgb(31, 35, 40);">(图-5. Dapper 收集管道概览)</font>_
 
@@ -207,7 +207,7 @@ _<font style="color:rgb(31, 35, 40);">(表-2. Dapper 采样频率对 Web 搜索�
 ### <font style="color:rgb(31, 35, 40);">5.2 Dapper 用户接口</font>
 <font style="color:rgb(31, 35, 40);">绝大多数情况下，人们通过基于 web 的用户交互接口来使用 Dapper。篇幅所限我们不能展示每一个特性，不过图6 列出了一个典型的用户工作流。</font>
 
-![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-6_workflow.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img_5.png)
 
 _<font style="color:rgb(31, 35, 40);">(图-6. 通用 Dapper 用户接口中的一个典型用户工作流)</font>_
 
@@ -251,7 +251,9 @@ _<font style="color:rgb(31, 35, 40);">(图-6. 通用 Dapper 用户接口中的�
 
 <font style="color:rgb(31, 35, 40);">一个工程师在调试长尾延迟的过程中建立了一个小型库，可以根据 DAPI</font><font style="color:rgb(31, 35, 40);"> </font>`<font style="color:rgb(31, 35, 40);">Trace</font>`<font style="color:rgb(31, 35, 40);">对象推断出层次性的关键路径。这些关键路径结构可用来诊断问题、为全文搜索可预期的性能改进调整优先级。Dapper 的这项工作引出了下列发现：</font>
 
-+ <font style="color:rgb(31, 35, 40);">关键路径上短暂的网络性能退化不会影响系统吞吐量，但能对延迟异常值产生巨大影响。在图7 中，大多数全文搜索的慢跟踪都在关键路径上有网络退化。</font><font style="color:rgb(31, 35, 40);"> </font>![](https://github.com/AlphaWang/alpha-dapper-translation-zh/raw/master/images/post/2019/dapper/dapper-7_network-lag.png)<font style="color:rgb(31, 35, 40);"> </font>_<font style="color:rgb(31, 35, 40);">(图-7. 关键路径上遇到非正常网络延迟的全文搜索跟踪，与端到端请求延迟的关系)</font>_
++ <font style="color:rgb(31, 35, 40);">关键路径上短暂的网络性能退化不会影响系统吞吐量，但能对延迟异常值产生巨大影响。在图7 中，大多数全文搜索的慢跟踪都在关键路径上有网络退化。</font><font style="color:rgb(31, 35, 40);"> </font>
++ ![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-09-Dapper/img_6.png)
++ <font style="color:rgb(31, 35, 40);"> </font>_<font style="color:rgb(31, 35, 40);">(图-7. 关键路径上遇到非正常网络延迟的全文搜索跟踪，与端到端请求延迟的关系)</font>_
 + <font style="color:rgb(31, 35, 40);">许多有问题的昂贵查询模式都源自服务间不经意的交互。一旦发现，他们往往很容易纠正；但是在没有 Dapper 时如何发现他们是很困难的。</font>
 + <font style="color:rgb(31, 35, 40);">通用查询是从 Dapper 之外的安全日志仓库中获取，并且使用 Dapper 的唯一 trace id，与Dapper 仓库做关联。这种映射随后被用于构建全文搜索每个独立子系统中的慢查询列表。</font>
 
