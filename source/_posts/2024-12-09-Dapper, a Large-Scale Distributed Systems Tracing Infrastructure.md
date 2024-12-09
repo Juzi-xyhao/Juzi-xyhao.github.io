@@ -18,7 +18,7 @@ tags:
 - 链路追踪
 ---
 
->最近在研究如何在RPC框架内部实现RPC链路追踪，中途发现了Google的这篇论文。于是找了翻译版本放博客上
+>最近在研究如何在RPC框架内部实现RPC链路追踪，中途发现了Google的这篇论文。于是找了翻译版本放在博客上
 >  
 > 原文：[https://ai.google/research/pubs/pub36356](https://ai.google/research/pubs/pub36356)
 > 
