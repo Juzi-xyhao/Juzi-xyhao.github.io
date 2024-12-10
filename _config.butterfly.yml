@@ -1243,7 +1243,7 @@ CDN:
   # 注意： Dev 版本只能使用 'local' 作为内部脚本
   # 注意：将第三方脚本设置为 'local' 时，需要安装 hexo-butterfly-extjs
   internal_provider: local
-  third_party_provider: jsdelivr
+  third_party_provider: custom
 
   # 是否在 URL 中添加版本号，true 或 false
   version: false
@@ -1254,3 +1254,4 @@ CDN:
 
   option:
     busuanzi: https://busuanzi.icodeq.com/busuanzi.pure.mini.js
+    fancybox: https://npm.elemecdn.com/@fancyapps/ui/dist/fancybox.css
