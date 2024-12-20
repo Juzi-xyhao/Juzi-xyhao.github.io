@@ -1,6 +1,6 @@
 ---
 title: SkyWalking原理概述
-categories: [其它]
+categories: [分布式,链路追踪]
 author:  xyhao
 keywords: 主要对其插桩及链路追踪原理的概述
 description: 主要对其插桩及链路追踪原理的概述

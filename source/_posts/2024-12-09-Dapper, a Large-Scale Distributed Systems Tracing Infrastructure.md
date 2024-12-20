@@ -1,6 +1,6 @@
 ---
 title: Dapper链路追踪论文翻译
-categories: [其它]
+categories: [分布式,链路追踪]
 author:  xyhao
 keywords: Dapper, a Large-Scale Distributed Systems Tracing Infrastructure
 description: Dapper, a Large-Scale Distributed Systems Tracing Infrastructure
