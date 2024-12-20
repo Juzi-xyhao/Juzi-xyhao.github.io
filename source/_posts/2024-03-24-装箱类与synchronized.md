@@ -9,9 +9,9 @@ author: xyhao
 keywords: 装箱类缓存了一些数据，这些数据只有一个内存地址
 description: 装箱类缓存了一些数据，这些数据只有一个内存地址
 top_img: >-
-  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/2024-03-24-lock.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-24-lock.png
 cover: >-
-  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/2024-03-24-lock.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-24-lock.png
 abbrlink: bdd01c69
 date: 2024-03-24 00:00:00
 ---
@@ -64,7 +64,7 @@ i是一个Integer对象。在Java中，自动装箱的Integer对象在作为同�
 
 附上两个运行结果：
 
-![img.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-03-24-Integer&synchronized/img.png)
-![img_1.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-03-24-Integer&synchronized/img_1.png)
+![img.png](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-03-24-Integer&synchronized/img.png)
+![img_1.png](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-03-24-Integer&synchronized/img_1.png)
 
 

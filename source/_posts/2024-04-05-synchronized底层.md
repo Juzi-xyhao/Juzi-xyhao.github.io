@@ -9,9 +9,9 @@ author: xyhao
 keywords: 锁升级的过程
 description: 锁升级的过程
 top_img: >-
-  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/2024-04-05-synchronized.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-04-05-synchronized.png
 cover: >-
-  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/2024-04-05-synchronized.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-04-05-synchronized.png
 abbrlink: 5e93ca9c
 date: 2024-04-05 00:00:00
 ---
@@ -41,7 +41,7 @@ synchronized可以修饰方法、静态方法、代码块。修饰方法和静�
 
 当synchronized修饰代码块时，代码块所处的那个方法的字节码中会多出两个指令 monitorenter 和 monitorexit，也就是说在同步方法块中，JVM 使用 monitorenter 和 monitorexit 这两个指令实现同步。
 ## 锁是如何升级的呢？
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img.png)
 
 锁标志位 “01” + 是否是偏向锁 “0” 表示无锁状态，也就是说该对象没有被锁定
 锁标志位 “01” + 是否是偏向锁 “1” 表示偏向锁状态
@@ -50,15 +50,15 @@ synchronized可以修饰方法、静态方法、代码块。修饰方法和静�
 
 1. Mark Word 的初始状态：在代码即将进入同步块的时候，如果此同步对象没有被锁定，也即 Mark Word 中的锁标志位 “01” + 是否是偏向锁 “0”：
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_1.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_1.png)
 
 2. 在当前线程的栈帧中建立一个锁记录：Java 虚拟机会在将在当前线程的栈帧中建立一个名为 锁记录（Lock Record） 的空间，Lock Record 中有一个字段 displaced_header，用于后续存储锁对象的 Mark Word 的拷贝：
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_2.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_2.png)
 
 3. 复制锁对象的 Mark Word 到锁记录中：把锁对象的 Mark Word 复制到锁记录中，更具体来讲，是将 Mark Word 放到锁记录的 displaced_header 属性中。官方给这个复制过来的记录起名 Displaced Mark Word：
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_3.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_3.png)
 
 4. 使用 CAS 操作更新锁对象的 Mark Word。Java 虚拟机使用 CAS 操作尝试把锁对象的 Mark Word 更新为指向锁记录的指针，并将锁记录里的 owner 指针指向对象的 Mark Word。如果这个更新操作成功了，就表明获取轻量级锁成功，也就是说该线程拥有了这个对象的锁！并且该对象 Mark Word 的锁标志位会被改为 00，即表示此对象处于轻量级锁定状态。如果这个更新操作失败了，那有两种可能性：
    1. 当前线程已经拥有了这个对象锁（直接进入同步块继续执行）
@@ -67,7 +67,7 @@ synchronized可以修饰方法、静态方法、代码块。修饰方法和静�
 为了证实到底是哪种情况，虚拟机首先会检查该对象的 Mark Word 是否指向当前线程的栈帧，如果是就说明当前线程已经拥有了这个对象的锁，那就可以直接进入同步块继续执行（synchronized 是可重入锁）。
 
 假设锁的状态是轻量级锁，下图反应了对象的 Mark word 和线程栈中锁记录的状态，可以看到左边线程栈中包含3个指向当前锁对象的 Lock Record。其中栈中最高位的锁记录为第一次获取轻量级锁时分配的，其 Displaced Mark word 的值为锁对象 obj 加锁之前的 Mark word，之后的每次锁重入都会在线程栈中分配一个 Displaced Mark word 为 null 的锁记录。
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_4.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_4.png)
 那么问题来了，为什么 synchronized 重入的时候 Java 虚拟机要在线程栈中添加 Displaced Mark word 为 null 的锁记录呢？
 首先锁重入次数是一定要记录下来的，因为每次解锁都需要对应一次加锁，只有解锁次数等于加锁次数时，该锁才真正的被释放，也就是在解锁时需要用到说锁的重入次数。
 最简单的记录锁重入次数的方案就是将其记录在对象头的 Mark word 中，但 Mark word 大小有限，没有多出来的地方存放该信息了。另一个方案就是在锁纪录中记录重入次数，但这样做的话，每次重入获得锁的时候都需要遍历该线程的栈找到对应的锁纪录，然后去修改重入次数的值，显然这样效率不是很高。
@@ -79,7 +79,7 @@ synchronized可以修饰方法、静态方法、代码块。修饰方法和静�
 > 线程在执行同步块之前，JVM 会先在当前线程的栈桢中创建用于存储锁记录的空间，并将对象头中的 Mark Word 复制到锁记录中，官方称为 Displaced Mark Word。然后线程尝试使用 CAS 将对象头中的 Mark Word 替换为指向锁记录的指针。如果成功，当前线程获得锁，<u>如果失败，表示其他线程竞争锁，当前线程便尝试使用自旋来获取锁。</u>
 > 
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_5.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_5.png)
 看上方划线的句子，话不多说，我们接着上面那段源码往下看：
 可以看到并没有什么自旋操作，如果 CAS 成功就直接 return 了，如果失败就会执行下面的锁膨胀方法 ObjectSynchronizer::inflate，这里面同样也没有自旋操作。
 **注意，从这段源码可以看到，锁的升级是用C++方法实现的**
@@ -90,8 +90,8 @@ synchronized可以修饰方法、静态方法、代码块。修饰方法和静�
 那么，一个对象和一个 monitor 是如何关联起来的呢？
 在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分：对象头（Header）、实例数据（Instance Data）和对齐填充（Padding）。
 其中，如果对象是数组类型，则虚拟机用 3 个字宽（Word）存储对象头（Mard Word、类型指针、数组长度），如果对象是非数组类型，则用 2 字宽存储对象头（Mard Word、类型指针）。在 32 位虚拟机中，1 字宽等于 4 字节，即 32 bit，如表所示：
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_6.png)
-![img.png](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-04-05-synchonized/img_7.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_6.png)
+![img.png](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-04-05-synchonized/img_7.png)
 Mark Word 就是对象与 monitor 关联的重点所在！ 《深入理解 Java 虚拟机 - 第 3 版》中是这样描述 Mark Word 的：
 > HotSpot 虚拟机对象的对象头部分包括两类信息。第一类是用于存储对象自身的运行时数据，如哈希码（HashCode）、GC 分代年龄、锁状态标志、线程持有的锁、偏向线程 ID、偏向时间戳等，这部分数据的长度在 32 位和 64 位的虚拟机（未开启压缩指针）中分别为 32 个比特和 64 个比特，官方称它为 “Mark Word”。
 > 对象需要存储的运行时数据很多，其实已经超出了 32、64 位 Bitmap 结构所能记录的最大限度，但对象头里的信息是与对象自身定义的数据无关的额外存储成本，考虑到虚拟机的空间效率，Mark Word 被设计成一个有着动态定义的数据结构，以便在极小的空间内存储尽量多的数据，根据对象的状态复用自己的存储空间。

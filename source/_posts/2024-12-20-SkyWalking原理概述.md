@@ -288,24 +288,24 @@ span分为entryspan,localspan,exitspan。entryspan和exitspan只能有一个。
 <h4 id="MG5oe">同步</h4>
 记录当前节点里的链路的TracingContext类里有一个栈，保存在该节点一次请求中发生的span。tracingcontext对象被放进了ThreadLocal。每次创建span时需要通过getOrCreate方法获取tracingcontext对象，然后将生成的span放进这个对象保存span的栈里面（通过LinkedList模拟栈）。
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img.png)
 
 (图1)
 
 当前节点的流程结束后，即栈的深度为 0，会调用ThreadLocal的remove方法把本次流程的span数据全部清空
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_1.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_1.png)
 
 (图2，将 span 弹出栈。如果栈的深度为 0，isEmpty，返回 true)
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_2.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_2.png)
 
 (图3，若图2方法返回 true，则清空本线程的ThreadLocal类型的Context)
 
 
 
 <h5 id="l3PGB">举例，对Dubbo类型的 span 出入栈</h5>
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_3.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_3.png)
 
 (图4，对Dubbo的插桩实现)
 
@@ -313,11 +313,11 @@ span分为entryspan,localspan,exitspan。entryspan和exitspan只能有一个。
 
 上图中line76调用下图中的createExitSpan方法。return push方法的返回值。push方法正是将生成的span压入栈内。
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_4.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_4.png)
 
 (图5，将生成的span压入栈内)
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_5.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_5.png)
 
 （ 图 6，在 afterMehtod 插桩方法内，调用图二的 stopSpan 方法，将span弹出栈）
 
@@ -366,7 +366,7 @@ public Res rpcFunc(int sign) {
 
 至于如何保证传递数据的准确性，就是另一回事了。
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_6.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_6.png)
 
 (图7，拦截线程的构造方法)
 
@@ -374,17 +374,17 @@ ContextManager.capture()方法就是专门用于跨线程传递数据，将Trace
 
 从这个方法的实现来看，是把快照发给Kafka或者ES。
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_7.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_7.png)
 
 (图8，EnhanceInstance接口的实现类)
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_8.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_8.png)
 
 (图9，老线程创建快照)
 
 
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_9.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_9.png)
 
 (图10，新线程获取快照)
 
@@ -426,17 +426,17 @@ skywalking将span分为了三种类型。EntrySpan/LocalSpan/ExitSpan。任何�
 
 创建ExitSpan时调用inject 方法
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_10.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_10.png)
 
 (图11，跨进程，发送carrier)
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_11.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_11.png)
 
 (图12，将Trace数据包装成ContextCarrier对象，通过DataCarrier发给下一个节点)
 
 至于链路数据的存储和发送，则是通过`org/apache/skywalking/apm/agent/core/remote/TraceSegmentServiceClient.java`类实现存储， DataCarrier 模块实现发送
 
-![](https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleSource/2024-12-20-SkyWalking原理概述/img_12.png)
+![](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_12.png)
 
 (图 13，DataCarrier模块)
 

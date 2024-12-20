@@ -8,9 +8,9 @@ author: xyhao
 keywords: ProcessBuilder VS Runtime.exec()
 description: ProcessBuilder VS Runtime.exec()
 top_img: >-
-  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/2024-03-09-ProcessBuilder.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-09-ProcessBuilder.png
 cover: >-
-  https://gitee.com/xyhaooo/picrepo/raw/master/assets/articleCover/2024-03-09-ProcessBuilder.png
+  https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-09-ProcessBuilder.png
 abbrlink: c56a813c
 date: 2024-03-09 00:00:00
 ---
