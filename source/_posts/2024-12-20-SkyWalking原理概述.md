@@ -459,13 +459,13 @@ skywalking将span分为了三种类型。EntrySpan/LocalSpan/ExitSpan。任何�
 
 在RPC报文字段里添加traceID和SegmentID等字段，B服务的 X 方法收到A服务的调用时，解析出TraceID和SegmentID，将TraceID放在ThreadLocal里面的TraceContext里，SegmentID赋值给parentID。
 
-执行过程中如果**同步调用**了其它RPC请求，那么这些请求都会去ThreadLocal里拿到TraceID，如果拿不到说明它是链路的起点。同时记录本次RPC调用的信息（TraceID，OperationName，SegmentID，SpanID，CreateTime，ParentID等等），记录MySQL。
+执行过程中如果**同步调用**了其它RPC请求，那么这些请求都去ThreadLocal里拿到TraceID，如果拿不到说明它是本段链路的起点。同时记录本次RPC调用的信息（TraceID，OperationName，SegmentID，SpanID，CreateTime，ParentID等等。
 
 同时用一个队列记录本节点 RPC 调用情况。B服务收到A服务的调用时，入队列。
 
-队列也要保存在 ThreadLocal 里。通过 Netty 发起 RPC 时入队列，RPC 通过 Netty 发送出去后弹出栈。Method.invoke 方法执行 X 方法结束后，本节点的 Trace 结束。
+队列也要保存在 ThreadLocal 里。通过 Netty 发起 RPC 时入队列。
 
-将队列元素全部弹出到 MySQL。
+Method.invoke 方法执行 X 方法结束后，本节点的 Trace 结束， 将队列元素全部弹出至 MySQL。
 
 后续查看链路信息从MySQL中统计即可。
 
@@ -473,5 +473,5 @@ skywalking将span分为了三种类型。EntrySpan/LocalSpan/ExitSpan。任何�
 
 **对于异步调用**
 
-则要难一些，除了显式地在形参里添加 Trace 参数，我能想到的唯一办法就是像 SkyWalking 一样对 Thread 库插桩。
+实现起来比同步调用更难一些，除了显式地在形参里添加 Trace 参数，我能想到的唯一办法就是像 SkyWalking 一样对 Thread 库插桩。
 
