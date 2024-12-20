@@ -299,9 +299,9 @@ agentBuilder.type(pluginFinder.buildMatch())
 <h3 id="gAxNk">链路追踪，如何实现？</h3>
 一个segment里面有多个span。每个span代表一个操作。
 
-span分为entryspan,localspan,exitspan。entryspan和exitspan只能有一个。
+span分为entryspan,localspan,exitspan。entryspan只能有一个。
 
-每个RPC操作（或其它服务）创建span时都会默认创建entryspan。同时用一个栈维护这些span。此外还有两个字段当前栈深和历史最大栈深。如果历史最大栈深大于1，说明entryspan已经被创建了，那么就创建localspan。
+每个RPC操作（或其它服务）创建span时都会默认创建entryspan。同时用一个栈维护这些span。此外还有两个字段记录当前栈深和历史最大栈深。如果历史最大栈深大于1，说明entryspan已经被创建了，那么就创建localspan。
 
 <h4 id="MG5oe">同步</h4>
 记录当前节点里的链路的TracingContext类里有一个栈，保存在该节点一次请求中发生的span。tracingcontext对象被放进了ThreadLocal。每次创建span时需要通过getOrCreate方法获取tracingcontext对象，然后将生成的span放进这个对象保存span的栈里面（通过LinkedList模拟栈）。
