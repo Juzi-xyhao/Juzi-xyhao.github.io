@@ -1,5 +1,5 @@
 ---
-title: SkyWalking原理概述
+title: SkyWalking链路追踪原理概述
 categories: [分布式,链路追踪]
 author:  xyhao
 keywords: 主要对其插桩及链路追踪原理的概述
@@ -291,7 +291,7 @@ premain，顾名思义，在main方法执行前执行，这印证了SkyWalking�
 1. 准备工作。验证各个参数合法性
 2. 见证类验证。确定中间件的版本。因为没有任何方法可以百分百获取系统中某个中间件的版本号。但是每个版本都会有一些独特的类。通过排列组合可以间接确定版本号。
 3. 增强静态和实例方法。在enhance方法中调了两个抽象方法。一个负责增强目标类的静态方法，另一个负责实例方法。具体的增强逻辑由子类使用`DynamicType.Builder<?>`<font style="color:rgba(0, 0, 0, 0.85);">（</font>`Byte Buddy`<font style="color:rgba(0, 0, 0, 0.85);"> 提供的用于构建和修改字节码的工具类）去实现。其实就是子类把要增加的代码写在beforeMethod和afterMethod方法里。这两个方法后文的代码截图会提到。</font>
-4. <font style="color:rgba(0, 0, 0, 0.85);">通过</font>`ByteBuddy`<font style="color:rgba(0, 0, 0, 0.85);">提供</font>API在字节码加载时修改字节码，实现增强字节码。具体增强代码见`org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.v2.ClassEnhancePluginDefineV2#enhanceClass`方法。
+4. <font style="color:rgba(0, 0, 0, 0.85);">通过</font>`ByteBuddy`<font style="color:rgba(0, 0, 0, 0.85);"></font>API在字节码加载时修改字节码，实现增强字节码。具体增强代码见`org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.v2.ClassEnhancePluginDefineV2#enhanceClass`方法。
 
 <font style="color:rgba(0, 0, 0, 0.85);">为什么字节码加载时能修改？谁通知</font>`ByteBuddy`<font style="color:rgba(0, 0, 0, 0.85);">修改？</font>
 
@@ -305,7 +305,7 @@ agentBuilder.type(pluginFinder.buildMatch())
                     .with(AgentBuilder.RedefinitionStrategy.RETRANSFORMATION)
                     .with(new RedefinitionListener())
                     .with(new Listener())
-                    .installOn(instrumentation);
+                    .installOn(instrumentation);//注册instrumentation接口
 ```
 
 <h3 id="gAxNk">链路追踪，如何实现？</h3>
@@ -318,7 +318,7 @@ span分为entryspan,localspan,exitspan。entryspan只能有一个。
 <h4 id="MG5oe">同步</h4>
 记录当前节点里的链路的TracingContext类里有一个栈，保存在该节点一次请求中发生的span。tracingcontext对象被放进了ThreadLocal。每次创建span时需要通过getOrCreate方法获取tracingcontext对象，然后将生成的span放进这个对象保存span的栈里面（通过LinkedList模拟栈）。
 
-![图1](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img.png)
+![图1，TraceContext是ThreadLocal类型](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img.png)
 
 
 当前节点的流程结束后，即栈的深度为 0，会调用ThreadLocal的remove方法把本次流程的span数据全部清空
@@ -332,6 +332,7 @@ span分为entryspan,localspan,exitspan。entryspan只能有一个。
 
 
 <h5 id="l3PGB">举例，对Dubbo类型的 span 出入栈</h5>
+
 ![图4，对Dubbo的插桩实现](https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-12-20-SkyWalking原理概述/img_3.png)
 
 
@@ -467,7 +468,8 @@ skywalking将span分为了三种类型。EntrySpan/LocalSpan/ExitSpan。任何�
 
 
 <h3 id="EF4c4">如何在 RPC 框架内部实现RPC链路追踪？</h3>
-**对于同步调用**
+
+**对于同步调用**  
 
 在RPC报文字段里添加traceID和SegmentID等字段，B服务的 X 方法收到A服务的调用时，解析出TraceID和SegmentID，将TraceID放在ThreadLocal里面的TraceContext里，SegmentID赋值给parentID。
 
