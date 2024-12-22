@@ -3,7 +3,7 @@ title: 2024-01-31-由一道力扣题引发的对Java中HashMap的思考
 tags:
   - Java
   - HashMap
-categories: [Java,HashMap,由一道力扣题引发的对Java中HashMap的思考]
+categories: [Java,HashMap]
 author: xyhao
 keywords: 开始背JUC八股的起点
 description: 开始背JUC八股的起点
@@ -25,7 +25,6 @@ copyright_url:
 copyright_info:
 ---
 
-> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
 <br>
 

@@ -3,7 +3,7 @@ title: Java里两种执行命令的方式比较
 tags:
   - 命令
   - Java
-categories: [Java,其它,Java里两种执行命令的方式比较]
+categories: [Java,其它]
 author: xyhao
 keywords: ProcessBuilder VS Runtime.exec()
 description: ProcessBuilder VS Runtime.exec()
@@ -14,7 +14,6 @@ cover: >-
 abbrlink: c56a813c
 date: 2024-03-09 00:00:00
 ---
-> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
 <br>
 

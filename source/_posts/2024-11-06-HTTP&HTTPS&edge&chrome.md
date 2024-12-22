@@ -1,6 +1,6 @@
 ---
 title: HTTP&HTTPS&edge&chrome
-categories: [其它,HTTP&HTTPS&edge&chrome]
+categories: [其它]
 author:  xyhao
 keywords: 偶然发现edge调试http类型url被屏蔽时状态码一栏空空如也
 description: 偶然发现edge调试http类型url被屏蔽时状态码一栏空空如也？

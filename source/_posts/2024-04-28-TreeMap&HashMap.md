@@ -4,7 +4,7 @@ tags:
   - JUC
   - Java
   - Synchronized
-categories: [Java,HashMap,TreeMap && HashMap]
+categories: [Java,HashMap]
 author: xyhao
 keywords: TreeMap由红黑树实现，HashMap由数组+链表+红黑树实现
 description: TreeMap由红黑树实现，HashMap由数组+链表+红黑树实现
@@ -15,7 +15,6 @@ cover: >-
 abbrlink: '81482818'
 date: 2024-04-28 00:00:00
 ---
-> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
 # **内部实现**：
 - HashMap 使用哈希表（基于数组和链表/红黑树的组合）实现，通过计算键的哈希值来快速访问值。

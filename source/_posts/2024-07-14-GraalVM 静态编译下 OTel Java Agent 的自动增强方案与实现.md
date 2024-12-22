@@ -3,7 +3,7 @@ title: GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现
 tags:
   - JVM
   - Java
-categories: [Java,编译,GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现]
+categories: [Java,字节码]
 author: xyhao
 keywords: 静态编译导致Java程序很多特性都失效了
 description: 静态编译导致Java程序很多特性都失效了
@@ -22,7 +22,6 @@ copyright_info:
 > 这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读  
 > [GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现](https://mp.weixin.qq.com/s/kEqBut3gcV9RM86DAMJLRA)  
 > 本文档讨论的动态、静态编译仅限于java语言  
-> 更多博客请见 [我的语雀知识库](https://www.yuque.com/u41117719/xd1qgc)
 
 ## 什么是动态编译？
 启动jar运行程序时，热点代码会被JVM以JIT（Just-In-Time Compilation,即时编译）的形式编译为机器码。当我们启动jar包时，实质上是启动了一个JVM，然后执行类加载，JIT将热点字节码编译为机器码这三个部分。
