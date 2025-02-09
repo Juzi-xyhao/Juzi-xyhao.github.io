@@ -29,7 +29,7 @@ code_blocks:
   # 是否使用 Mac 风格
   macStyle: true
   # 代码块高度限制（单位: px）
-  height_limit: 700
+  height_limit: 300
   # 是否自动换行
   word_wrap: false
 
