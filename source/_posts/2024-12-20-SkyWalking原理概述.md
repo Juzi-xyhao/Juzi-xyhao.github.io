@@ -37,7 +37,81 @@ tags:
 插桩就是字节码增强，一个意思。
 
 <h4 id="K1i9R">如何自定义插件？</h4>
-见官方文档
+见官方文档  
+[插件开发指南](https://skywalking.apache.org/docs/skywalking-java/next/en/setup/service-agent/java-agent/java-plugin-development-guide/)
+
+### 自定义类加载器
+如果看过skywalking的源码就会发现，里面很多类都是通过自定义类加载器加载的。
+为什么要自定义类加载器呢？  
+
+**为了隔离资源，避免依赖冲突。**   
+
+每个类加载器都有自己的加载路径。不同路径下的资源不能互相加载。这也是双亲委派机制的由来。  
+对于同一份字节码，由不同的类加载器加载，加载出的两个实例不相同。如果一个项目里引入了不同的组件，比如每个组件都有log4j的库，但是版本不同。使用不同的类加载器就能避免因为类的全限定路径相同而导致不同的组件使用相同的log4j，也就避免了依赖冲突。
+
+一个自定义类加载器的demo如下：
+
+```java
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+public class MyClassLoader extends ClassLoader {
+
+    private String classDir;
+
+    public MyClassLoader(String classDir) {
+        this.classDir = classDir;
+    }
+
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        byte[] classData = loadClassData(name);
+        if (classData == null) {
+            throw new ClassNotFoundException();
+        } else {
+            return defineClass(name, classData, 0, classData.length);
+        }
+    }
+
+    private byte[] loadClassData(String className) {
+        String fileName = classDir + File.separatorChar
+                + className.replace('.', File.separatorChar) + ".class";
+        try (FileInputStream fis = new FileInputStream(fileName);
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            int b;
+            while ((b = fis.read()) != -1) {
+                baos.write(b);
+            }
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        try {
+            // 实例化自定义类加载器并指定要加载类的根目录
+            MyClassLoader classLoader = new MyClassLoader("/path/to/classes/");
+
+            /*
+             * 使用自定义类加载器加载该类，将该类的信息加载进JVM的方法区里。
+             * 也就是俗称的三步走：加载、链接（验证、准备、解析）、初始化
+             */
+            Class<?> helloWorldClass = classLoader.loadClass("HelloWorld");
+            
+            // 创建实例并调用方法
+            Object instance = helloWorldClass.getDeclaredConstructor().newInstance();
+            helloWorldClass.getMethod("sayHello").invoke(instance);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
 
 <h3 id="k3u2d">插桩，如何实现？</h3>
 这是SkyWalking实现插桩的核心类：
@@ -295,8 +369,9 @@ premain，顾名思义，在main方法执行前执行，这印证了SkyWalking�
 
 <font style="color:rgba(0, 0, 0, 0.85);">为什么字节码加载时能修改？谁通知</font>`ByteBuddy`<font style="color:rgba(0, 0, 0, 0.85);">修改？</font>
 
-<font style="color:rgba(0, 0, 0, 0.85);">这个功能由</font>`JVM`<font style="color:rgba(0, 0, 0, 0.85);">提供的</font>`Instrumentation`接口实现
-
+<font style="color:rgba(0, 0, 0, 0.85);">这个功能由</font>`JVM`<font style="color:rgba(0, 0, 0, 0.85);">提供的</font>`Instrumentation`接口实现  
+这个接口是用于类加载时对其字节码进行修改。  
+从Java 7开始，这个接口可以在运行时重新定义已加载的类（但不能改变其结构，如添加或移除变量或方法）。这样可以在不重启应用的情况下更新某些行为，对于调试和热修复非常有用。
 
 
 ```java
