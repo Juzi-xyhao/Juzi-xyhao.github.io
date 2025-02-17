@@ -1,8 +1,5 @@
 ---
 title: GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现
-tags:
-  - JVM
-  - Java
 categories: [Java,字节码]
 author: xyhao
 keywords: 静态编译导致Java程序很多特性都失效了
@@ -17,6 +14,14 @@ abbrlink: 1105307b
 date: 2024-07-14 00:00:00
 copyright_author_href:
 copyright_info:
+tags:
+  - Java
+  - JVM
+  - 静态编译
+  - JIT
+  - AOT
+  - native image
+  - GraalVM
 ---
 
 > 这篇文档的创作灵感来源于阿里巴巴中间件微信公众号的推文，是对其的解读  
