@@ -83,7 +83,7 @@ def process_markdown_file():
     md_filename = os.path.splitext(os.path.basename(md_file_path))[0]
 
     # Define the local directory for images
-    local_dir = f'/Users/xyhao/workspace/Blog/assets/articleSource/{date_str}-{md_filename}'
+    local_dir = f'/Users/xyhao/workspace/Juzi-xyhao.github.io/assets/articleSource/{date_str}-{md_filename}'
     os.makedirs(local_dir, exist_ok=True)
 
     # Base URL for the GitHub repository
