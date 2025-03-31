@@ -12,7 +12,7 @@
     "version": "7.3.0"
   },
   "dependencies": {
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "1.0.0",
     "hexo": "^7.3.0",
     "hexo-abbrlink": "^2.2.1",
     "hexo-blog-encrypt": "^3.1.9",
