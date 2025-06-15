@@ -360,18 +360,18 @@ premain，顾名思义，在main方法执行前执行，这印证了SkyWalking�
 > `AgentBuilder` 是 `ByteBuddy` 提供的用于构建字节码转换操作的核心类之一，它会在后续按照设定的规则和配置来执行字节码增强的流程，而 `transform` 方法的作用就是指定具体由谁（ `Transformer` 实例）来对匹配到的目标类进行字节码的转换操作
 >
 
-<font style="color:rgba(0, 0, 0, 0.85);">define方法开始的调用链的具体流程如下：</font>
+define方法开始的调用链的具体流程如下：
 
 1. 准备工作。验证各个参数合法性
 2. 见证类验证。确定中间件的版本。因为没有任何方法可以百分百获取系统中某个中间件的版本号。但是每个版本都会有一些独特的类。通过排列组合可以间接确定版本号。
-3. 增强静态和实例方法。在enhance方法中调了两个抽象方法。一个负责增强目标类的静态方法，另一个负责实例方法。具体的增强逻辑由子类使用`DynamicType.Builder<?>`<font style="color:rgba(0, 0, 0, 0.85);">（</font>`Byte Buddy`<font style="color:rgba(0, 0, 0, 0.85);"> 提供的用于构建和修改字节码的工具类）去实现。其实就是子类把要增加的代码写在beforeMethod和afterMethod方法里。这两个方法后文的代码截图会提到。</font>
-4. <font style="color:rgba(0, 0, 0, 0.85);">通过</font>`ByteBuddy`<font style="color:rgba(0, 0, 0, 0.85);"></font>API在字节码加载时修改字节码，实现增强字节码。具体增强代码见`org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.v2.ClassEnhancePluginDefineV2#enhanceClass`方法。
+3. 增强静态和实例方法。在enhance方法中调了两个抽象方法。一个负责增强目标类的静态方法，另一个负责实例方法。具体的增强逻辑由子类使用`DynamicType.Builder<?>`（`Byte Buddy` 提供的用于构建和修改字节码的工具类）去实现。其实就是子类把要增加的代码写在beforeMethod和afterMethod方法里。这两个方法后文的代码截图会提到。
+4. 通过`ByteBuddy`API在字节码加载时修改字节码，实现增强字节码。具体增强代码见`org.apache.skywalking.apm.agent.core.plugin.interceptor.enhance.v2.ClassEnhancePluginDefineV2#enhanceClass`方法。
 
-<font style="color:rgba(0, 0, 0, 0.85);">为什么字节码加载时能修改？谁通知</font>`ByteBuddy`<font style="color:rgba(0, 0, 0, 0.85);">修改？</font>
+为什么字节码加载时能修改？谁通知`ByteBuddy`修改？
 
-<font style="color:rgba(0, 0, 0, 0.85);">这个功能由</font>`JVM`<font style="color:rgba(0, 0, 0, 0.85);">提供的</font>`Instrumentation`接口实现  
-这个接口是用于类加载时对其字节码进行修改。  
-从Java 7开始，这个接口可以在运行时重新定义已加载的类（但不能改变其结构，如添加或移除变量或方法）。这样可以在不重启应用的情况下更新某些行为，对于调试和热修复非常有用。
+这个功能由`JVM`提供的`Instrumentation`接口实现  
+这个接口是用于类加载时对其字节码进行修改。修改的内容就是增加我们定义的BeforeMethod方法和AfterMethod方法，如图4中展示的BeforeMethod方法  
+从Java 7开始，这个接口可以在运行时重新定义已加载的类（如果字节码已经加载过了，那么就不能改变其结构，如添加或移除字段或方法）。这样可以在不重启应用的情况下更新某些行为，对于调试和热修复非常有用。
 
 
 ```java
@@ -501,9 +501,9 @@ ContextManager.capture()方法就是专门用于跨线程传递数据，将Trace
 
 假设一个场景：
 
-A线程接收到RPC请求，创建B线程异步调用别的服务。与此同时，A线程所在的节点还创建了一批线程处理别的非链路任务<font style="color:rgba(0, 0, 0, 0.85);">。难道这些链路无关的线程也要被拦截去执行BeforeMethod方法？这显然是不合理的。</font>
+A线程接收到RPC请求，创建B线程异步调用别的服务。与此同时，A线程所在的节点还创建了一批线程处理别的非链路任务。难道这些链路无关的线程也要被拦截去执行BeforeMethod方法？这显然是不合理的。
 
-<font style="color:rgba(0, 0, 0, 0.85);">怎么判断一个线程是否由链路上的线程创建？或者说：</font>SkyWalking怎么控制线程插桩的粒度？
+怎么判断一个线程是否由链路上的线程创建？或者说：SkyWalking怎么控制线程插桩的粒度？
 
 
 
@@ -557,6 +557,9 @@ skywalking将span分为了三种类型。EntrySpan/LocalSpan/ExitSpan。任何�
 Method.invoke 方法执行 X 方法结束后，本节点的 Trace 结束， 将队列元素全部弹出至 MySQL。
 
 后续查看链路信息从MySQL中统计即可。
+
+**如何感知本节点内的链路结束并清除ThreadLocal呢？** 
+执行RPC方法用的是Method类的invoke方法，在invoke方法结束后清除threadlocal即可。不用担心这两个步骤不是原子执行会导致下一次RPC链路使用本线程上一个链路的ThreadLocal
 
 
 
