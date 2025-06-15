@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>volatile | xyhao的博客</title><meta name="author" content="xyhao"><meta name="copyright" content="xyhao"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="禁止指令重排序">
+<meta property="og:type" content="article">
+<meta property="og:title" content="volatile">
+<meta property="og:url" content="http://juziblog.space/2024/02/16/2024-02-16-volatile/index.html">
+<meta property="og:site_name" content="xyhao的博客">
+<meta property="og:description" content="禁止指令重排序">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-16-volatile.png">
+<meta property="article:published_time" content="2024-02-16T00:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-15T11:52:37.412Z">
+<meta property="article:author" content="xyhao">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-16-volatile.png"><link rel="shortcut icon" href="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png"><link rel="canonical" href="http://juziblog.space/2024/02/16/2024-02-16-volatile/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"已经过了","messageNext":"天自上次更新，文章内容可能已过时。"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'volatile',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-06-15 11:52:37'
+}</script><meta name="referrer" content="no-referrer" /><link rel="stylesheet" href="/css/mycss.css"><link rel="stylesheet" href="/css/modify.css"><link rel="stylesheet" href="/css/transpancy.css"><script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="xyhao的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load', preloader.endLoading)
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background-image: url(https://pic.imgdb.cn/item/672c4d1ad29ded1a8cbde4f5.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-16-volatile.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">xyhao的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">volatile</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">volatile</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-02-16T00:00:00.000Z" title="发表于 2024-02-16 00:00:00">2024-02-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-15T11:52:37.412Z" title="更新于 2025-06-15 11:52:37">2025-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Java/">Java</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Java/JUC/">JUC</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><br>
+
+<p><a name="UnhI0"></a></p>
+<h1 id="第一个作用：保证可见性"><a href="#第一个作用：保证可见性" class="headerlink" title="第一个作用：保证可见性"></a>第一个作用：保证可见性</h1><p>当一个共享变量被volatile修饰时，它会保证修改的值会立即被更新到主内存中，当其他线程读取此变量时，会去主内存中读取新值。这样就保证了多个线程之间的可见性</p>
+<p>** 假如B线程时刻X去主存里读volatile修饰的变量的值，A线程在时刻Y修改了该变量的值，在时刻Z将修改后的值写回主存。现在时刻X在时刻Y和Z的中间，该变量被修改的时间点早于B读取它的时间，但B却没有读取到。那么可见性保证了吗？  **<br /><strong>这种情况不存在，总线机制保证B一定能读取到修改后的值。</strong><br /><strong>具体见下文解释：</strong><br />上文提到了：“当一个共享变量被volatile修饰时，它会保证修改的值会立即被更新到主内存中，当其他线程读取此变量时，会去主内存中读取新值”，实际上是这样的：<br />线程的CPU会一直在总线BUS上嗅探其内部缓存中的内存地址在其他处理器的操作情况，一旦嗅探到某处处理器打算修改其内存地址中的值，而该内存地址刚好也在自己的内部缓存中，那么处理器就会强制让自己对该缓存地址的无效。所以当该处理器要访问该数据的时候，由于发现自己缓存的数据无效了，就会去主存中访问。<br />这里涉及到了缓存一致性协议。<br />也就是说，只要修改的时间点发生在读取之前，即使还没来得及写回主存，其它线程的CPU也会让自己的cache中的该变量无效，让读操作一定去主存读。<br />事实上，完整的 MESI 协议更复杂，但我们没必要记得这么细。我们只需要记住最关键的 2 点：</p>
+<ul>
+<li>关键 1 - 阻止同时有多个核心修改的共享数据： <strong>当一个 CPU 核心要求修改数据时，会先广播 RFO 请求获得 Cache 块的所有权，并将其它 CPU 核心中对应的 Cache 块置为已失效状态</strong>；</li>
+<li>关键 2 - 延迟回写： 只有在需要的时候才将数据写回内存，当一个 CPU 核心要求访问已失效状态的 Cache 块时，会先要求其它核心先将数据写回内存，再从内存读取。</li>
+</ul>
+<p>关键1中的”当一个 CPU 核心要求修改数据时，会先广播 RFO 请求获得 Cache 块的所有权，并将其它 CPU 核心中对应的 Cache 块置为已失效状态“就是解决上文”该变量被修改的时间点早于B读取它的时间，但B却没有读取到“这种情况的。保证B一定能读到。</p>
+<blockquote>
+<p>如果有多个CPU同时对volatile变量做写操作。如何保证顺序？或者说，如何保证串行化？<br>由总线仲裁系统保证。<br>总线的独占性要求同一时刻最多只有一个主模块占用总线，天然地会将所有核心对内存的读写操作串行化。如果多个核心同时发起总线事务，此时总线仲裁单元会对竞争做出仲裁，未获胜的事务只能等待获胜的事务处理完成后才能执行。’</p>
+<p>参考来源：<a target="_blank" rel="noopener external nofollow noreferrer" href="https://cloud.tencent.com/developer/article/2197853">https://cloud.tencent.com/developer/article/2197853</a></p>
+</blockquote>
+<p>:::info<br>关于happens-before原则：<br />实现了该原则的编译器承诺： 在满足一些条件后：</p>
+<ol>
+<li>如果一个操作在另一个操作之前发生（happens - before），那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前。即使第一个操作的结果产生时间晚于第二个操作的开始时间。</li>
+<li>两个操作之间存在 Happens-before 关系，并不意味着 Java 平台的具体实现必须要按照 Happens-before 关系指定的顺序来执行。如果重排序之后的执行结果，与按 Happens-before 关系来执行的结果一致，那么这种重排序并不非法（也就是说，JMM 允许这种重排序）</li>
+</ol>
+<p>happens-before原则的条件有下面这些：</p>
+<ol>
+<li><strong>程序顺序规则</strong>：一个线程内的操作按代码顺序发生。</li>
+<li><strong>管程锁定规则</strong>：解锁操作发生在随后的同一个锁的加锁操作之前。</li>
+<li><strong>volatile变量规则</strong>：对volatile字段的写操作发生在随后的读操作之前。</li>
+<li><strong>线程启动规则</strong>：线程的start()方法调用发生在该线程的任何操作之前。</li>
+<li><strong>线程终止规则</strong>：线程的所有操作都发生在线程的终止之前。</li>
+<li><strong>对象终结规则</strong>：对象的finalize()方法调用发生在该对象的垃圾回收之前。</li>
+<li><strong>线程中断规则</strong>：Thread.interrupted()方法检测到中断状态的发生，发生在实际的中断操作之前</li>
+<li><strong>传递性</strong>：如果A happens-before B，且B happens-before C，那么A happens-before C。</li>
+</ol>
+<p>只要你的代码满足了这八条规则中的任何一条，或者通过规则间的传递性和组合可以满足，那么编译器就一定能实现happens-before。<br />在任何一条都不满足的情况下，happens-before原则不会生效。<br><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-02-16-volatile/img.png" alt="image.png"><br /> <strong>为什么线程启动、终止、中断规则和对象终结规则也和这里完全没有关系？</strong><br />因为这些规则与线程的生命周期有关。示例中的代码片段并没有涉及到线程的启动、终止或中断，因此这些规则也不适用。<br>:::</p>
+<p><a name="t4ehk"></a></p>
+<h1 id="第二个作用：禁止指令重排"><a href="#第二个作用：禁止指令重排" class="headerlink" title="第二个作用：禁止指令重排"></a>第二个作用：禁止指令重排</h1><p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-02-16-volatile/image_1.png" alt="image.png"><br />假如某个变量的读写涉及到了2条指令，那么由于指令重排序的原因，第一条指令和第二条指令中间可能穿插了多条其它线程的指令，导致读写速度变慢。加上volatile修饰去禁止指令重排序后，会提高该线程的运行效率。<br />指令重排序保证结果不受影响，但不保证这原本的多条指令集合是顺序执行的。<br><a name="DYoyN"></a></p>
+<h1 id="双重校验锁DCL："><a href="#双重校验锁DCL：" class="headerlink" title="双重校验锁DCL："></a>双重校验锁DCL：</h1><p>关于 volatile 最出名的应用就是单例模式的 <strong>双重校验锁（Double Checked Locking，DCL）</strong> 写法了。如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SingleTon</span> &#123;</span><br><span class="line">	<span class="comment">// 私有化构造方法</span></span><br><span class="line">	<span class="keyword">private</span> <span class="title function_">SingleTon</span><span class="params">()</span>&#123;&#125;; </span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="type">SingleTon</span> <span class="variable">instance</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> SingleTon <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="comment">// 第一次校验，减少锁的竞争  </span></span><br><span class="line">            <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123; </span><br><span class="line">                <span class="keyword">synchronized</span> (SingleTon.class) &#123;</span><br><span class="line">                       <span class="comment">// 第二次校验</span></span><br><span class="line">                        <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;     </span><br><span class="line">                            instance = <span class="keyword">new</span> <span class="title class_">SingleTon</span>();</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"> 	<span class="keyword">return</span> instance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先来解释下这两重校验分别作了什么：<br><a name="aJ33Z"></a></p>
+<h2 id="第一重校验："><a href="#第一重校验：" class="headerlink" title="第一重校验："></a>第一重校验：</h2><p>由于单例模式只需要创建一次实例，所以如果多次调用 getInstance 方法的话，应该直接返回第一次创建的实例。因此其实大部分时间都是不需要去执行同步方法里面的代码的，减少了锁的竞争。这样，第一重校验大大提高了性能。<br><a name="piQea"></a></p>
+<h2 id="第二重校验："><a href="#第二重校验：" class="headerlink" title="第二重校验："></a>第二重校验：</h2><p>我们先假设没有第二重校验。<br />假设线程 t1 执行了第一重校验后，判断为 instance &#x3D;&#x3D; null；<br />就在这个时候，发生上下文切换，另一个线程 t2 获得了 CPU 调度，并且也执行了第一重校验，也判断 instance &#x3D;&#x3D; null，随后 t2 获得锁，创建实例；<br />然后，发生上下文切换，t1 又重新获得 CPU 调度，由于之前已经进行了第一重校验，结果为 true（不会再次判断），所以 t1 也会去获得锁并创建实例。这样就会导致创建多个实例。<br />所以需要在同步块里面进行第二重校验，如果实例为空，才进行创建。</p>
+<p>再来解释下为什么 instance 一定要用 volatile 这个关键字来修饰。</p>
+<p>这里就是 volatile 第二项特性 - 禁止指令重排的应用。在 Java 语言层面上，创建对象仅仅是一个 new 关键字而已，而在 JVM 中，对象的创建其实并不是一蹴而就的，忽略掉一些 JVM 底层的细节比如设置对象头啥的，对象的创建可以大致分三个步骤：</p>
+<ol>
+<li>在堆中为对象分配内存空间</li>
+<li>调用构造函数，初始化实例</li>
+<li>将栈中的对象引用指向刚分配的内存空间</li>
+<li><br /></li>
+</ol>
+<p>那么由于 JVM 指令重排优化的存在，有可能第二步和第三步发生交换：</p>
+<ol>
+<li>在堆中为对象分配内存空间</li>
+<li>将栈中的对象引用指向刚分配的内存空间（<strong>线程可能在这个时刻获取了未初始化的instance</strong>）</li>
+<li>调用构造函数，初始化实例</li>
+</ol>
+<p>现在考虑重排序后，两个线程发生了以下调用：<br /><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-02-16-volatile/image.png" alt="image.png"><br />在这种情况下，线程 T2 访问到的就是一个未完成初始化的对象，是个半成品，会报空指针异常的错误。<br />所以说，instance 一定要用 volatile 这个关键字来修饰，从而禁止指令重排。</p>
+<blockquote>
+<p>作者：飞天小牛肉<br />链接：<a target="_blank" rel="noopener external nofollow noreferrer" href="https://leetcode.cn/leetbook/read/concurrency/a8hxqg/">https://leetcode.cn/leetbook/read/concurrency/a8hxqg/</a><br />来源：力扣（LeetCode）<br />著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://juziblog.space">xyhao</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://juziblog.space/2024/02/16/2024-02-16-volatile/">http://juziblog.space/2024/02/16/2024-02-16-volatile/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://juziblog.space" target="_blank">xyhao的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/JUC/">JUC</a></div><div class="post-share"><div class="social-share" data-image="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-16-volatile.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/2024/03/09/2024-03-09-ProcessBuilder&amp;Runtime.getRuntime().exec()/" title="Java里两种执行命令的方式比较"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-09-ProcessBuilder.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Java里两种执行命令的方式比较</div></div></a><a class="next-post pull-right" href="/2024/02/13/2024-02-13-Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/" title="Java线程和操作系统线程的区别"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-13-Thread.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Java线程和操作系统线程的区别</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/2024/02/13/2024-02-13-Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/" title="Java线程和操作系统线程的区别"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-13-Thread.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-13</div><div class="title">Java线程和操作系统线程的区别</div></div></a><a href="/2024/03/24/2024-03-24-%E8%A3%85%E7%AE%B1%E7%B1%BB%E4%B8%8Esynchronized/" title="装箱类"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-24-lock.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-24</div><div class="title">装箱类</div></div></a><a href="/2024/04/05/2024-04-05-synchronized%E5%BA%95%E5%B1%82/" title="synchronized底层"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-04-05-synchronized.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-05</div><div class="title">synchronized底层</div></div></a><a href="/2024/04/28/2024-04-28-TreeMap&HashMap/" title="TreeMap &amp; HashMap"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-05-02-Hash.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-28</div><div class="title">TreeMap &amp; HashMap</div></div></a><a href="/2024/01/31/2024-01-31-%E7%94%B1%E4%B8%80%E9%81%93%E5%8A%9B%E6%89%A3%E9%A2%98%E5%BC%95%E5%8F%91%E7%9A%84%E5%AF%B9Java%E4%B8%ADHashMap%E7%9A%84%E6%80%9D%E8%80%83/" title="2024-01-31-由一道力扣题引发的对Java中HashMap的思考"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-01-31-Hash.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-31</div><div class="title">2024-01-31-由一道力扣题引发的对Java中HashMap的思考</div></div></a><a href="/2024/03/09/2024-03-09-ProcessBuilder&Runtime.getRuntime().exec()/" title="Java里两种执行命令的方式比较"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-09-ProcessBuilder.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-09</div><div class="title">Java里两种执行命令的方式比较</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">xyhao</div><div class="author-info-description">软件工程专业2025届本科毕业生，Java服务端开发方向</br>工作经历：</br>2025年6月-至今 拼多多-Java开发</br></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><a id="card-info-btn" target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/Juzi-xyhao"><i class="fab fa-github"></i><span>GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Juzi-xyhao" rel="external nofollow noreferrer" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:xyhaomail@163.com" rel="external nofollow noreferrer" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="https://space.bilibili.com" rel="external nofollow noreferrer" target="_blank" title="Bilibili"><i class="fas fa-tv"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">未来的一些更新：</br> YouTube视频：System Design Interview 笔记 </br> && DDIA（数据密集型应用系统设计）笔记</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E4%B8%AA%E4%BD%9C%E7%94%A8%EF%BC%9A%E4%BF%9D%E8%AF%81%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="toc-number">1.</span> <span class="toc-text">第一个作用：保证可见性</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E4%B8%AA%E4%BD%9C%E7%94%A8%EF%BC%9A%E7%A6%81%E6%AD%A2%E6%8C%87%E4%BB%A4%E9%87%8D%E6%8E%92"><span class="toc-number">2.</span> <span class="toc-text">第二个作用：禁止指令重排</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%8C%E9%87%8D%E6%A0%A1%E9%AA%8C%E9%94%81DCL%EF%BC%9A"><span class="toc-number">3.</span> <span class="toc-text">双重校验锁DCL：</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E9%87%8D%E6%A0%A1%E9%AA%8C%EF%BC%9A"><span class="toc-number">3.1.</span> <span class="toc-text">第一重校验：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%87%8D%E6%A0%A1%E9%AA%8C%EF%BC%9A"><span class="toc-number">3.2.</span> <span class="toc-text">第二重校验：</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/前缀树.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="性能优化：字符串替换研究"/></a><div class="content"><a class="title" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究">性能优化：字符串替换研究</a><time datetime="2025-05-14T11:00:00.000Z" title="发表于 2025-05-14 11:00:00">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/Linux.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="常用的Linux命令"/></a><div class="content"><a class="title" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令">常用的Linux命令</a><time datetime="2025-03-21T11:00:00.000Z" title="发表于 2025-03-21 11:00:00">2025-03-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/shell.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="shell的一些简单语法"/></a><div class="content"><a class="title" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法">shell的一些简单语法</a><time datetime="2025-03-20T11:00:00.000Z" title="发表于 2025-03-20 11:00:00">2025-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JavaDoc"/></a><div class="content"><a class="title" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc">JavaDoc</a><time datetime="2025-02-17T12:00:00.000Z" title="发表于 2025-02-17 12:00:00">2025-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="浅浅理解Java中的逆变与协变"/></a><div class="content"><a class="title" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变">浅浅理解Java中的逆变与协变</a><time datetime="2025-02-16T12:00:00.000Z" title="发表于 2025-02-16 12:00:00">2025-02-16</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By xyhao</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a style="margin-inline:5px" target="_blank" href="https://hexo.io/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a><a style="margin-inline:5px" target="_blank" href="https://butterfly.js.org/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a><a style="margin-inline:5px" target="_blank" href="https://github.com/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a><a style="margin-inline:5px" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page/instantpage.js" type="module"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div><script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script><script>(() => {
+  const option = null
+  const config = {"site_uv":false,"site_pv":false,"page_pv":false,"token":"GIavIQd5ls6rab5DTfY42p1VRA4DfPQo"}
+
+  const runTrack = () => {
+    umami.track(props => ({ ...props, url: window.location.pathname, title: GLOBAL_CONFIG_SITE.title }))
+  }
+
+  const loadUmamiJS = () => {
+    btf.getScript('https://cloud.umami.is/script.js', {
+      'data-website-id': '5b9ef408-bff2-4b30-8d1e-28cb3c95721a',
+      'data-auto-track': 'false',
+      ...option
+    }).then(runTrack)
+  }
+
+  const getData = async (isPost) => {
+    const now = Date.now()
+    const keyUrl = isPost ? `&url=${window.location.pathname}` : ''
+    const headerList = { 'Accept': 'application/json' }
+    if (false) headerList['Authorization'] = `Bearer ${config.token}`
+    else headerList['x-umami-api-key'] = config.token
+    const res = await fetch(`https://api.umami.is/v1/websites/5b9ef408-bff2-4b30-8d1e-28cb3c95721a/stats?startAt=0000000000&endAt=${now}${keyUrl}`, {
+      method: "GET",
+      headers: headerList
+    })
+    return await res.json()
+  }
+
+  const insertData = async () => {
+    try {
+      if (GLOBAL_CONFIG_SITE.isPost && config.page_pv) {
+        const pagePV = document.getElementById('umamiPV')
+        if (pagePV) {
+          const data = await getData(true)
+          pagePV.textContent = data.pageviews.value
+        }
+      } else {
+        const data = (config.site_uv || config.site_pv) && await getData()
+        if (config.site_uv) {
+          const siteUV = document.getElementById('umami-site-uv')
+          if (siteUV) siteUV.textContent = data.visitors.value
+        }
+        if (config.site_pv) {
+          const sitePV = document.getElementById('umami-site-pv')
+          if (sitePV) sitePV.textContent = data.pageviews.value
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load Umami Analytics:', e)
+    }
+  }
+
+  btf.addGlobalFn('pjaxComplete', runTrack, 'umami_analytics_run_track')
+  btf.addGlobalFn('pjaxComplete', insertData, 'umami_analytics_insert')
+
+  loadUmamiJS()
+  insertData()
+})()</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="search" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>

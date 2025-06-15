@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MySQL三大日志 | xyhao的博客</title><meta name="author" content="xyhao"><meta name="copyright" content="xyhao"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="三大日志支撑了MySQL主从同步、事务回滚、Crash Safe等特性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL三大日志">
+<meta property="og:url" content="http://juziblog.space/2024/07/13/2024-07-13-%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97/index.html">
+<meta property="og:site_name" content="xyhao的博客">
+<meta property="og:description" content="三大日志支撑了MySQL主从同步、事务回滚、Crash Safe等特性">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-13-log.png">
+<meta property="article:published_time" content="2024-07-13T00:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-15T11:52:37.413Z">
+<meta property="article:author" content="xyhao">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-13-log.png"><link rel="shortcut icon" href="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png"><link rel="canonical" href="http://juziblog.space/2024/07/13/2024-07-13-%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"已经过了","messageNext":"天自上次更新，文章内容可能已过时。"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MySQL三大日志',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-06-15 11:52:37'
+}</script><meta name="referrer" content="no-referrer" /><link rel="stylesheet" href="/css/mycss.css"><link rel="stylesheet" href="/css/modify.css"><link rel="stylesheet" href="/css/transpancy.css"><script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="xyhao的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load', preloader.endLoading)
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background-image: url(https://pic.imgdb.cn/item/672c4d1ad29ded1a8cbde4f5.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-13-log.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">xyhao的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">MySQL三大日志</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">MySQL三大日志</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-07-13T00:00:00.000Z" title="发表于 2024-07-13 00:00:00">2024-07-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-15T11:52:37.413Z" title="更新于 2025-06-15 11:52:37">2025-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/MySQL/">MySQL</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="什么是三大日志"><a href="#什么是三大日志" class="headerlink" title="什么是三大日志"></a>什么是三大日志</h2><ul>
+<li>**bin日志： **保存的是当前数据库中最新的数据以及表结构变更的语句，不包含每行数据的历史版本。</li>
+<li><strong>undo日志：</strong>不仅保存了最新的数据，也保存了每行数据的历史版本，为事务回滚和MVCC提供了支持。</li>
+<li><strong>redo日志：</strong>保存内存缓冲区BufferPool中脏页的数据，不保存已经被刷到磁盘中的数据，也就是说，redo日志保存的数据是不全的。redo日志只是为了应对因为断电等原因BufferPool还没来得及刷到磁盘就丢失了的情况。redo日志默认每秒钟都会刷一次盘，事务提交时也会刷盘，mysql关闭时也会刷盘。</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p><strong>redo的作用是对Bufferpool中脏页的持久化。</strong>保存的是脏页更新后的值。<br>而undo保存的更新前的值。对undo的刷盘是异步的，不知道它什么时候刷。万一刷盘过程中宕机，bufferpool脏页的数据就全没了。为了不让它全没，就有了redo对Bufferpool的持久化。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><h3 id="三个log的记录顺序是什么"><a href="#三个log的记录顺序是什么" class="headerlink" title="三个log的记录顺序是什么?"></a>三个log的记录顺序是什么?</h3><ul>
+<li>undo：在事务开启时就会记录数据；</li>
+<li>redo： 在增删改语句执行之前就会记录数据；</li>
+<li>bin： 在增删改语句执行之后会生成一条binlog。事务提交时这条binlog会写入磁盘的binlog。<br>一个log文件写满之后，会创建一个新的log文件接着写入。</li>
+</ul>
+<h3 id="为什么有了-binlog，-还要有-redo-log？"><a href="#为什么有了-binlog，-还要有-redo-log？" class="headerlink" title="为什么有了 binlog， 还要有 redo log？"></a>为什么有了 binlog， 还要有 redo log？</h3><p>这个问题跟 MySQL 的时间线有关系。<br>最开始 MySQL 里并没有 InnoDB 引擎，MySQL 自带的引擎是 MyISAM，但是 MyISAM 没有 crash-safe 的能力，binlog 日志只能用于归档。<br>而 InnoDB 是另一个公司以插件形式引入 MySQL 的，既然只依靠 binlog 是没有 crash-safe 能力的，所以 InnoDB 使用 redo log 来实现 crash-safe 能力。</p>
+<h3 id="有了undolog为啥还需要redolog呢，不能直接undolog-最新数据刷盘吗"><a href="#有了undolog为啥还需要redolog呢，不能直接undolog-最新数据刷盘吗" class="headerlink" title="有了undolog为啥还需要redolog呢，不能直接undolog+最新数据刷盘吗"></a>有了undolog为啥还需要redolog呢，不能直接undolog+最新数据刷盘吗</h3><p>最新数据也就是BufferPool里面的内存数据，当增删改的sql执行成功后，一些缓存页就会被修改，这些被修改的数据以脏页的形式存放在BufferPool中。<br>一旦服务器宕机，这些脏页的数据就全没了。<br>所以要保证脏页的数据在宕机之间就被持久化。而这就靠redolog保证了。<br>为了防止断电导致数据丢失的问题，当有一条记录需要更新的时候，InnoDB 引擎就会<strong>先</strong>更新内存（同时标记为脏页），然后将本次对这个页的修改以 redo log 的形式记录下来。<br>当系统崩溃时，虽然脏页数据没有持久化，但是 redo log 已经持久化。根据redo就可以恢复完整的原内存数据了。</p>
+<h3 id="为什么要增加一个redolog来保证BufferPool脏页的持久化？直接把脏页持久化到磁盘不行吗？redolog也是持久化到磁盘啊？"><a href="#为什么要增加一个redolog来保证BufferPool脏页的持久化？直接把脏页持久化到磁盘不行吗？redolog也是持久化到磁盘啊？" class="headerlink" title="为什么要增加一个redolog来保证BufferPool脏页的持久化？直接把脏页持久化到磁盘不行吗？redolog也是持久化到磁盘啊？"></a>为什么要增加一个redolog来保证BufferPool脏页的持久化？直接把脏页持久化到磁盘不行吗？redolog也是持久化到磁盘啊？</h3><h4 id="直接持久化Buffer-Pool的局限性"><a href="#直接持久化Buffer-Pool的局限性" class="headerlink" title="直接持久化Buffer Pool的局限性"></a>直接持久化Buffer Pool的局限性</h4><ol>
+<li><strong>性能影响</strong>：脏页的数据在B+树中存储的位置基本不是连续的，必然会有大量的随机IO。</li>
+<li><strong>并发问题</strong>：直接将Buffer Pool的内容写回磁盘会导致更多的锁竞争，因为多个事务可能同时尝试写入相同的页面。</li>
+<li><strong>数据完整性风险</strong>：如果在事务提交过程中发生崩溃，而修改尚未完全写入磁盘，那么数据可能处于不一致状态。</li>
+</ol>
+<h4 id="redoLog的改善"><a href="#redoLog的改善" class="headerlink" title="redoLog的改善"></a>redoLog的改善</h4><ol>
+<li><strong>性能影响</strong>：redo的写入是顺序的，是磁盘顺序io，比随机io快得多</li>
+<li><strong>并发问题</strong>：redo是由后台单线程管理的，天然避免了并发问题。</li>
+<li><strong>数据完整性风险</strong>：InnoDB维护一个叫做Checkpoint的机制，它记录了最后成功完成的Redo Log的位置。在系统重启时，InnoDB可以从这个位置开始重做，以确保所有已完成的事务都被正确处理</li>
+</ol>
+<blockquote>
+<p>本问题的回答由AI生成<br><a target="_blank" rel="noopener external nofollow noreferrer" href="https://lxblog.com/qianwen/share?shareId=cf89a692-e026-4745-a132-fe6afc901f2b">https://lxblog.com/qianwen/share?shareId=cf89a692-e026-4745-a132-fe6afc901f2b</a></p>
+</blockquote>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://juziblog.space">xyhao</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://juziblog.space/2024/07/13/2024-07-13-%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97/">http://juziblog.space/2024/07/13/2024-07-13-三大日志/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://juziblog.space" target="_blank">xyhao的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/MySQL/">MySQL</a></div><div class="post-share"><div class="social-share" data-image="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-13-log.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/2024/07/14/2024-07-14-GraalVM%20%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B%20OTel%20Java%20Agent%20%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0/" title="GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-14-GraalVM.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现</div></div></a><a class="next-post pull-right" href="/2024/07/11/2024-07-11-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81/" title="分布式锁"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-24-lock.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">分布式锁</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/2024/05/13/2024-05-13-%E5%B9%BB%E8%AF%BB%E4%B8%8E%E4%B8%8D%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E7%9A%84%E5%8C%BA%E5%88%AB/" title="幻读与不可重复读的区别"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-05-13-phantomReading.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-13</div><div class="title">幻读与不可重复读的区别</div></div></a><a href="/2024/07/03/2024-07-03-MySQL%E8%A1%A8%E7%A9%BA%E9%97%B4%E7%BB%93%E6%9E%84/" title="MySQL表空间结构"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-03-MySQL.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-07-03</div><div class="title">MySQL表空间结构</div></div></a><a href="/2024/07/10/2024-07-10-%E4%B8%80%E6%9D%A1SQL%E5%B8%A6%E4%BD%A0%E7%90%86%E6%B8%85%E9%A1%B5%E3%80%81%E7%B4%A2%E5%BC%95%E3%80%81%E9%94%81%E7%9A%84%E5%85%B3%E7%B3%BB/" title="一条SQL带你理清页、索引、锁的关系"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-10-Index.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-07-10</div><div class="title">一条SQL带你理清页、索引、锁的关系</div></div></a><a href="/2024/12/22/2024-12-22-%E6%B7%B1%E5%88%86%E9%A1%B5%E9%97%AE%E9%A2%98/" title="深分页问题"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/MySQL.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-12-22</div><div class="title">深分页问题</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">xyhao</div><div class="author-info-description">软件工程专业2025届本科毕业生，Java服务端开发方向</br>工作经历：</br>2025年6月-至今 拼多多-Java开发</br></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><a id="card-info-btn" target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/Juzi-xyhao"><i class="fab fa-github"></i><span>GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Juzi-xyhao" rel="external nofollow noreferrer" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:xyhaomail@163.com" rel="external nofollow noreferrer" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="https://space.bilibili.com" rel="external nofollow noreferrer" target="_blank" title="Bilibili"><i class="fas fa-tv"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">未来的一些更新：</br> YouTube视频：System Design Interview 笔记 </br> && DDIA（数据密集型应用系统设计）笔记</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%89%E5%A4%A7%E6%97%A5%E5%BF%97"><span class="toc-number">1.</span> <span class="toc-text">什么是三大日志</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.</span> <span class="toc-text">总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E4%B8%AAlog%E7%9A%84%E8%AE%B0%E5%BD%95%E9%A1%BA%E5%BA%8F%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">3.1.</span> <span class="toc-text">三个log的记录顺序是什么?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E4%BA%86-binlog%EF%BC%8C-%E8%BF%98%E8%A6%81%E6%9C%89-redo-log%EF%BC%9F"><span class="toc-number">3.2.</span> <span class="toc-text">为什么有了 binlog， 还要有 redo log？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E4%BA%86undolog%E4%B8%BA%E5%95%A5%E8%BF%98%E9%9C%80%E8%A6%81redolog%E5%91%A2%EF%BC%8C%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5undolog-%E6%9C%80%E6%96%B0%E6%95%B0%E6%8D%AE%E5%88%B7%E7%9B%98%E5%90%97"><span class="toc-number">3.3.</span> <span class="toc-text">有了undolog为啥还需要redolog呢，不能直接undolog+最新数据刷盘吗</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%A2%9E%E5%8A%A0%E4%B8%80%E4%B8%AAredolog%E6%9D%A5%E4%BF%9D%E8%AF%81BufferPool%E8%84%8F%E9%A1%B5%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%9F%E7%9B%B4%E6%8E%A5%E6%8A%8A%E8%84%8F%E9%A1%B5%E6%8C%81%E4%B9%85%E5%8C%96%E5%88%B0%E7%A3%81%E7%9B%98%E4%B8%8D%E8%A1%8C%E5%90%97%EF%BC%9Fredolog%E4%B9%9F%E6%98%AF%E6%8C%81%E4%B9%85%E5%8C%96%E5%88%B0%E7%A3%81%E7%9B%98%E5%95%8A%EF%BC%9F"><span class="toc-number">3.4.</span> <span class="toc-text">为什么要增加一个redolog来保证BufferPool脏页的持久化？直接把脏页持久化到磁盘不行吗？redolog也是持久化到磁盘啊？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E6%8C%81%E4%B9%85%E5%8C%96Buffer-Pool%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-number">3.4.1.</span> <span class="toc-text">直接持久化Buffer Pool的局限性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#redoLog%E7%9A%84%E6%94%B9%E5%96%84"><span class="toc-number">3.4.2.</span> <span class="toc-text">redoLog的改善</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/前缀树.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="性能优化：字符串替换研究"/></a><div class="content"><a class="title" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究">性能优化：字符串替换研究</a><time datetime="2025-05-14T11:00:00.000Z" title="发表于 2025-05-14 11:00:00">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/Linux.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="常用的Linux命令"/></a><div class="content"><a class="title" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令">常用的Linux命令</a><time datetime="2025-03-21T11:00:00.000Z" title="发表于 2025-03-21 11:00:00">2025-03-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/shell.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="shell的一些简单语法"/></a><div class="content"><a class="title" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法">shell的一些简单语法</a><time datetime="2025-03-20T11:00:00.000Z" title="发表于 2025-03-20 11:00:00">2025-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JavaDoc"/></a><div class="content"><a class="title" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc">JavaDoc</a><time datetime="2025-02-17T12:00:00.000Z" title="发表于 2025-02-17 12:00:00">2025-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="浅浅理解Java中的逆变与协变"/></a><div class="content"><a class="title" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变">浅浅理解Java中的逆变与协变</a><time datetime="2025-02-16T12:00:00.000Z" title="发表于 2025-02-16 12:00:00">2025-02-16</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By xyhao</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a style="margin-inline:5px" target="_blank" href="https://hexo.io/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a><a style="margin-inline:5px" target="_blank" href="https://butterfly.js.org/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a><a style="margin-inline:5px" target="_blank" href="https://github.com/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a><a style="margin-inline:5px" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page/instantpage.js" type="module"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div><script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script><script>(() => {
+  const option = null
+  const config = {"site_uv":false,"site_pv":false,"page_pv":false,"token":"GIavIQd5ls6rab5DTfY42p1VRA4DfPQo"}
+
+  const runTrack = () => {
+    umami.track(props => ({ ...props, url: window.location.pathname, title: GLOBAL_CONFIG_SITE.title }))
+  }
+
+  const loadUmamiJS = () => {
+    btf.getScript('https://cloud.umami.is/script.js', {
+      'data-website-id': '5b9ef408-bff2-4b30-8d1e-28cb3c95721a',
+      'data-auto-track': 'false',
+      ...option
+    }).then(runTrack)
+  }
+
+  const getData = async (isPost) => {
+    const now = Date.now()
+    const keyUrl = isPost ? `&url=${window.location.pathname}` : ''
+    const headerList = { 'Accept': 'application/json' }
+    if (false) headerList['Authorization'] = `Bearer ${config.token}`
+    else headerList['x-umami-api-key'] = config.token
+    const res = await fetch(`https://api.umami.is/v1/websites/5b9ef408-bff2-4b30-8d1e-28cb3c95721a/stats?startAt=0000000000&endAt=${now}${keyUrl}`, {
+      method: "GET",
+      headers: headerList
+    })
+    return await res.json()
+  }
+
+  const insertData = async () => {
+    try {
+      if (GLOBAL_CONFIG_SITE.isPost && config.page_pv) {
+        const pagePV = document.getElementById('umamiPV')
+        if (pagePV) {
+          const data = await getData(true)
+          pagePV.textContent = data.pageviews.value
+        }
+      } else {
+        const data = (config.site_uv || config.site_pv) && await getData()
+        if (config.site_uv) {
+          const siteUV = document.getElementById('umami-site-uv')
+          if (siteUV) siteUV.textContent = data.visitors.value
+        }
+        if (config.site_pv) {
+          const sitePV = document.getElementById('umami-site-pv')
+          if (sitePV) sitePV.textContent = data.pageviews.value
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load Umami Analytics:', e)
+    }
+  }
+
+  btf.addGlobalFn('pjaxComplete', runTrack, 'umami_analytics_run_track')
+  btf.addGlobalFn('pjaxComplete', insertData, 'umami_analytics_insert')
+
+  loadUmamiJS()
+  insertData()
+})()</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="search" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>

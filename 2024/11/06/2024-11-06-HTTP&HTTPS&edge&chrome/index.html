@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>HTTP&amp;HTTPS&amp;edge&amp;chrome | xyhao的博客</title><meta name="author" content="xyhao"><meta name="copyright" content="xyhao"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="偶然发现edge调试http类型url被屏蔽时状态码一栏空空如也？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP&amp;HTTPS&amp;edge&amp;chrome">
+<meta property="og:url" content="http://juziblog.space/2024/11/06/2024-11-06-HTTP&HTTPS&edge&chrome/index.html">
+<meta property="og:site_name" content="xyhao的博客">
+<meta property="og:description" content="偶然发现edge调试http类型url被屏蔽时状态码一栏空空如也？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-11-06-edgechrome.png">
+<meta property="article:published_time" content="2024-11-06T19:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-15T11:52:37.414Z">
+<meta property="article:author" content="xyhao">
+<meta property="article:tag" content="其它">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-11-06-edgechrome.png"><link rel="shortcut icon" href="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png"><link rel="canonical" href="http://juziblog.space/2024/11/06/2024-11-06-HTTP&amp;HTTPS&amp;edge&amp;chrome/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"已经过了","messageNext":"天自上次更新，文章内容可能已过时。"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HTTP&HTTPS&edge&chrome',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-06-15 11:52:37'
+}</script><meta name="referrer" content="no-referrer" /><link rel="stylesheet" href="/css/mycss.css"><link rel="stylesheet" href="/css/modify.css"><link rel="stylesheet" href="/css/transpancy.css"><script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="xyhao的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load', preloader.endLoading)
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background-image: url(https://pic.imgdb.cn/item/672c4d1ad29ded1a8cbde4f5.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-11-06-edgechrome.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">xyhao的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">HTTP&amp;HTTPS&amp;edge&amp;chrome</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">HTTP&amp;HTTPS&amp;edge&amp;chrome</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-11-06T19:00:00.000Z" title="发表于 2024-11-06 19:00:00">2024-11-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-15T11:52:37.414Z" title="更新于 2025-06-15 11:52:37">2025-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%85%B6%E5%AE%83/">其它</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="前情提要"><a href="#前情提要" class="headerlink" title="前情提要"></a>前情提要</h2><p>原本博客直接部署在github.io上，并白嫖GitHub的免费图床，但访问需要挂梯子，为了更方便地访问，我注册了一个域名并使用免费的cloudflare做CDN分发。<br>但这样做确实博客里的文字可以被加载出来，但是图床还是GitHub，不挂梯子图片自然还是加载不出来。<br>如图：</p>
+<p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-11-06-edgechrome/img_2.png">  </p>
+<p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-11-06-edgechrome/img_3.png"></p>
+<p>但还好我还有华为云的个人服务器，于是自己简易搭建了一个图床服务器。相关代码在文末给出。  </p>
+<h2 id="状态码：已屏蔽：mixed-content"><a href="#状态码：已屏蔽：mixed-content" class="headerlink" title="状态码：已屏蔽：mixed-content"></a>状态码：<code>已屏蔽：mixed-content</code></h2><p>图床建好后修改图片链接，重新访问看看  </p>
+<p>发现还是显示上面两张图，图片一张都没加载出来。按理说我的服务器在国内，不可能访问不了，所以我在电脑上打开chrome浏览器开始调试:  </p>
+<p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-11-06-edgechrome/img_1.png">  </p>
+<p>原本应该显示状态码的地方显示<code>已屏蔽：mixed-content</code> 。<br>好嘛，没见过这玩意的八股战士应声倒地。赶紧问问通义：</p>
+<p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-11-06-edgechrome/img_4.png">   </p>
+<p>原来是这些URL全走HTTP协议，但是网站是以HTTPS协议访问的。HTTPS把HTTP给ban了。<br>问题找出来了，怎么解决呢？</p>
+<ol>
+<li>以后只以HTTP协议访问</li>
+<li>给我的服务器装SSL证书，但这样做需要一个域名，没有域名申请不到证书。我手里唯一的域名juziblog.space已经绑了本站。试试二级域名，发现我为了cloudflare的CDN加速已经修改了DNS解析，如果不改回去二级域名不会生效，改回去cloudflare就不会生效。</li>
+</ol>
+<p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-11-06-edgechrome/img_5.png"></p>
+<ol start="3">
+<li>博客模版把md的图片转换成html语法里的img标签，img除了HTTP&#x2F;HTTPS还支持一些其它协议：<ul>
+<li>base64,把图片写在html里，比起原图片会增加33%左右的大小，会显著降低网站加载速度，服务端大忌，而且也会增加修改博客的时间成本，typora和idea都不会隐藏几万甚至几十万个字符base64，修改md光是上下文翻动就难如登天。</li>
+<li>ftp，会暴露我的服务器密码，且很多浏览器都不支持ftp。</li>
+<li>blob，浏览器动态生成的链接，把本机内存里的图片以链接的形式显示，这还是要先发HTTP请求获取图片才行</li>
+<li>file:&#x2F;&#x2F;,显示本地磁盘图像</li>
+</ul>
+</li>
+</ol>
+<p>所以要么换一个支持https的图床服务器，要么再买一个域名给现在的服务器装证书。</p>
+<p style="font-size: 17px;">我选择GitHub国内平替版的Gitee当免费图床。</p>
+仓库内图片链接由 
+
+<p><code>https://gitee.com/xyhaooo/picrepo/blob/master/assets/home.png</code></p>
+<p>改为</p>
+<p><code>https://gitee.com/xyhaooo/picrepo/raw/master/home.png</code> 即可</p>
+<p>因为gitee加了防盗链，html头部还加入</p>
+<p><code>&lt;meta name=&quot;referrer&quot; content=&quot;no-referrer&quot; /&gt;</code></p>
+<p>之后我鬼使神差地又用edge浏览器调试了一遍，发现edge的调试工具连<code>已屏蔽：mixed-content</code>都不报，状态栏全是空白？<br>还好先用chrome调试，不然这个问题不知道得到什么时候才能发现。</p>
+<p><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleSource/2024-11-06-edgechrome/img.png">  </p>
+<h2 id="图床简易代码"><a href="#图床简易代码" class="headerlink" title="图床简易代码"></a>图床简易代码</h2><p>将文件写入HTTP的response，记得设置一些HTTP的头部字段</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController(&quot;fileInfoController&quot;)</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/file&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileInfoController</span> <span class="keyword">extends</span> <span class="title class_">CommonFileController</span> &#123;</span><br><span class="line">    <span class="comment">// url举例：http://121.36.193.119/api/file/getBlogImage?imagePath=assets/articleCover/2024-01-31-Hash.png</span></span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/getBlogImage&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getImage1</span><span class="params">(HttpServletResponse response,</span></span><br><span class="line"><span class="params">                          String imagePath)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isBlank(imagePath)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">String</span> <span class="variable">imageSuffix</span> <span class="operator">=</span> StringTools.getFileSuffix(imagePath);</span><br><span class="line">        <span class="type">String</span> <span class="variable">filePath</span> <span class="operator">=</span> appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE  + <span class="string">&quot;/&quot;</span> + imagePath;</span><br><span class="line">        imageSuffix = imageSuffix.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">        <span class="type">String</span> <span class="variable">contentType</span> <span class="operator">=</span> <span class="string">&quot;image/&quot;</span> + imageSuffix;</span><br><span class="line">        response.setContentType(contentType);</span><br><span class="line">        response.setHeader(<span class="string">&quot;Cache-Control&quot;</span>, <span class="string">&quot;max-age=2592000&quot;</span>);</span><br><span class="line">        readFile(response, filePath);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">readFile</span><span class="params">(HttpServletResponse response, String filePath)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!StringTools.pathIsOk(filePath)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">OutputStream</span> <span class="variable">out</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">in</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(filePath);</span><br><span class="line">            <span class="keyword">if</span> (!file.exists()) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            in = <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(file);</span><br><span class="line">            <span class="type">byte</span>[] byteData = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">1024</span>];</span><br><span class="line">            out = response.getOutputStream();</span><br><span class="line">            <span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span> ((len = in.read(byteData)) != -<span class="number">1</span>) &#123;</span><br><span class="line">                out.write(byteData, <span class="number">0</span>, len);</span><br><span class="line">            &#125;</span><br><span class="line">            out.flush();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;读取文件异常&quot;</span>, e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (out != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    out.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    logger.error(<span class="string">&quot;IO异常&quot;</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (in != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    in.close();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    logger.error(<span class="string">&quot;IO异常&quot;</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://juziblog.space">xyhao</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://juziblog.space/2024/11/06/2024-11-06-HTTP&amp;HTTPS&amp;edge&amp;chrome/">http://juziblog.space/2024/11/06/2024-11-06-HTTP&amp;HTTPS&amp;edge&amp;chrome/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://juziblog.space" target="_blank">xyhao的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%85%B6%E5%AE%83/">其它</a></div><div class="post-share"><div class="social-share" data-image="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-11-06-edgechrome.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/2024/11/23/2024-11-23-%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E9%AB%98%E5%B9%B6%E5%8F%91/" title="我理解的高并发"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-11-23-高并发.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">我理解的高并发</div></div></a><a class="next-post pull-right" href="/2024/10/23/2024-10-23-PC%E7%AB%AF%E5%85%AC%E4%BC%97%E5%8F%B7%E8%AE%A2%E9%98%85%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/" title="更优雅的PC端微信公众号订阅管理工具"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/wewe-rss.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">更优雅的PC端微信公众号订阅管理工具</div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">xyhao</div><div class="author-info-description">软件工程专业2025届本科毕业生，Java服务端开发方向</br>工作经历：</br>2025年6月-至今 拼多多-Java开发</br></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><a id="card-info-btn" target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/Juzi-xyhao"><i class="fab fa-github"></i><span>GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Juzi-xyhao" rel="external nofollow noreferrer" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:xyhaomail@163.com" rel="external nofollow noreferrer" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="https://space.bilibili.com" rel="external nofollow noreferrer" target="_blank" title="Bilibili"><i class="fas fa-tv"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">未来的一些更新：</br> YouTube视频：System Design Interview 笔记 </br> && DDIA（数据密集型应用系统设计）笔记</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E6%83%85%E6%8F%90%E8%A6%81"><span class="toc-number">1.</span> <span class="toc-text">前情提要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8A%B6%E6%80%81%E7%A0%81%EF%BC%9A%E5%B7%B2%E5%B1%8F%E8%94%BD%EF%BC%9Amixed-content"><span class="toc-number">2.</span> <span class="toc-text">状态码：已屏蔽：mixed-content</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E5%BA%8A%E7%AE%80%E6%98%93%E4%BB%A3%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">图床简易代码</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/前缀树.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="性能优化：字符串替换研究"/></a><div class="content"><a class="title" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究">性能优化：字符串替换研究</a><time datetime="2025-05-14T11:00:00.000Z" title="发表于 2025-05-14 11:00:00">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/Linux.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="常用的Linux命令"/></a><div class="content"><a class="title" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令">常用的Linux命令</a><time datetime="2025-03-21T11:00:00.000Z" title="发表于 2025-03-21 11:00:00">2025-03-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/shell.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="shell的一些简单语法"/></a><div class="content"><a class="title" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法">shell的一些简单语法</a><time datetime="2025-03-20T11:00:00.000Z" title="发表于 2025-03-20 11:00:00">2025-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JavaDoc"/></a><div class="content"><a class="title" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc">JavaDoc</a><time datetime="2025-02-17T12:00:00.000Z" title="发表于 2025-02-17 12:00:00">2025-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="浅浅理解Java中的逆变与协变"/></a><div class="content"><a class="title" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变">浅浅理解Java中的逆变与协变</a><time datetime="2025-02-16T12:00:00.000Z" title="发表于 2025-02-16 12:00:00">2025-02-16</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By xyhao</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a style="margin-inline:5px" target="_blank" href="https://hexo.io/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a><a style="margin-inline:5px" target="_blank" href="https://butterfly.js.org/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a><a style="margin-inline:5px" target="_blank" href="https://github.com/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a><a style="margin-inline:5px" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page/instantpage.js" type="module"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div><script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script><script>(() => {
+  const option = null
+  const config = {"site_uv":false,"site_pv":false,"page_pv":false,"token":"GIavIQd5ls6rab5DTfY42p1VRA4DfPQo"}
+
+  const runTrack = () => {
+    umami.track(props => ({ ...props, url: window.location.pathname, title: GLOBAL_CONFIG_SITE.title }))
+  }
+
+  const loadUmamiJS = () => {
+    btf.getScript('https://cloud.umami.is/script.js', {
+      'data-website-id': '5b9ef408-bff2-4b30-8d1e-28cb3c95721a',
+      'data-auto-track': 'false',
+      ...option
+    }).then(runTrack)
+  }
+
+  const getData = async (isPost) => {
+    const now = Date.now()
+    const keyUrl = isPost ? `&url=${window.location.pathname}` : ''
+    const headerList = { 'Accept': 'application/json' }
+    if (false) headerList['Authorization'] = `Bearer ${config.token}`
+    else headerList['x-umami-api-key'] = config.token
+    const res = await fetch(`https://api.umami.is/v1/websites/5b9ef408-bff2-4b30-8d1e-28cb3c95721a/stats?startAt=0000000000&endAt=${now}${keyUrl}`, {
+      method: "GET",
+      headers: headerList
+    })
+    return await res.json()
+  }
+
+  const insertData = async () => {
+    try {
+      if (GLOBAL_CONFIG_SITE.isPost && config.page_pv) {
+        const pagePV = document.getElementById('umamiPV')
+        if (pagePV) {
+          const data = await getData(true)
+          pagePV.textContent = data.pageviews.value
+        }
+      } else {
+        const data = (config.site_uv || config.site_pv) && await getData()
+        if (config.site_uv) {
+          const siteUV = document.getElementById('umami-site-uv')
+          if (siteUV) siteUV.textContent = data.visitors.value
+        }
+        if (config.site_pv) {
+          const sitePV = document.getElementById('umami-site-pv')
+          if (sitePV) sitePV.textContent = data.pageviews.value
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load Umami Analytics:', e)
+    }
+  }
+
+  btf.addGlobalFn('pjaxComplete', runTrack, 'umami_analytics_run_track')
+  btf.addGlobalFn('pjaxComplete', insertData, 'umami_analytics_insert')
+
+  loadUmamiJS()
+  insertData()
+})()</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="search" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>

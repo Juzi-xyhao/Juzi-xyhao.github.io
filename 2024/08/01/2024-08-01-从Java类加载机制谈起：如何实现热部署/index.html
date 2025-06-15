@@ -1,0 +1,385 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>从Java类加载机制谈起：如何实现热部署 | xyhao的博客</title><meta name="author" content="xyhao"><meta name="copyright" content="xyhao"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="arthas是怎么实现热部署的呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Java类加载机制谈起：如何实现热部署">
+<meta property="og:url" content="http://juziblog.space/2024/08/01/2024-08-01-%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2/index.html">
+<meta property="og:site_name" content="xyhao的博客">
+<meta property="og:description" content="arthas是怎么实现热部署的呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-08-01-arthas.png">
+<meta property="article:published_time" content="2024-08-01T00:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-15T11:52:37.413Z">
+<meta property="article:author" content="xyhao">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-08-01-arthas.png"><link rel="shortcut icon" href="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png"><link rel="canonical" href="http://juziblog.space/2024/08/01/2024-08-01-%E4%BB%8EJava%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%B0%88%E8%B5%B7%EF%BC%9A%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%83%AD%E9%83%A8%E7%BD%B2/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"已经过了","messageNext":"天自上次更新，文章内容可能已过时。"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '从Java类加载机制谈起：如何实现热部署',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-06-15 11:52:37'
+}</script><meta name="referrer" content="no-referrer" /><link rel="stylesheet" href="/css/mycss.css"><link rel="stylesheet" href="/css/modify.css"><link rel="stylesheet" href="/css/transpancy.css"><script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="xyhao的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load', preloader.endLoading)
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background-image: url(https://pic.imgdb.cn/item/672c4d1ad29ded1a8cbde4f5.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-08-01-arthas.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">xyhao的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">从Java类加载机制谈起：如何实现热部署</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">从Java类加载机制谈起：如何实现热部署</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-08-01T00:00:00.000Z" title="发表于 2024-08-01 00:00:00">2024-08-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-15T11:52:37.413Z" title="更新于 2025-06-15 11:52:37">2025-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Java/">Java</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Java/%E5%AD%97%E8%8A%82%E7%A0%81/">字节码</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">4.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>15分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>原文地址：<a target="_blank" rel="noopener external nofollow noreferrer" href="https://developer.aliyun.com/article/828000">从Java类加载机制谈起：如何实现热部署</a></p>
+</blockquote>
+<h2 id="一-、class的热替换"><a href="#一-、class的热替换" class="headerlink" title="一 、class的热替换"></a>一 、class的热替换</h2><p>ClassLoader中重要的方法:</p>
+<h3 id="loadClass"><a href="#loadClass" class="headerlink" title="loadClass:"></a>loadClass:</h3><p>**ClassLoader.loadClass(…) **是ClassLoader的入口点。当一个类没有指明用什么加载器加载的时候，JVM默认采用AppClassLoader加载器加载没有加载过的class，调用的方法的入口就是loadClass(…)。如果一个class被自定义的ClassLoader加载，那么JVM也会调用这个自定义的ClassLoader.loadClass(…)方法来加载class内部引用的一些别的class文件。重载这个方法，能实现自定义加载class的方式，抛弃双亲委托机制，但是即使不采用双亲委托机制，比如java.lang包中的相关类还是不能自定义一个同名的类来代替，主要因为JVM解析、验证class的时候，会进行相关判断。</p>
+<h3 id="defineClass"><a href="#defineClass" class="headerlink" title="defineClass:"></a>defineClass:</h3><p>系统自带的ClassLoader，默认加载程序的是AppClassLoader，ClassLoader加载一个class，最终调用的是defineClass(…)方法，这时候就在想是否可以重复调用defineClass(…)方法加载同一个类(或者修改过)，最后发现调用多次的话会有相关错误:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.lang.LinkageError </span><br><span class="line">attempted duplicate <span class="keyword">class</span> <span class="title class_">definition</span></span><br></pre></td></tr></table></figure>
+<p>所以<strong>一个class被一个ClassLoader实例加载过的话，就不能再被这个ClassLoader实例再次加载</strong>(这里的加载指的是，调用了defileClass(…)放方法，重新加载字节码、解析、验证。)。而系统默认的AppClassLoader加载器，他们内部会缓存加载过的class，重新加载的话，就直接取缓存。所与对于热加载的话，只能重新创建一个ClassLoader，然后再去加载已经被加载过的class文件。</p>
+<h2 id="二、class的卸载"><a href="#二、class的卸载" class="headerlink" title="二、class的卸载"></a>二、class的卸载</h2><p>在Java中class也是可以unload。<strong>JVM中class和Meta信息存放在PermGen space区域</strong>。如果加载的class文件很多，那么可能导致PermGen space区域空间溢出。引起：java.lang.OutOfMemoryErrorPermGen space. 对于有些Class我们可能只需要使用一次，就不再需要了，也可能我们修改了class文件，我们需要重新加载 newclass，那么oldclass就不再需要了。那么JVM怎么样才能卸载Class呢。<br>JVM中的Class只有满足以下三个条件，才能被GC回收，也就是该Class被卸载（unload）：</p>
+<ul>
+<li>该类所有的实例都已经被GC。</li>
+<li>加载该类的ClassLoader实例已经被GC。</li>
+<li>该类的java.lang.Class对象没有在任何地方被引用。</li>
+</ul>
+<p>GC的时机我们是不可控的，那么同样的我们对于Class的卸载也是不可控的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">有启动类加载器加载的类型在整个运行期间是不可能被卸载的(jvm和jls规范).</span><br><span class="line">被系统类加载器和标准扩展类加载器加载的类型在运行期间不太可能被卸载，因为系统类加载器实例或者标准扩展类的实例基本上在整个运行期间总能直接或者间接的访问的到，其达到unreachable的可能性极小.(当然，在虚拟机快退出的时候可以，因为不管ClassLoader实例或者Class(java.lang.Class)实例也都是在堆中存在，同样遵循垃圾收集的规则).</span><br><span class="line">被开发者自定义的类加载器实例加载的类型只有在很简单的上下文环境中才能被卸载，而且一般还要借助于强制调用虚拟机的垃圾收集功能才可以做到.可以预想，稍微复杂点的应用场景中(尤其很多时候，用户在开发自定义类加载器实例的时候采用缓存的策略以提高系统性能)，被加载的类型在运行期间也是几乎不太可能被卸载的(至少卸载的时间是不确定的).</span><br></pre></td></tr></table></figure>
+<p>综合以上三点， 一个已经加载的类型被卸载的几率很小至少被卸载的时间是不确定的.同时，我们可以看的出来，开发者在开发代码时候，不应该对虚拟机的类型卸载做任何假设的前提下来实现系统中的特定功能.</p>
+<hr>
+<h2 id="三、Tomcat中关于类的加载与卸载"><a href="#三、Tomcat中关于类的加载与卸载" class="headerlink" title="三、Tomcat中关于类的加载与卸载"></a>三、Tomcat中关于类的加载与卸载</h2><p>Tomcat中与其说有热加载，还不如说是热部署来的准确些。因为对于一个应用，其中class文件被修改过，那么Tomcat会先卸载这个应用(Context)，然后重新加载这个应用，其中关键就在于自定义ClassLoader的应用。这里有篇文章很好的介绍了tomcat中对于ClassLoader的应用。<br>Tomcat启动的时候，ClassLoader加载的流程：</p>
+<ol>
+<li>system classloader即AppClassLoader加载 {catalina.home}&#x2F;bin里面的jar包，也就是tomcat启动相关的jar包。 </li>
+<li>Tomcat启动类Bootstrap中有3个classloader属性，catalinaLoader、commonLoader、sharedLoader在Tomcat7中默认他们初始化都为同一个StandardClassLoader实例。具体的也可以在 {catalina.home}&#x2F;bin&#x2F;bootstrap.jar包中的catalina.properites中进行配置</li>
+<li>StandardClassLoader加载 {catalina.home}&#x2F;lib下面的所有Tomcat用到的jar包</li>
+<li>一个Context容器，代表了一个app应用。Context–&gt;WebappLoader–&gt;WebClassLoader。并且Thread.contextClassLoader&#x3D;WebClassLoader。应用程序中的jsp文件、class类、lib&#x2F;*.jar包，都是WebClassLoader加载的。</li>
+</ol>
+<p>当Jsp文件修改的时候，Tomcat更新步骤：  </p>
+<ol>
+<li><p>当访问1.jsp的时候，1.jsp的包装类JspServletWrapper会去比较1.jsp文件最新修改时间和上次的修改时间，以此判断1.jsp是否修改过</p>
+</li>
+<li><p>1.jsp修改过的话，那么jspservletWrapper会清除相关引用，包括1.jsp编译后的servlet实例和加载这个servlet的JasperLoader实例</p>
+</li>
+<li><p>重新创建一个JasperLoader实例，重新加载修改过后的1.jsp，重新生成一个Servlet实例</p>
+</li>
+<li><p>返回修改后的1.jsp内容给用户。<br>当app下面的class文件修改的时候，Tomcat更新步骤：</p>
+</li>
+<li><p>Context容器会有专门线程监控app下面的类的修改情况 </p>
+</li>
+<li><p>如果发现有类被修改了。那么调用Context.reload()。清楚一系列相关的引用和资源</p>
+</li>
+<li><p>然后创新创建一个WebClassLoader实例，重新加载app下面需要的class。</p>
+</li>
+</ol>
+<p>在一个有一定规模的应用中，如果文件修改多次，重启多次的话,<code>java.lang.OutOfMemoryErrorPermGen space</code>这个错误的的出现非常频繁。主要就是因为每次重启重新加载大量的class，超过了PermGen space设置的大小<br>两种情况可能导致PermGen space溢出</p>
+<ol>
+<li>GC(Garbage Collection)在主程序运行期对PermGen space没有进行清理(GC的不可控行)， </li>
+<li>重启之前WebClassLoader加载的class在别的地方还存在着引用。  <blockquote>
+<p><a target="_blank" rel="noopener external nofollow noreferrer" href="http://www.blogjava.net/heavensay/archive/2012/11/07/389685.html">class卸载、热替换和Tomcat的热部署的分析 - heavensay - BlogJava</a></p>
+</blockquote>
+</li>
+</ol>
+<hr>
+<h3 id="类加载的探索"><a href="#类加载的探索" class="headerlink" title="类加载的探索"></a>类加载的探索</h3><p>首先谈一下何为热部署（hotswap），<strong>热部署是在不重启 Java 虚拟机的前提下，能自动侦测到 class 文件的变化，更新运行时 class 的行为</strong>。<br>Java 类是通过 Java 虚拟机加载的，某个类的 class 文件在被 classloader 加载后，会生成对应的 Class 对象，之后就可以创建该类的实例。<br><strong>默认的虚拟机行为只会在启动时加载类，如果后期有一个类需要更新的话，单纯替换编译的 class 文件，Java 虚拟机是不会更新正在运行的 class</strong>。如果要实现热部署，最根本的方式是修改虚拟机的源代码，改变 classloader 的加载行为，使虚拟机能监听 class 文件的更新，重新加载 class 文件。这样的行为破坏性很大。  </p>
+<p>另一种友好的方法是创建自己的 classloader 来加载需要监听的 class，这样就能控制类加载的时机，从而实现热部署。<br>本文将具体探索如何实现这个方案。首先需要了解一下 Java 虚拟机现有的加载机制。目前的加载机制，称为<strong>双亲委派</strong>。<br>系统在使用一个 classloader 来加载类时，会先询问当前 classloader 的父类是否有能力加载，如果父类无法实现加载操作，才会将任务下放到该 classloader 来加载。这种自上而下的加载方式的好处是，让每个 classloader 执行自己的加载任务，不会重复加载类。  </p>
+<p><strong>但是这种方式却使加载顺序非常难改变，让自定义 classloader 抢先加载需要监听改变的类成为了一个难题。</strong><br>不过我们可以换一个思路，虽然无法抢先加载该类，但是仍然可以用自定义 classloader 创建一个功能相同的类，让每次实例化的对象都指向这个新的类。当这个类的 class 文件发生改变的时候，再次创建一个更新的类，之后如果系统再次发出实例化请求，创建的对象讲指向这个全新的类。<br>下面来简单列举一下需要做的工作。</p>
+<p>创建自定义的 classloader，加载需要监听改变的类，在 class 文件发生改变的时候，重新加载该类。 改变创建对象的行为，使他们在创建时使用自定义 classloader 加载的 class。</p>
+<hr>
+<h3 id="自定义类加载器的实现"><a href="#自定义类加载器的实现" class="headerlink" title="自定义类加载器的实现"></a>自定义类加载器的实现</h3><p>自定义加载器仍然需要执行类加载的功能。这里却存在一个问题，<strong>同一个类加载器无法同时加载两个相同名称的类</strong>，由于不论类的结构如何发生变化，生成的类名不会变，而 <strong>classloader 只能在虚拟机停止前销毁已经加载的类</strong>，这样 classloader 就无法加载更新后的类了。这里有一个小技巧，让每次加载的类都保存成一个带有版本信息的 class，比如加载 Test.class 时，保存在内存中的类是 Test_v1.class，当类发生改变时，重新加载的类名是 Test_v2.class。但是真正执行加载 class 文件创建 class 的 defineClass 方法是一个 native 的方法，修改起来又变得很困难。所以面前还剩一条路，那就是直接修改编译生成的 class 文件。<br><strong>利用 ASM 修改 class 文件</strong><br>可以修改字节码的框架有很多，比如 ASM，CGLIB。本文使用的是 ASM。先来介绍一下 class 文件的结构，class 文件包含了以下几类信息:</p>
+<p>第一个是类的基本信息，包含了访问权限信息，类名信息，父类信息，接口信息。<br>第二个是类的变量信息。<br>第三个是方法的信息。</p>
+<p>ASM 会先加载一个 class 文件，然后严格顺序读取类的各项信息，用户可以按照自己的意愿定义增强组件修改这些信息，最后输出成一个新的 class。<br>首先看一下如何利用 ASM 修改类信息。</p>
+<ol>
+<li><p>利用 ASM 修改字节码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ClassWriter</span> <span class="variable">cw</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassWriter</span>(ClassWriter.COMPUTE_MAXS); </span><br><span class="line">   <span class="type">ClassReader</span> <span class="variable">cr</span> <span class="operator">=</span> <span class="literal">null</span>;     </span><br><span class="line">   <span class="type">String</span> <span class="variable">enhancedClassName</span> <span class="operator">=</span> classSource.getEnhancedName(); </span><br><span class="line">   <span class="keyword">try</span> &#123; </span><br><span class="line">       cr = <span class="keyword">new</span> <span class="title class_">ClassReader</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>( </span><br><span class="line">               classSource.getFile())); </span><br><span class="line">   &#125; <span class="keyword">catch</span> (IOException e) &#123; </span><br><span class="line">       e.printStackTrace(); </span><br><span class="line">       <span class="keyword">return</span> <span class="literal">null</span>; </span><br><span class="line">   &#125; </span><br><span class="line">   <span class="type">ClassVisitor</span> <span class="variable">cv</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">EnhancedModifier</span>(cw, </span><br><span class="line">           className.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>), </span><br><span class="line">           enhancedClassName.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>)); </span><br><span class="line">   cr.accept(cv, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>ASM 修改字节码文件的流程是一个责任链模式，首先使用一个 ClassReader 读入字节码，然后利用 ClassVisitor 做个性化的修改，最后利用 ClassWriter 输出修改后的字节码。<br>之前提过，需要将读取的 class 文件的类名做一些修改，加载成一个全新名字的派生类。这里将之分为了 2 个步骤。<br><strong>第一步，先将原来的类变成接口。</strong></p>
+</li>
+<li><p>重定义的原始类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Class&lt;?&gt; redefineClass(String className)&#123; </span><br><span class="line">    <span class="type">ClassWriter</span> <span class="variable">cw</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassWriter</span>(ClassWriter.COMPUTE_MAXS); </span><br><span class="line">    <span class="type">ClassReader</span> <span class="variable">cr</span> <span class="operator">=</span> <span class="literal">null</span>; </span><br><span class="line">    <span class="type">ClassSource</span> <span class="variable">cs</span> <span class="operator">=</span> classFiles.get(className); </span><br><span class="line">    <span class="keyword">if</span>(cs==<span class="literal">null</span>)&#123; </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>; </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">try</span> &#123; </span><br><span class="line">        cr = <span class="keyword">new</span> <span class="title class_">ClassReader</span>(<span class="keyword">new</span> <span class="title class_">FileInputStream</span>(cs.getFile())); </span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123; </span><br><span class="line">        e.printStackTrace(); </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>; </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="type">ClassModifier</span> <span class="variable">cm</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassModifier</span>(cw); </span><br><span class="line">    cr.accept(cm, <span class="number">0</span>); </span><br><span class="line">    <span class="type">byte</span>[] code = cw.toByteArray(); </span><br><span class="line">    <span class="keyword">return</span> defineClass(className, code, <span class="number">0</span>, code.length); </span><br></pre></td></tr></table></figure>
+<p>首先 load 原始类的 class 文件，此处定义了一个增强组件 ClassModifier，作用是修改原始类的类型，将它转换成接口。原始类的所有方法逻辑都会被去掉。<br><strong>第二步，生成的派生类都实现这个接口，即原始类，并且复制原始类中的所有方法逻辑。</strong>之后如果该类需要更新，会生成一个新的派生类，也会实现这个接口。这样做的目的是不论如何修改，同一个 class 的派生类都有一个共同的接口，他们之间的转换变得对外不透明。</p>
+</li>
+<li><p>定义一个派生类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在 class 文件发生改变时重新定义这个类</span></span><br><span class="line"><span class="keyword">private</span> Class&lt;?&gt; redefineClass(String className, ClassSource classSource)&#123; </span><br><span class="line">    <span class="type">ClassWriter</span> <span class="variable">cw</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ClassWriter</span>(ClassWriter.COMPUTE_MAXS); </span><br><span class="line">    <span class="type">ClassReader</span> <span class="variable">cr</span> <span class="operator">=</span> <span class="literal">null</span>; </span><br><span class="line">    classSource.update(); </span><br><span class="line">    <span class="type">String</span> <span class="variable">enhancedClassName</span> <span class="operator">=</span> classSource.getEnhancedName();       </span><br><span class="line">    <span class="keyword">try</span> &#123; </span><br><span class="line">        cr = <span class="keyword">new</span> <span class="title class_">ClassReader</span>( </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(classSource.getFile())); </span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123; </span><br><span class="line">        e.printStackTrace(); </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>; </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="type">EnhancedModifier</span> <span class="variable">em</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">EnhancedModifier</span>(cw, className.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>), </span><br><span class="line">            enhancedClassName.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>)); </span><br><span class="line">    <span class="type">ExtendModifier</span> <span class="variable">exm</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ExtendModifier</span>(em, className.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>), </span><br><span class="line">            enhancedClassName.replace(<span class="string">&quot;.&quot;</span>, <span class="string">&quot;/&quot;</span>)); </span><br><span class="line">    cr.accept(exm, <span class="number">0</span>); </span><br><span class="line">    <span class="type">byte</span>[] code = cw.toByteArray(); </span><br><span class="line">    classSource.setByteCopy(code); </span><br><span class="line">    Class&lt;?&gt; clazz = defineClass(enhancedClassName, code, <span class="number">0</span>, code.length); </span><br><span class="line">    classSource.setClassCopy(clazz); </span><br><span class="line">    <span class="keyword">return</span> clazz; </span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>再次 load 原始类的 class 文件，此处定义了两个增强组件，一个是 EnhancedModifier，这个增强组件的作用是改变原有的类名。第二个增强组件是 ExtendModifier，这个增强组件的作用是改变原有类的父类，让这个修改后的派生类能够实现同一个原始类（此时原始类已经转成接口了）。<br>自定义 classloader 还有一个作用是监听会发生改变的 class 文件，classloader 会管理一个定时器，定时依次扫描这些 class 文件是否改变。</p>
+<hr>
+<h2 id="四、改变创建对象的行为"><a href="#四、改变创建对象的行为" class="headerlink" title="四、改变创建对象的行为"></a>四、改变创建对象的行为</h2><p>Java 虚拟机常见的创建对象的方法有两种，一种是静态创建，直接 new 一个对象，一种是动态创建，通过反射的方法，创建对象。<br>由于已经在自定义加载器中更改了原有类的类型，把它从类改成了接口，所以这两种创建方法都无法成立。我们要做的是将实例化原始类的行为变成实例化派生类。<br>对于第一种方法，需要做的是将静态创建，变为通过 classloader 获取 class，然后动态创建该对象。</p>
+<ol start="4">
+<li><p>替换后的指令集所对应的逻辑</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 原始逻辑</span></span><br><span class="line"><span class="type">Greeter</span> <span class="variable">p</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Greeter</span>();</span><br><span class="line"><span class="comment">// 改变后的逻辑</span></span><br><span class="line"><span class="type">IGreeter</span> <span class="variable">p</span> <span class="operator">=</span> (IGreeter)MyClassLoader.getInstance().</span><br><span class="line">findClass(“com.example.Greeter”).newInstance();</span><br></pre></td></tr></table></figure>
+<p>这里又需要用到 ASM 来修改 class 文件了。查找到所有 new 对象的语句，替换成通过 classloader 的形式来获取对象的形式。</p>
+</li>
+<li><p>利用 ASM 修改方法体</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">visitTypeInsn</span><span class="params">(<span class="type">int</span> opcode, String type)</span> &#123; </span><br><span class="line">    <span class="keyword">if</span>(opcode==Opcodes.NEW &amp;&amp; type.equals(className))&#123; </span><br><span class="line">        List&lt;LocalVariableNode&gt; variables = node.localVariables; </span><br><span class="line">        <span class="type">String</span> <span class="variable">compileType</span> <span class="operator">=</span> <span class="literal">null</span>; </span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;variables.size();i++)&#123; </span><br><span class="line">            <span class="type">LocalVariableNode</span> <span class="variable">localVariable</span> <span class="operator">=</span> variables.get(i); </span><br><span class="line">            compileType = formType(localVariable.desc); </span><br><span class="line">            <span class="keyword">if</span>(matchType(compileType)&amp;&amp;!valiableIndexUsed[i])&#123; </span><br><span class="line">                valiableIndexUsed[i] = <span class="literal">true</span>; </span><br><span class="line">                <span class="keyword">break</span>; </span><br><span class="line">            &#125; </span><br><span class="line">        &#125; </span><br><span class="line">    mv.visitMethodInsn(Opcodes.INVOKESTATIC, CLASSLOAD_TYPE, </span><br><span class="line">        <span class="string">&quot;getInstance&quot;</span>, <span class="string">&quot;()L&quot;</span>+CLASSLOAD_TYPE+<span class="string">&quot;;&quot;</span>); </span><br><span class="line">    mv.visitLdcInsn(type.replace(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;.&quot;</span>)); </span><br><span class="line">    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, CLASSLOAD_TYPE, </span><br><span class="line">        <span class="string">&quot;findClass&quot;</span>, <span class="string">&quot;(Ljava/lang/String;)Ljava/lang/Class;&quot;</span>); </span><br><span class="line">    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, <span class="string">&quot;java/lang/Class&quot;</span>, </span><br><span class="line">        <span class="string">&quot;newInstance&quot;</span>, <span class="string">&quot;()Ljava/lang/Object;&quot;</span>); </span><br><span class="line">    mv.visitTypeInsn(Opcodes.CHECKCAST, compileType); </span><br><span class="line">    flag = <span class="literal">true</span>; </span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; </span><br><span class="line">        mv.visitTypeInsn(opcode, type); </span><br><span class="line">    &#125; </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>对于第二种创建方法，需要通过修改 Class.forName()和 ClassLoader.findClass()的行为，使他们通过自定义加载器加载类。</p>
+</li>
+</ol>
+<hr>
+<h2 id="五、使用-JavaAgent-拦截默认加载器的行为"><a href="#五、使用-JavaAgent-拦截默认加载器的行为" class="headerlink" title="五、使用 JavaAgent 拦截默认加载器的行为"></a>五、使用 JavaAgent 拦截默认加载器的行为</h2><p>之前实现的类加载器已经解决了热部署所需要的功能，可是 JVM 启动时，并不会用自定义的加载器加载 classpath 下的所有 class 文件，取而代之的是通过应用加载器去加载。如果在其之后用自定义加载器重新加载已经加载的 class，有可能会出现 LinkageError 的 exception。所以必须在应用启动之前，重新替换已经加载的 class。如果在 jdk1.4 之前，能使用的方法只有一种，改变 jdk 中 classloader 的加载行为，使它指向自定义加载器的加载行为。好在 jdk5.0 之后，我们有了另一种侵略性更小的办法，这就是 JavaAgent 方法，JavaAgent 可以在 JVM 启动之后，应用启动之前的短暂间隙，提供空间给用户做一些特殊行为。比较常见的应用，是利用 JavaAgent 做面向方面的编程，在方法间加入监控日志等。<br>JavaAgent 的实现很容易，只要在一个类里面，定义一个 premain 的方法。</p>
+<ol start="6">
+<li><p>一个简单的 JavaAgent</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ReloadAgent</span> &#123; </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">premain</span><span class="params">(String agentArgs, Instrumentation inst)</span>&#123; </span><br><span class="line">        <span class="type">GeneralTransformer</span> <span class="variable">trans</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GeneralTransformer</span>(); </span><br><span class="line">        inst.addTransformer(trans); </span><br><span class="line">    &#125; </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>然后编写一个 manifest 文件，将 Premain-Class属性设置成定义一个拥有 premain方法的类名即可。<br>生成一个包含这个 manifest 文件的 jar 包。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">manifest-Version:</span> <span class="number">1.0</span> </span><br><span class="line"><span class="attr">Premain-Class:</span> <span class="string">com.example.ReloadAgent</span> </span><br><span class="line"><span class="attr">Can-Redefine-Classes:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>最后需要在执行应用的参数中增加 -javaagent参数 , 加入这个 jar。同时可以为 Javaagent增加参数，下图中的参数是测试代码中 test project 的绝对路径。这样在执行应用的之前，会优先执行 premain方法中的逻辑，并且预解析需要加载的 class。<br>这里利用 JavaAgent替换原始字节码，阻止原始字节码被 Java 虚拟机加载。只需要实现 一个 ClassFileTransformer的接口，利用这个实现类完成 class 替换的功能。</p>
+</li>
+<li><p>替换 class</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> </span><br><span class="line"><span class="keyword">public</span> <span class="type">byte</span> [] transform(ClassLoader paramClassLoader, String paramString, </span><br><span class="line">                         Class&lt;?&gt; paramClass, ProtectionDomain paramProtectionDomain, </span><br><span class="line">                         <span class="type">byte</span> [] paramArrayOfByte) <span class="keyword">throws</span> IllegalClassFormatException &#123; </span><br><span class="line">    <span class="type">String</span> <span class="variable">className</span> <span class="operator">=</span> paramString.replace(<span class="string">&quot;/&quot;</span>, <span class="string">&quot;.&quot;</span>); </span><br><span class="line">    <span class="keyword">if</span>(className.equals(<span class="string">&quot;com.example.Test&quot;</span>))&#123; </span><br><span class="line">        <span class="type">MyClassLoader</span> <span class="variable">cl</span> <span class="operator">=</span> MyClassLoader.getInstance(); </span><br><span class="line">        cl.defineReference(className, <span class="string">&quot;com.example.Greeter&quot;</span>); </span><br><span class="line">        <span class="keyword">return</span> cl.getByteCode(className); </span><br><span class="line">    &#125;<span class="keyword">else</span> <span class="keyword">if</span>(className.equals(<span class="string">&quot;com.example.Greeter&quot;</span>))&#123; </span><br><span class="line">        <span class="type">MyClassLoader</span> <span class="variable">cl</span> <span class="operator">=</span> MyClassLoader.getInstance(); </span><br><span class="line">        cl.redefineClass(className); </span><br><span class="line">        <span class="keyword">return</span> cl.getByteCode(className); </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，所有的工作大功告成。</p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://juziblog.space">阿里云社区</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a target="_blank" rel="noopener external nofollow noreferrer" href="https://developer.aliyun.com/article/828000">https://developer.aliyun.com/article/828000</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://juziblog.space" target="_blank">xyhao的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a></div><div class="post-share"><div class="social-share" data-image="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-08-01-arthas.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/2024/08/02/2024-08-02-Vector%20API%E4%BB%8B%E7%BB%8D&amp;%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" title="Vector API介绍&amp;简单使用"><img class="cover" src="https://vjs.zencdn.net/v/oceans.mp4" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Vector API介绍&amp;简单使用</div></div></a><a class="next-post pull-right" href="/2024/07/14/2024-07-14-GraalVM%20%E9%9D%99%E6%80%81%E7%BC%96%E8%AF%91%E4%B8%8B%20OTel%20Java%20Agent%20%E7%9A%84%E8%87%AA%E5%8A%A8%E5%A2%9E%E5%BC%BA%E6%96%B9%E6%A1%88%E4%B8%8E%E5%AE%9E%E7%8E%B0/" title="GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-07-14-GraalVM.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">GraalVM 静态编译下 OTel Java Agent 的自动增强方案与实现</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/2024/01/31/2024-01-31-%E7%94%B1%E4%B8%80%E9%81%93%E5%8A%9B%E6%89%A3%E9%A2%98%E5%BC%95%E5%8F%91%E7%9A%84%E5%AF%B9Java%E4%B8%ADHashMap%E7%9A%84%E6%80%9D%E8%80%83/" title="2024-01-31-由一道力扣题引发的对Java中HashMap的思考"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-01-31-Hash.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-31</div><div class="title">2024-01-31-由一道力扣题引发的对Java中HashMap的思考</div></div></a><a href="/2024/02/13/2024-02-13-Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/" title="Java线程和操作系统线程的区别"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-13-Thread.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-13</div><div class="title">Java线程和操作系统线程的区别</div></div></a><a href="/2024/02/16/2024-02-16-volatile/" title="volatile"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-16-volatile.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-16</div><div class="title">volatile</div></div></a><a href="/2024/03/09/2024-03-09-ProcessBuilder&Runtime.getRuntime().exec()/" title="Java里两种执行命令的方式比较"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-09-ProcessBuilder.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-09</div><div class="title">Java里两种执行命令的方式比较</div></div></a><a href="/2024/03/24/2024-03-24-%E8%A3%85%E7%AE%B1%E7%B1%BB%E4%B8%8Esynchronized/" title="装箱类"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-24-lock.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-24</div><div class="title">装箱类</div></div></a><a href="/2024/04/05/2024-04-05-synchronized%E5%BA%95%E5%B1%82/" title="synchronized底层"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-04-05-synchronized.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-05</div><div class="title">synchronized底层</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">xyhao</div><div class="author-info-description">软件工程专业2025届本科毕业生，Java服务端开发方向</br>工作经历：</br>2025年6月-至今 拼多多-Java开发</br></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><a id="card-info-btn" target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/Juzi-xyhao"><i class="fab fa-github"></i><span>GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Juzi-xyhao" rel="external nofollow noreferrer" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:xyhaomail@163.com" rel="external nofollow noreferrer" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="https://space.bilibili.com" rel="external nofollow noreferrer" target="_blank" title="Bilibili"><i class="fas fa-tv"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">未来的一些更新：</br> YouTube视频：System Design Interview 笔记 </br> && DDIA（数据密集型应用系统设计）笔记</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E3%80%81class%E7%9A%84%E7%83%AD%E6%9B%BF%E6%8D%A2"><span class="toc-number">1.</span> <span class="toc-text">一 、class的热替换</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#loadClass"><span class="toc-number">1.1.</span> <span class="toc-text">loadClass:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#defineClass"><span class="toc-number">1.2.</span> <span class="toc-text">defineClass:</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81class%E7%9A%84%E5%8D%B8%E8%BD%BD"><span class="toc-number">2.</span> <span class="toc-text">二、class的卸载</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81Tomcat%E4%B8%AD%E5%85%B3%E4%BA%8E%E7%B1%BB%E7%9A%84%E5%8A%A0%E8%BD%BD%E4%B8%8E%E5%8D%B8%E8%BD%BD"><span class="toc-number">3.</span> <span class="toc-text">三、Tomcat中关于类的加载与卸载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E7%9A%84%E6%8E%A2%E7%B4%A2"><span class="toc-number">3.1.</span> <span class="toc-text">类加载的探索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.2.</span> <span class="toc-text">自定义类加载器的实现</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%94%B9%E5%8F%98%E5%88%9B%E5%BB%BA%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%A1%8C%E4%B8%BA"><span class="toc-number">4.</span> <span class="toc-text">四、改变创建对象的行为</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E4%BD%BF%E7%94%A8-JavaAgent-%E6%8B%A6%E6%88%AA%E9%BB%98%E8%AE%A4%E5%8A%A0%E8%BD%BD%E5%99%A8%E7%9A%84%E8%A1%8C%E4%B8%BA"><span class="toc-number">5.</span> <span class="toc-text">五、使用 JavaAgent 拦截默认加载器的行为</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/前缀树.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="性能优化：字符串替换研究"/></a><div class="content"><a class="title" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究">性能优化：字符串替换研究</a><time datetime="2025-05-14T11:00:00.000Z" title="发表于 2025-05-14 11:00:00">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/Linux.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="常用的Linux命令"/></a><div class="content"><a class="title" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令">常用的Linux命令</a><time datetime="2025-03-21T11:00:00.000Z" title="发表于 2025-03-21 11:00:00">2025-03-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/shell.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="shell的一些简单语法"/></a><div class="content"><a class="title" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法">shell的一些简单语法</a><time datetime="2025-03-20T11:00:00.000Z" title="发表于 2025-03-20 11:00:00">2025-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JavaDoc"/></a><div class="content"><a class="title" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc">JavaDoc</a><time datetime="2025-02-17T12:00:00.000Z" title="发表于 2025-02-17 12:00:00">2025-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="浅浅理解Java中的逆变与协变"/></a><div class="content"><a class="title" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变">浅浅理解Java中的逆变与协变</a><time datetime="2025-02-16T12:00:00.000Z" title="发表于 2025-02-16 12:00:00">2025-02-16</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By xyhao</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a style="margin-inline:5px" target="_blank" href="https://hexo.io/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a><a style="margin-inline:5px" target="_blank" href="https://butterfly.js.org/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a><a style="margin-inline:5px" target="_blank" href="https://github.com/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a><a style="margin-inline:5px" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page/instantpage.js" type="module"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div><script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script><script>(() => {
+  const option = null
+  const config = {"site_uv":false,"site_pv":false,"page_pv":false,"token":"GIavIQd5ls6rab5DTfY42p1VRA4DfPQo"}
+
+  const runTrack = () => {
+    umami.track(props => ({ ...props, url: window.location.pathname, title: GLOBAL_CONFIG_SITE.title }))
+  }
+
+  const loadUmamiJS = () => {
+    btf.getScript('https://cloud.umami.is/script.js', {
+      'data-website-id': '5b9ef408-bff2-4b30-8d1e-28cb3c95721a',
+      'data-auto-track': 'false',
+      ...option
+    }).then(runTrack)
+  }
+
+  const getData = async (isPost) => {
+    const now = Date.now()
+    const keyUrl = isPost ? `&url=${window.location.pathname}` : ''
+    const headerList = { 'Accept': 'application/json' }
+    if (false) headerList['Authorization'] = `Bearer ${config.token}`
+    else headerList['x-umami-api-key'] = config.token
+    const res = await fetch(`https://api.umami.is/v1/websites/5b9ef408-bff2-4b30-8d1e-28cb3c95721a/stats?startAt=0000000000&endAt=${now}${keyUrl}`, {
+      method: "GET",
+      headers: headerList
+    })
+    return await res.json()
+  }
+
+  const insertData = async () => {
+    try {
+      if (GLOBAL_CONFIG_SITE.isPost && config.page_pv) {
+        const pagePV = document.getElementById('umamiPV')
+        if (pagePV) {
+          const data = await getData(true)
+          pagePV.textContent = data.pageviews.value
+        }
+      } else {
+        const data = (config.site_uv || config.site_pv) && await getData()
+        if (config.site_uv) {
+          const siteUV = document.getElementById('umami-site-uv')
+          if (siteUV) siteUV.textContent = data.visitors.value
+        }
+        if (config.site_pv) {
+          const sitePV = document.getElementById('umami-site-pv')
+          if (sitePV) sitePV.textContent = data.pageviews.value
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load Umami Analytics:', e)
+    }
+  }
+
+  btf.addGlobalFn('pjaxComplete', runTrack, 'umami_analytics_run_track')
+  btf.addGlobalFn('pjaxComplete', insertData, 'umami_analytics_insert')
+
+  loadUmamiJS()
+  insertData()
+})()</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="search" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>

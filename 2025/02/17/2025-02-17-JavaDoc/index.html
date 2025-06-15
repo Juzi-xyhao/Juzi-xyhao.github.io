@@ -1,0 +1,473 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>JavaDoc | xyhao的博客</title><meta name="author" content="xyhao"><meta name="copyright" content="xyhao"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="JavaDoc规范">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaDoc">
+<meta property="og:url" content="http://juziblog.space/2025/02/17/2025-02-17-JavaDoc/index.html">
+<meta property="og:site_name" content="xyhao的博客">
+<meta property="og:description" content="JavaDoc规范">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png">
+<meta property="article:published_time" content="2025-02-17T12:00:00.000Z">
+<meta property="article:modified_time" content="2025-06-15T11:52:37.415Z">
+<meta property="article:author" content="xyhao">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="软件工程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png"><link rel="shortcut icon" href="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png"><link rel="canonical" href="http://juziblog.space/2025/02/17/2025-02-17-JavaDoc/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        if (name && globalFn[key][name]) return
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'undefined')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"已经过了","messageNext":"天自上次更新，文章内容可能已过时。"},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":true,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: true,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'JavaDoc',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-06-15 11:52:37'
+}</script><meta name="referrer" content="no-referrer" /><link rel="stylesheet" href="/css/mycss.css"><link rel="stylesheet" href="/css/modify.css"><link rel="stylesheet" href="/css/transpancy.css"><script defer src="https://cloud.umami.is/script.js" data-website-id="5b9ef408-bff2-4b30-8d1e-28cb3c95721a"></script><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="xyhao的博客" type="application/atom+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load', preloader.endLoading)
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="web_bg" style="background-image: url(https://pic.imgdb.cn/item/672c4d1ad29ded1a8cbde4f5.jpg);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">xyhao的博客</span></a><a class="nav-page-title" href="/"><span class="site-name">JavaDoc</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友情链接</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">JavaDoc</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-02-17T12:00:00.000Z" title="发表于 2025-02-17 12:00:00">2025-02-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-06-15T11:52:37.415Z" title="更新于 2025-06-15 11:52:37">2025-06-15</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/">软件工程</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/%E6%96%87%E6%A1%A3/">文档</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>10分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><blockquote>
+<p>以前实习的时候，组里的代码很少有注释，理解起来着实难受。mentor 可能会说：”不懂的问我，随便问”，但人家只是客气，你要是真随便问就输了。</p>
+<p>因此，我写代码尽量带有完整的 <code>JavaDoc</code> 注释。</p>
+<p>如果不做二次开发，个人觉得其实没必要理解一部分代码的实现逻辑。通过完整的 JavaDoc 了解每个方法在做什么，结合调用链路梳理逻辑，就差不多理解业务了。</p>
+<p>有人可能会说：良好的代码本身就是一种注释。可是大部分人的代码命名水平实在不怎么高(包括我)，变量名中混入拼音首字母缩写的大有人在，有一种 yyds 的美。</p>
+<p>而且不是每个人的代码都优雅、简洁的能让大一新生看懂。如果做不到，还是好好写注释吧。</p>
+<p>但是话又说回来，如果你的目的是防御性编程，增强自己不可替代的地位，那确实没必要写 JavaDoc。</p>
+</blockquote>
+<h2 id="类名-JavaDoc"><a href="#类名-JavaDoc" class="headerlink" title="类名 JavaDoc"></a>类名 JavaDoc</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 这是一个展示如何使用详细JavaDoc注释的示例类。</span></span><br><span class="line"><span class="comment"> * 此类提供文件读取功能以及一些辅助方法。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> xyhao</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 3.2</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #readFileContent(String)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #printMessage(String</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@deprecated</span> 使用 &#123;<span class="doctag">@link</span> String&#125;代替，因为它·······</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ExampleClass</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><code>@author</code> 作者是谁</li>
+<li><code>@since</code> 从项目的哪个版本引入的</li>
+<li><code>@version</code>  该类迭代了几个版本</li>
+<li><code>@see</code> 与该类相关联的类、方法、或者 URL</li>
+<li><code>@deprecated</code> 该类若准备删除，可以用这个标签表示。但是要给出删除之后的替代方案。</li>
+</ul>
+<p>但其实这只对完美的、非常规范的开发流程生效，一般而言，用 <code>@author</code> 标签记录负责人就足够了。</p>
+<h2 id="方法名-JavaDoc"><a href="#方法名-JavaDoc" class="headerlink" title="方法名 JavaDoc"></a>方法名 JavaDoc</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 读取指定文件的内容并返回其内容作为一个字符串。</span></span><br><span class="line"><span class="comment"> * 如果在读取过程中发生I/O错误，则会抛出IOException。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> encoding 文件编码格式。</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> String&#125;  返回文件的内容作为字符串。</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 3.2</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> java.nio.file.Files#readAllBytes(java.nio.file.Path)</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> IOException 如果发生输入输出错误（如文件未找到或无法读取）。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">readFileContent</span><span class="params">(String encoding)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    <span class="comment">// 示例代码，实际实现被省略</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><code>@param</code> 表示方法参数的含义</li>
+<li><code>@return</code> 返回值的含义</li>
+<li><code>@since</code> 从项目的哪个版本开始引入</li>
+<li><code>@see</code> 标记与该方法相关的类、方法、URL 等</li>
+<li><code>@throws</code> 如果该方法有抛出异常的可能，用该标签标记异常类型（引申：什么时候抛出异常，什么时候捕获异常？）</li>
+</ul>
+<p>方法返回类型一眼就可以看到， 真的需要<code>return</code> 标签吗？</p>
+<p>假设你对这个方法一点也不了解，当然也不了解这个方法返回值的具体含义，如果有个 <code>return</code> 标签解释了返回值的具体含义，这不是一件很好的事吗？</p>
+<h2 id="成员变量-JavaDoc"><a href="#成员变量-JavaDoc" class="headerlink" title="成员变量 JavaDoc"></a>成员变量 JavaDoc</h2><p>通常对于成员变量而言，只需使用无标签的文本描述即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 存储用于加密用户密码的盐值。</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 盐值是一个随机生成的字符串，它被添加到原始密码中以增加哈希算法的安全性。</span></span><br><span class="line"><span class="comment"> * 通过使用不同的盐值，即使两个用户拥有相同的密码，它们的哈希结果也会不同，</span></span><br><span class="line"><span class="comment"> * 这样可以有效防止彩虹表攻击等常见的密码破解技术。</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 在创建新账户或更改密码时会生成一个新的盐值，并且该盐值将与加密后的密码一起存储。</span></span><br><span class="line"><span class="comment"> * 当验证用户输入的密码时，需要使用相同的盐值重新计算哈希值并与存储的哈希值进行比较。</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> String salt;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>但为了便于后来者理解，用 <code>@see</code> 标签关联相关信息也可以：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 存储用于加密用户密码的盐值。</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 盐值是一个随机生成的字符串，它被添加到原始密码中以增加哈希算法的安全性。</span></span><br><span class="line"><span class="comment"> * 通过使用不同的盐值，即使两个用户拥有相同的密码，它们的哈希结果也会不同，</span></span><br><span class="line"><span class="comment"> * 这样可以有效防止彩虹表攻击等常见的密码破解技术。</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 在创建新账户或更改密码时会生成一个新的盐值，并且该盐值将与加密后的密码一起存储。</span></span><br><span class="line"><span class="comment"> * 当验证用户输入的密码时，需要使用相同的盐值重新计算哈希值并与存储的哈希值进行比较。</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> &lt;a href=&quot;https://baike.baidu.com/item/salt%E5%80%BC/15931315&quot;&gt;百度百科：盐值是什么？&lt;/a&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> String salt;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="如何在-JavaDoc-中引用方法、类、成员变量、URL？"><a href="#如何在-JavaDoc-中引用方法、类、成员变量、URL？" class="headerlink" title="如何在 JavaDoc 中引用方法、类、成员变量、URL？"></a>如何在 JavaDoc 中引用方法、类、成员变量、URL？</h2><p>看代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 用户账户的基本信息。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 该类提供了用户账户的基本功能，包括密码加密和存储安全相关的属性。</span></span><br><span class="line"><span class="comment"> * 加密操作依靠 &#123;<span class="doctag">@link</span> java.security.MessageDigest&#125; 实现</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> xyhao</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2025-02-17</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #hashPasswordWithSalt(String,String)  引用本类的有参方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> java.util.HashMap#size()  引用别的类的无参方法</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> #salt  引用成员变量</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@see</span> &lt;a href=&quot;https://baike.baidu.com/item/salt%E5%80%BC/15931315&quot;&gt;百度百科：盐值是什么？&lt;/a&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Account</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> String salt;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> String <span class="title function_">hashPasswordWithSalt</span><span class="params">(String password, String salt)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">MessageDigest</span> <span class="variable">md</span> <span class="operator">=</span> MessageDigest.getInstance(<span class="string">&quot;SHA-256&quot;</span>);</span><br><span class="line">            <span class="comment">// 将盐值和密码组合起来</span></span><br><span class="line">            <span class="type">String</span> <span class="variable">beforeHash</span> <span class="operator">=</span> salt + password;</span><br><span class="line">            <span class="type">byte</span>[] hashedBytes = md.digest(beforeHash.getBytes());</span><br><span class="line">            <span class="comment">// 将字节数组转换为Base64编码的字符串</span></span><br><span class="line">            passwordHash = Base64.getEncoder().encodeToString(hashedBytes);</span><br><span class="line">            <span class="keyword">return</span> passwordHash;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchAlgorithmException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;无法找到SHA-256算法&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<hr>
+<br>
+
+<p>上文中所有的 JavaDoc 都遵守着这样的格式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * xxxxxxxxxxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@xxx</span> xxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@xxx</span> xxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@xxx</span> xxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@xxx</span> xxxxxxxxxxxxx</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>但其实除了第一行和最后一行的 <code>*</code>外，其他行开头的 <code>*</code>并不是必须的。</p>
+<p>有人说带上 <code>*</code>格式更整洁？可读性更高？</p>
+<p>那是不是觉得多行字符串的这种写法也很整洁，可读性更高呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">html</span> <span class="operator">=</span> <span class="string">&quot;&lt;html&gt;\n&quot;</span> +</span><br><span class="line">              <span class="string">&quot;    &lt;body&gt;\n&quot;</span> +</span><br><span class="line">              <span class="string">&quot;        &lt;p&gt;Hello, World!&lt;/p&gt;\n&quot;</span> +</span><br><span class="line">              <span class="string">&quot;    &lt;/body&gt;\n&quot;</span> +</span><br><span class="line">              <span class="string">&quot;&lt;/html&gt;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>有下面的整洁吗？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JDK15开始引入的多行文本表达式</span></span><br><span class="line"><span class="type">String</span> <span class="variable">html</span> <span class="operator">=</span> <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">              &lt;html&gt;</span></span><br><span class="line"><span class="string">                  &lt;body&gt;</span></span><br><span class="line"><span class="string">                      &lt;p&gt;Hello, World!&lt;/p&gt;</span></span><br><span class="line"><span class="string">                  &lt;/body&gt;</span></span><br><span class="line"><span class="string">              &lt;/html&gt;</span></span><br><span class="line"><span class="string">              &quot;&quot;&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+<br>
+
+<hr>
+<br>
+
+
+
+
+
+
+
+<p>完整示例如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.security.MessageDigest;</span><br><span class="line"><span class="keyword">import</span> java.security.NoSuchAlgorithmException;</span><br><span class="line"><span class="keyword">import</span> java.security.SecureRandom;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> 用户账户的基本信息。</span></span><br><span class="line"><span class="comment"> 该类提供了用户账户的基本功能，包括密码加密和存储安全相关的属性。</span></span><br><span class="line"><span class="comment"> 依靠 &#123;<span class="doctag">@link</span> java.security.MessageDigest&#125; 实现</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> <span class="doctag">@author</span> xyhao</span></span><br><span class="line"><span class="comment"> <span class="doctag">@version</span> 1.0</span></span><br><span class="line"><span class="comment"> <span class="doctag">@since</span> 3.2</span></span><br><span class="line"><span class="comment"> <span class="doctag">@see</span> #hashPasswordWithSalt(String,String)</span></span><br><span class="line"><span class="comment"> <span class="doctag">@see</span> java.util.HashMap#size()</span></span><br><span class="line"><span class="comment"> <span class="doctag">@see</span> #salt</span></span><br><span class="line"><span class="comment"> <span class="doctag">@see</span> &lt;a href=&quot;https://baike.baidu.com/item/salt%E5%80%BC/15931315&quot;&gt;百度百科：盐值是什么？&lt;/a&gt;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Account</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     存储用于加密用户密码的盐值。</span></span><br><span class="line"><span class="comment">     &lt;p&gt;</span></span><br><span class="line"><span class="comment">     盐值是一个随机生成的字符串，它被添加到原始密码中以增加哈希算法的安全性。</span></span><br><span class="line"><span class="comment">     通过使用不同的盐值，即使两个用户拥有相同的密码，它们的哈希结果也会不同，</span></span><br><span class="line"><span class="comment">     这样可以有效防止彩虹表攻击等常见的密码破解技术。</span></span><br><span class="line"><span class="comment">     &lt;/p&gt;</span></span><br><span class="line"><span class="comment">     &lt;p&gt;</span></span><br><span class="line"><span class="comment">     在创建新账户或更改密码时会生成一个新的盐值，并且该盐值将与加密后的密码一起存储。</span></span><br><span class="line"><span class="comment">     当验证用户输入的密码时，需要使用相同的盐值重新计算哈希值并与存储的哈希值进行比较。</span></span><br><span class="line"><span class="comment">     &lt;/p&gt;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     <span class="doctag">@see</span> #generateSalt()</span></span><br><span class="line"><span class="comment">     <span class="doctag">@see</span> #encryptPassword(String)</span></span><br><span class="line"><span class="comment">     <span class="doctag">@see</span> &lt;a href=&quot;https://baike.baidu.com/item/salt%E5%80%BC/15931315&quot;&gt;百度百科：盐值是什么？&lt;/a&gt;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String salt;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     存储加密后的密码哈希值。</span></span><br><span class="line"><span class="comment">     &lt;p&gt;</span></span><br><span class="line"><span class="comment">     密码哈希值是通过对用户提供的原始密码和盐值组合后，使用SHA-256算法计算得出的。</span></span><br><span class="line"><span class="comment">     它用于在登录时验证用户输入的密码是否正确。</span></span><br><span class="line"><span class="comment">     &lt;/p&gt;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String passwordHash;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     这个方法的方法名和参数名配合起来非常简洁明了，没啥必要写文本注释</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     <span class="doctag">@param</span> password 用户提供的原始密码。</span></span><br><span class="line"><span class="comment">     <span class="doctag">@return</span> 加密后的密码哈希值。</span></span><br><span class="line"><span class="comment">     <span class="doctag">@see</span> #generateSalt()</span></span><br><span class="line"><span class="comment">     <span class="doctag">@see</span> #hashPasswordWithSalt(String, String)</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">encryptPassword</span><span class="params">(String password)</span> &#123;</span><br><span class="line">        <span class="comment">// 如果没有设置盐值，则生成一个新的盐值</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">this</span>.salt == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="built_in">this</span>.salt = generateSalt();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> hashPasswordWithSalt(password, <span class="built_in">this</span>.salt);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     这个方法的方法名非常简洁明了，没啥必要写文本注释</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     <span class="doctag">@return</span> Base64编码的盐值字符串。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String <span class="title function_">generateSalt</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">SecureRandom</span> <span class="variable">random</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SecureRandom</span>();</span><br><span class="line">        <span class="type">byte</span>[] saltBytes = <span class="keyword">new</span> <span class="title class_">byte</span>[<span class="number">16</span>];</span><br><span class="line">        random.nextBytes(saltBytes);</span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(saltBytes);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     这个方法的方法名和参数名配合起来非常简洁明了，没啥必要写文本注释</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     <span class="doctag">@param</span> password 用户提供的原始密码。</span></span><br><span class="line"><span class="comment">     <span class="doctag">@param</span> salt 盐值字符串。</span></span><br><span class="line"><span class="comment">     <span class="doctag">@return</span> 基于SHA-256算法的哈希结果。</span></span><br><span class="line"><span class="comment">     <span class="doctag">@throws</span> IllegalStateException。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String <span class="title function_">hashPasswordWithSalt</span><span class="params">(String password, String salt)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">MessageDigest</span> <span class="variable">md</span> <span class="operator">=</span> MessageDigest.getInstance(<span class="string">&quot;SHA-256&quot;</span>);</span><br><span class="line">            <span class="comment">// 将盐值和密码组合起来</span></span><br><span class="line">            <span class="type">String</span> <span class="variable">beforeHash</span> <span class="operator">=</span> salt + password;</span><br><span class="line">            <span class="type">byte</span>[] hashedBytes = md.digest(beforeHash.getBytes());</span><br><span class="line">            <span class="comment">// 将字节数组转换为Base64编码的字符串</span></span><br><span class="line">            passwordHash = Base64.getEncoder().encodeToString(hashedBytes);</span><br><span class="line">            <span class="keyword">return</span> passwordHash;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchAlgorithmException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalStateException</span>(<span class="string">&quot;无法找到SHA-256算法&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Account</span> <span class="variable">account</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Account</span>();</span><br><span class="line">        <span class="type">String</span> <span class="variable">encryptedPassword</span> <span class="operator">=</span> account.encryptPassword(<span class="string">&quot;myPassword123&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;Encrypted Password: &quot;</span> + encryptedPassword);</span><br><span class="line">        System.out.println(<span class="string">&quot;Salt: &quot;</span> + account.salt);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="附录：所有-JavaDoc-标签"><a href="#附录：所有-JavaDoc-标签" class="headerlink" title="附录：所有 JavaDoc 标签"></a>附录：所有 JavaDoc 标签</h2><ol>
+<li><code>@author</code><ul>
+<li>描述类或接口的作者。</li>
+</ul>
+</li>
+<li><code>@version</code><ul>
+<li>指定API版本信息。</li>
+</ul>
+</li>
+<li><code>@since</code><ul>
+<li>标识从哪个版本开始引入了该特性。</li>
+</ul>
+</li>
+<li><code>@param</code><ul>
+<li>描述方法参数的信息。</li>
+</ul>
+</li>
+<li><code>@return</code><ul>
+<li>描述方法返回值的信息。</li>
+</ul>
+</li>
+<li><code>@throws</code> &#x2F; <code>@exception</code><ul>
+<li>描述可能抛出的异常。</li>
+</ul>
+</li>
+<li><code>@deprecated</code><ul>
+<li>表示某个类、方法或字段已被弃用，并提供替代方案。</li>
+</ul>
+</li>
+<li><code>@see</code><ul>
+<li>提供指向其他元素的链接，如类、方法或其他资源。</li>
+</ul>
+</li>
+<li><code>&#123;@link&#125;</code> 和 <code>&#123;@linkplain&#125;</code><ul>
+<li>在文本中创建链接到另一个元素，区别在于字体样式（<code>&#123;@link&#125;</code>使用代码字体，而<code>&#123;@linkplain&#125;</code>使用普通字体）。</li>
+</ul>
+</li>
+<li><code>&#123;@docRoot&#125;</code><ul>
+<li>代表生成的文档根目录的相对路径。</li>
+</ul>
+</li>
+<li><code>&#123;@value&#125;</code><ul>
+<li>显示静态字段的值。</li>
+</ul>
+</li>
+<li><code>@serial</code><ul>
+<li>用于序列化字段的说明。</li>
+</ul>
+</li>
+<li><code>@serialField</code><ul>
+<li>用于描述<code>Serializable</code>类中<code>serialPersistentFields</code>成员变量的具体字段。</li>
+</ul>
+</li>
+<li><code>@serialData</code><ul>
+<li>描述由<code>writeObject</code>或<code>readObject</code>方法写入或读取的数据格式。</li>
+</ul>
+</li>
+<li><code>@code</code><ul>
+<li>将一段文本标记为代码样式。</li>
+</ul>
+</li>
+<li><code>@literal</code><ul>
+<li>类似于<code>@code</code>，但不使用等宽字体显示文本。</li>
+</ul>
+</li>
+<li><code>@inheritDoc</code><ul>
+<li>继承父类或接口的文档注释。</li>
+</ul>
+</li>
+<li><code>@hidden</code><ul>
+<li>隐藏特定的成员，使其不出现在生成的文档中。</li>
+</ul>
+</li>
+<li><code>@review</code><ul>
+<li>标记需要审查的部分。</li>
+</ul>
+</li>
+<li><code>&#123;@index&#125;</code><ul>
+<li>为特定术语创建索引条目。</li>
+</ul>
+</li>
+<li><code>@apiNote</code><ul>
+<li>提供关于API使用的额外信息。</li>
+</ul>
+</li>
+<li><code>@implSpec</code><ul>
+<li>描述实现细节，适用于接口默认方法或抽象类中的具体实现。</li>
+</ul>
+</li>
+<li><code>@implNote</code><ul>
+<li>提供关于实现的额外信息。</li>
+</ul>
+</li>
+<li><code>@param &lt;T&gt;</code><ul>
+<li>描述泛型类型参数。</li>
+</ul>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://juziblog.space">xyhao</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://juziblog.space/2025/02/17/2025-02-17-JavaDoc/">http://juziblog.space/2025/02/17/2025-02-17-JavaDoc/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://juziblog.space" target="_blank">xyhao的博客</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/%E8%BD%AF%E4%BB%B6%E5%B7%A5%E7%A8%8B/">软件工程</a></div><div class="post-share"><div class="social-share" data-image="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="prev-post pull-left" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/shell.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">shell的一些简单语法</div></div></a><a class="next-post pull-right" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">浅浅理解Java中的逆变与协变</div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a href="/2024/01/31/2024-01-31-%E7%94%B1%E4%B8%80%E9%81%93%E5%8A%9B%E6%89%A3%E9%A2%98%E5%BC%95%E5%8F%91%E7%9A%84%E5%AF%B9Java%E4%B8%ADHashMap%E7%9A%84%E6%80%9D%E8%80%83/" title="2024-01-31-由一道力扣题引发的对Java中HashMap的思考"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-01-31-Hash.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-31</div><div class="title">2024-01-31-由一道力扣题引发的对Java中HashMap的思考</div></div></a><a href="/2024/02/13/2024-02-13-Java%E7%BA%BF%E7%A8%8B%E5%92%8C%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%8C%BA%E5%88%AB/" title="Java线程和操作系统线程的区别"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-13-Thread.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-13</div><div class="title">Java线程和操作系统线程的区别</div></div></a><a href="/2024/02/16/2024-02-16-volatile/" title="volatile"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-02-16-volatile.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-16</div><div class="title">volatile</div></div></a><a href="/2024/03/09/2024-03-09-ProcessBuilder&Runtime.getRuntime().exec()/" title="Java里两种执行命令的方式比较"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-09-ProcessBuilder.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-09</div><div class="title">Java里两种执行命令的方式比较</div></div></a><a href="/2024/03/24/2024-03-24-%E8%A3%85%E7%AE%B1%E7%B1%BB%E4%B8%8Esynchronized/" title="装箱类"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-03-24-lock.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-03-24</div><div class="title">装箱类</div></div></a><a href="/2024/04/05/2024-04-05-synchronized%E5%BA%95%E5%B1%82/" title="synchronized底层"><img class="cover" src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/2024-04-05-synchronized.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-05</div><div class="title">synchronized底层</div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info is-center"><div class="avatar-img"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">xyhao</div><div class="author-info-description">软件工程专业2025届本科毕业生，Java服务端开发方向</br>工作经历：</br>2025年6月-至今 拼多多-Java开发</br></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">42</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">28</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">23</div></a></div><a id="card-info-btn" target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/Juzi-xyhao"><i class="fab fa-github"></i><span>GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Juzi-xyhao" rel="external nofollow noreferrer" target="_blank" title="Github"><i class="fab fa-github" style="color: #hdhfbb;"></i></a><a class="social-icon" href="mailto:xyhaomail@163.com" rel="external nofollow noreferrer" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #000000;"></i></a><a class="social-icon" href="https://space.bilibili.com" rel="external nofollow noreferrer" target="_blank" title="Bilibili"><i class="fas fa-tv"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">未来的一些更新：</br> YouTube视频：System Design Interview 笔记 </br> && DDIA（数据密集型应用系统设计）笔记</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E5%90%8D-JavaDoc"><span class="toc-number">1.</span> <span class="toc-text">类名 JavaDoc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%90%8D-JavaDoc"><span class="toc-number">2.</span> <span class="toc-text">方法名 JavaDoc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F-JavaDoc"><span class="toc-number">3.</span> <span class="toc-text">成员变量 JavaDoc</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%9C%A8-JavaDoc-%E4%B8%AD%E5%BC%95%E7%94%A8%E6%96%B9%E6%B3%95%E3%80%81%E7%B1%BB%E3%80%81%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F%E3%80%81URL%EF%BC%9F"><span class="toc-number">4.</span> <span class="toc-text">如何在 JavaDoc 中引用方法、类、成员变量、URL？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%99%84%E5%BD%95%EF%BC%9A%E6%89%80%E6%9C%89-JavaDoc-%E6%A0%87%E7%AD%BE"><span class="toc-number">5.</span> <span class="toc-text">附录：所有 JavaDoc 标签</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/前缀树.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="性能优化：字符串替换研究"/></a><div class="content"><a class="title" href="/2025/05/14/2025-05-14-%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%EF%BC%9A%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%9B%BF%E6%8D%A2%E7%A0%94%E7%A9%B6/" title="性能优化：字符串替换研究">性能优化：字符串替换研究</a><time datetime="2025-05-14T11:00:00.000Z" title="发表于 2025-05-14 11:00:00">2025-05-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/Linux.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="常用的Linux命令"/></a><div class="content"><a class="title" href="/2025/03/21/2025-03-21-%E5%B8%B8%E7%94%A8%E7%9A%84linux%E5%91%BD%E4%BB%A4/" title="常用的Linux命令">常用的Linux命令</a><time datetime="2025-03-21T11:00:00.000Z" title="发表于 2025-03-21 11:00:00">2025-03-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/shell.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="shell的一些简单语法"/></a><div class="content"><a class="title" href="/2025/03/20/2025-03-20-shell%E7%9A%84%E4%B8%80%E4%BA%9B%E7%AE%80%E5%8D%95%E8%AF%AD%E6%B3%95/" title="shell的一些简单语法">shell的一些简单语法</a><time datetime="2025-03-20T11:00:00.000Z" title="发表于 2025-03-20 11:00:00">2025-03-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="JavaDoc"/></a><div class="content"><a class="title" href="/2025/02/17/2025-02-17-JavaDoc/" title="JavaDoc">JavaDoc</a><time datetime="2025-02-17T12:00:00.000Z" title="发表于 2025-02-17 12:00:00">2025-02-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变"><img src="https://gitee.com/xyhaooo/picrepo/raw/master/articleCover/java.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="浅浅理解Java中的逆变与协变"/></a><div class="content"><a class="title" href="/2025/02/16/2025-02-16-%E6%B5%85%E6%B5%85%E7%90%86%E8%A7%A3Java%E4%B8%AD%E7%9A%84%E9%80%86%E5%8F%98%E4%B8%8E%E5%8D%8F%E5%8F%98/" title="浅浅理解Java中的逆变与协变">浅浅理解Java中的逆变与协变</a><time datetime="2025-02-16T12:00:00.000Z" title="发表于 2025-02-16 12:00:00">2025-02-16</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By xyhao</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener external nofollow noreferrer" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text"><p><a style="margin-inline:5px" target="_blank" href="https://hexo.io/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo"></a><a style="margin-inline:5px" target="_blank" href="https://butterfly.js.org/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly"></a><a style="margin-inline:5px" target="_blank" href="https://github.com/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Gtihub托管"></a><a style="margin-inline:5px" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow noreferrer"><img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可"></a></p></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://unpkg.com/@fancyapps/ui/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page/instantpage.js" type="module"></script><div class="js-pjax"></div><div class="aplayer no-destroy" data-id="7509532357" data-server="netease" data-type="playlist" data-fixed="true" data-autoplay="false" data-order="random"> </div><script>(function(a,h,g,f,e,d,c,b){b=function(){d=h.createElement(g);c=h.getElementsByTagName(g)[0];d.src=e;d.charset="utf-8";d.async=1;c.parentNode.insertBefore(d,c)};a["SeniverseWeatherWidgetObject"]=f;a[f]||(a[f]=function(){(a[f].q=a[f].q||[]).push(arguments)});a[f].l=+new Date();if(a.attachEvent){a.attachEvent("onload",b)}else{a.addEventListener("load",b,false)}}(window,document,"script","SeniverseWeatherWidget","//cdn.sencdn.com/widget2/static/js/bundle.js?t="+parseInt((new Date().getTime()/100000000).toString(),10)));window.SeniverseWeatherWidget('show',{flavor:"slim",location:"WWMKWU0KKVZP",geolocation:true,language:"zh-Hans",unit:"c",theme:"auto",token:"be6ff036-8674-43e7-8f27-8716c37b157b",hover:"disabled",container:"tp-weather-widget"});</script><script>(() => {
+  const option = null
+  const config = {"site_uv":false,"site_pv":false,"page_pv":false,"token":"GIavIQd5ls6rab5DTfY42p1VRA4DfPQo"}
+
+  const runTrack = () => {
+    umami.track(props => ({ ...props, url: window.location.pathname, title: GLOBAL_CONFIG_SITE.title }))
+  }
+
+  const loadUmamiJS = () => {
+    btf.getScript('https://cloud.umami.is/script.js', {
+      'data-website-id': '5b9ef408-bff2-4b30-8d1e-28cb3c95721a',
+      'data-auto-track': 'false',
+      ...option
+    }).then(runTrack)
+  }
+
+  const getData = async (isPost) => {
+    const now = Date.now()
+    const keyUrl = isPost ? `&url=${window.location.pathname}` : ''
+    const headerList = { 'Accept': 'application/json' }
+    if (false) headerList['Authorization'] = `Bearer ${config.token}`
+    else headerList['x-umami-api-key'] = config.token
+    const res = await fetch(`https://api.umami.is/v1/websites/5b9ef408-bff2-4b30-8d1e-28cb3c95721a/stats?startAt=0000000000&endAt=${now}${keyUrl}`, {
+      method: "GET",
+      headers: headerList
+    })
+    return await res.json()
+  }
+
+  const insertData = async () => {
+    try {
+      if (GLOBAL_CONFIG_SITE.isPost && config.page_pv) {
+        const pagePV = document.getElementById('umamiPV')
+        if (pagePV) {
+          const data = await getData(true)
+          pagePV.textContent = data.pageviews.value
+        }
+      } else {
+        const data = (config.site_uv || config.site_pv) && await getData()
+        if (config.site_uv) {
+          const siteUV = document.getElementById('umami-site-uv')
+          if (siteUV) siteUV.textContent = data.visitors.value
+        }
+        if (config.site_pv) {
+          const sitePV = document.getElementById('umami-site-pv')
+          if (sitePV) sitePV.textContent = data.pageviews.value
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load Umami Analytics:', e)
+    }
+  }
+
+  btf.addGlobalFn('pjaxComplete', runTrack, 'umami_analytics_run_track')
+  btf.addGlobalFn('pjaxComplete', insertData, 'umami_analytics_insert')
+
+  loadUmamiJS()
+  insertData()
+})()</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="search" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '30');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '200ms');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('flink-list-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('article-sort-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__slideInRight');
+    arr[i].setAttribute('data-wow-duration', '1.5s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__flipInY');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script><script async="async">var arr = document.getElementsByClassName('site-card');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__animated');
+    arr[i].setAttribute('data-wow-duration', '3s');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://cdn.cbd.int/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>
